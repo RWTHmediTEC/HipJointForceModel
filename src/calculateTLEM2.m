@@ -1,4 +1,4 @@
-function [rMag, rMagP, rPhi, rTheta] = calculateTLEM2(LE, BW, HRC, Side)
+function [rMag, rMagP, rPhi, rTheta, rDir] = calculateTLEM2(LE, BW, HRC, Side)
 % Calculate the hip joint reaction force according to Iglic 1990
 
 %% Active Muscles
@@ -123,10 +123,10 @@ eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
 
 hipJointForce = solve(eq1, eq2, eq3, eq4); % , eq5, eq6
 
-rX = double(hipJointForce.rX)
-rY = double(hipJointForce.rY)
-rZ = double(hipJointForce.rZ)
-fa = double(hipJointForce.fa)
+rX = double(hipJointForce.rX);
+rY = double(hipJointForce.rY);
+rZ = double(hipJointForce.rZ);
+fa = double(hipJointForce.fa);
 % ft = double(hipJointForce.ft)
 % fp = double(hipJointForce.fp)
 
@@ -134,5 +134,6 @@ rMag = norm([rX rY rZ]);        % Magnitude of hip joint reaction force in [N]
 rMagP = rMag / abs(wb) * 100;   % Magnitude of hip joint reaction force in [BW%]
 rPhi = -atand(rZ / rY);         % Angle in frontal plane
 rTheta = -atand(rX / rY);       % Angle in sagital plane
+rDir=normalizeVector3d([rX rY rZ]);
 
 end

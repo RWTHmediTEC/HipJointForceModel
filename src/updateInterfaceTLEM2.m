@@ -32,71 +32,29 @@ function updateVisualization()
 end
 %-------------------------------------------------------------------------%
 function updateResults
-    % Adjust force arrows
+    % Plot HJF vector
     if gui.IsUpdated == true
         
-        % Frontal Arrow
+        % In frontal view
         delete(gui.FV_Axis.Children);
-        imagesc(gui.FV_Axis,imread('front_hrc.png'));
+        visualizeTLEM2(data.LE, data.MuscleList, gui.FV_Axis, ...
+            'Bones', 1, 'Joints', false, 'Muscles', false);
+        gui.FV_Axis.View = [90, 0];
+        gui.FV_Axis.CameraUpVector = [0, 1, 0];
         
-        % Coordinates of the arrow
-        if data.Side == 'L'
-            xS = 569;
-        else 
-            xS = 188;
-        end
-        
-        xStart = xS - 100 * sind(data.rPhi);
-        yStart = 379 + 100 * cosd(data.rPhi);
-        Start = [xStart yStart];
-        xStop = xS;
-        yStop = 379;
-        Stop = [xStop yStop];
+        quiver3D(gui.FV_Axis, -data.rDir*40, data.rDir*40, 'r')
             
-        gui.FrontalArrow = arrow(Start, Stop,...
-                                    'Color', 'b',...
-                                    'LineWidth', 2,...
-                                    'Length',10000);
-            
-        set(gui.FrontalArrow, 'Parent', gui.FV_Axis);              
-        set(gui.FV_Axis,...
-                'PlotBoxAspectRatioMode', 'manual',...
-                'PlotBoxAspectRatio', [746 593 1],...
-                'XTick', [],...
-                'YTick', [],...    
-                'Ydir','reverse');
-            
-        % Sagittal Arrow
+        % In lateral view
         delete(gui.SV_Axis.Children);
-        imagesc(gui.SV_Axis,imread('right_hrc.png'));
-
-        % Coordinates of the arrow
-        xStart = 268 + 100 * sind(data.rTheta);
-        yStart = 379 + 100 * cosd(data.rTheta);
-        Start = [xStart yStart];
-        xStop = 268;
-        yStop = 379;
-        Stop = [xStop yStop];
-            
-        gui.SagittalArrow = arrow(Start, Stop,...
-                                    'Color', 'b',...
-                                    'LineWidth', 2,...
-                                    'Length',10000);
-            
-        set(gui.SagittalArrow, 'Parent', gui.SV_Axis);
-        
-        if data.Side == 'L'
-            set(gui.SV_Axis, 'XDir', 'reverse');
-        else
-            set(gui.SV_Axis, 'XDir', 'normal');
+        visualizeTLEM2(data.LE, data.MuscleList, gui.SV_Axis, ...
+            'Bones', 1, 'Joints', false, 'Muscles', false);
+        switch data.Side
+            case 'L'
+                gui.SV_Axis.View = [0, -90];
         end
-            
-        set(gui.SV_Axis,...
-                'PlotBoxAspectRatioMode', 'manual',...
-                'PlotBoxAspectRatio', [436 593 1],...
-                'XTick', [],...
-                'YTick', [],...
-                'Ydir','reverse');
+        gui.SV_Axis.CameraUpVector = [0, 1, 0];
+        
+        quiver3D(gui.SV_Axis, -data.rDir*40, data.rDir*40, 'r')
      end
                 
      if gui.IsUpdated == true
