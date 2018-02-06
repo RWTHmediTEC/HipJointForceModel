@@ -1,9 +1,11 @@
 function funcHandles = OneLegStance_IglicEggert
 
 funcHandles.Position = @Position;
+funcHandles.Muscles = @Muscles;
 funcHandles.Calculation = @Calculation;
 
 end
+
 
 %% Calculate the joint angles for positioning of the TLEM2
 function jointAngles = Position(data)
@@ -19,41 +21,31 @@ ny = asind(b/FL);
 jointAngles = {[0.5 0 -PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
 end
 
-% Calculate the HJF
-function [rMag, rMagP, rPhi, rTheta, rDir] = Calculation(data)
-
-% Inputs
-LE=data.LE;
-muscleList=data.MuscleList;
-BW=data.BW;
-HRC=data.HRC;
-Side=data.Side;
-
+function activeMuscles = Muscles()
 %% Active Muscles
 % Muscle elements required for Iglic including unknown average muscle tension f
-
-activeMusclesIglic = {'GluteusMediusAnterior1',   'fa';
-                      'GluteusMediusAnterior2',   'fa';
-                      'GluteusMediusAnterior3',   'fa';
-                      'GluteusMediusAnterior4',   'fa';
-                      'GluteusMediusAnterior5',   'fa';
-                      'GluteusMediusAnterior6',   'fa';
-                      'GluteusMediusPosterior1',  'fa';
-                      'GluteusMediusPosterior2',  'fa';
-                      'GluteusMediusPosterior3',  'fa';
-                      'GluteusMediusPosterior4',  'fa';
-                      'GluteusMediusPosterior5',  'fa';
-                      'GluteusMediusPosterior6',  'fa';
-                      'GluteusMinimusAnterior1',  'fa';
-                      'GluteusMinimusAnterior2',  'fa';
-                      'TensorFasciaeLatae1',      'fa';
-                      'TensorFasciaeLatae2',      'fa';
-                      'RectusFemoris1',           'fa';
-                      'RectusFemoris2',           'fa';
-                      'GluteusMinimusMid1',       'fa';
-                      'GluteusMinimusMid2',       'fa';
-                      'GluteusMinimusPosterior1', 'fa';
-                      'GluteusMinimusPosterior2', 'fa';};
+activeMuscles =  {'GluteusMediusAnterior1',   'fa';
+                  'GluteusMediusAnterior2',   'fa';
+                  'GluteusMediusAnterior3',   'fa';
+                  'GluteusMediusAnterior4',   'fa';
+                  'GluteusMediusAnterior5',   'fa';
+                  'GluteusMediusAnterior6',   'fa';
+                  'GluteusMediusPosterior1',  'fa';
+                  'GluteusMediusPosterior2',  'fa';
+                  'GluteusMediusPosterior3',  'fa';
+                  'GluteusMediusPosterior4',  'fa';
+                  'GluteusMediusPosterior5',  'fa';
+                  'GluteusMediusPosterior6',  'fa';
+                  'GluteusMinimusAnterior1',  'fa';
+                  'GluteusMinimusAnterior2',  'fa';
+                  'TensorFasciaeLatae1',      'fa';
+                  'TensorFasciaeLatae2',      'fa';
+                  'RectusFemoris1',           'fa';
+                  'RectusFemoris2',           'fa';
+                  'GluteusMinimusMid1',       'fa';
+                  'GluteusMinimusMid2',       'fa';
+                  'GluteusMinimusPosterior1', 'fa';
+                  'GluteusMinimusPosterior2', 'fa';};
                   
 %                       'GluteusMinimusAnterior1',  'fa';
 %                       'GluteusMinimusAnterior2',  'fa';
@@ -72,12 +64,24 @@ activeMusclesIglic = {'GluteusMediusAnterior1',   'fa';
 %                       'GluteusMinimusPosterior1', 'fa';
 %                       'GluteusMinimusPosterior2', 'fa';
 %                       'Piriformis1',              'fa';
-%                       'GluteusMaximusSuperior1',    'fa';
-%                       'GluteusMaximusSuperior2',    'fa';
-%                       'GluteusMaximusSuperior3',    'fa';
-%                       'GluteusMaximusSuperior4',    'fa';
-%                       'GluteusMaximusSuperior5',    'fa';
-%                       'GluteusMaximusSuperior6',    'fa'
+%                       'GluteusMaximusSuperior1',  'fa';
+%                       'GluteusMaximusSuperior2',  'fa';
+%                       'GluteusMaximusSuperior3',  'fa';
+%                       'GluteusMaximusSuperior4',  'fa';
+%                       'GluteusMaximusSuperior5',  'fa';
+%                       'GluteusMaximusSuperior6',  'fa';
+end
+
+%% Calculation of the HJF
+function [rMag, rMagP, rPhi, rTheta, rDir] = Calculation(data)
+
+% Inputs
+LE=data.LE;
+muscleList=data.MuscleList;
+BW=data.BW;
+HRC=data.HRC;
+activeMuscles=data.activeMuscles;
+Side=data.Side;
                                  
 %% Define Parameters
 G = -9.81;                              % Weight force
@@ -94,7 +98,7 @@ a = (wb * ca - wl * ba) / (wb - wl);    % Lever arm of the force w's attachment 
 % and Physiological Cross-Sectional Areas (PCSA)
 
 % Number of active Muscles
-NoaM = length(activeMusclesIglic);
+NoaM = length(activeMuscles);
 
 % Get MOPs and MIPs
 MOP=zeros(NoaM,3);
@@ -103,11 +107,11 @@ for m = 1:NoaM
     for b = 1:length(LE)
         if ~isempty(LE(b).Muscle)
             muscles = fieldnames(LE(b).Muscle);
-            if any(strcmp(muscles,activeMusclesIglic(m,1)))
-                if strcmp(LE(b).Muscle.(activeMusclesIglic{m}).Type, 'Origin')
-                    MOP(m,:) = LE(b).Muscle.(activeMusclesIglic{m}).Pos;                        
+            if any(strcmp(muscles,activeMuscles(m,1)))
+                if strcmp(LE(b).Muscle.(activeMuscles{m}).Type, 'Origin')
+                    MOP(m,:) = LE(b).Muscle.(activeMuscles{m}).Pos;                        
                 else
-                    MIP(m,:) = LE(b).Muscle.(activeMusclesIglic{m}).Pos;
+                    MIP(m,:) = LE(b).Muscle.(activeMuscles{m}).Pos;
                 end
             end
         end
@@ -118,21 +122,21 @@ PCSA=zeros(NoaM,1);
 % Get PCSAs
 for m = 1:NoaM
     % PCSA of each fascicle
-    PCSA_Idx = strcmp(activeMusclesIglic{m}(1:end-1), muscleList(:,1));
+    PCSA_Idx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
     PCSA(m)=muscleList{PCSA_Idx,5}/muscleList{PCSA_Idx,4};
 end
 
 % Unit vectors s in the direction of the muscles
 s=normalizeVector3d(MIP - MOP);
 % Iglic 1990 equation 2
-muscleForce = PCSA .* cell2sym(activeMusclesIglic(:,2)) .* s; 
+muscleForce = PCSA .* cell2sym(activeMuscles(:,2)) .* s; 
 % Moment of muscleForce around HRC
 momentF = cross(MOP,muscleForce);
 % for m = 1:length(MOP)
     % Unit vector s_m in the direction of the m-th muscle
 %     s(m,:) = (MIP(m,:) - MOP(m,:)) / norm(MIP(m,:) - MOP(m,:));
     % Iglic 1990 equation 2
-%     muscleForce(m,:) = PCSA(m) * cell2sym(activeMusclesIglic(m,2)) .* s(m,:);
+%     muscleForce(m,:) = PCSA(m) * cell2sym(activeMuscles(m,2)) .* s(m,:);
     % Moment of muscleForce around HRC
 %     momentF(m,:) = cross(MOP(m,:),muscleForce(m,:));
 % end

@@ -1,5 +1,4 @@
-TODO
-1. Visualize only muscles used by the model
+TODO:
 
 
 TOTEST:

@@ -5,7 +5,7 @@ p = inputParser;
 valFctBones=@(x) validateattributes(x,{'numeric'},{'>=',1,'<=',length(LE)});
 addParameter(p,'Bones',length(LE),valFctBones);
 addParameter(p,'Joints',false,@islogical);
-addParameter(p,'Muscles',true,@islogical);
+addParameter(p,'Muscles',{},@iscell);
 parse(p,varargin{:});
 
 NoB = p.Results.Bones;
@@ -54,7 +54,7 @@ if visJoints
 end
 
 % Visualize muscles
-if visMuscles
+if ~isempty(visMuscles)
     lineProps.Marker = 'o';
     lineProps.MarkerSize = 2;
     % Loop over bones with muscles
@@ -66,7 +66,7 @@ if visMuscles
             Via = [];
             % Check if the muscle originates from this bone
             oIdx = strcmp(LE(b).Muscle.(Muscles{m}).Type, 'Origin');
-            if any(oIdx)
+            if any(oIdx) && ismember(Muscles{m}, visMuscles)
                 Origin = LE(b).Muscle.(Muscles{m}).Pos(oIdx,:);
                 % Check if there are Via points on the bone of Origin
                 vIdx = strcmp(LE(b).Muscle.(Muscles{m}).Type, 'Via');

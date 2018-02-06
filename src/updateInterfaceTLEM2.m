@@ -27,7 +27,7 @@ end
 function updateVisualization()
     if gui.IsUpdated == true           
         delete(gui.Axis_Vis.Children);
-        visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis);
+        visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis, 'Muscles', data.activeMuscles);
     end
 end
 %-------------------------------------------------------------------------%
@@ -38,7 +38,7 @@ function updateResults
         % In frontal view
         delete(gui.FV_Axis.Children);
         visualizeTLEM2(data.LE, data.MuscleList, gui.FV_Axis, ...
-            'Bones', 1, 'Joints', false, 'Muscles', false);
+            'Bones', 1, 'Joints', false, 'Muscles', {});
         gui.FV_Axis.View = [90, 0];
         gui.FV_Axis.CameraUpVector = [0, 1, 0];
         
@@ -47,16 +47,16 @@ function updateResults
         % In lateral view
         delete(gui.SV_Axis.Children);
         visualizeTLEM2(data.LE, data.MuscleList, gui.SV_Axis, ...
-            'Bones', 1, 'Joints', false, 'Muscles', false);
+            'Bones', 1, 'Joints', false, 'Muscles', {});
         switch data.Side
+            case 'R'
+                gui.SV_Axis.View = [0, 90];
             case 'L'
                 gui.SV_Axis.View = [0, -90];
         end
         gui.SV_Axis.CameraUpVector = [0, 1, 0];
         
         quiver3D(gui.SV_Axis, -data.rDir*40, data.rDir*40, 'r')
-        
-        drawnow
      end
      
      if gui.IsUpdated

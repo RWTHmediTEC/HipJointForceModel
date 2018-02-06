@@ -146,7 +146,7 @@ gui.Label_SFW = uicontrol('Parent', gui.Panel_SFW,...
 
 %% Model Panel
 gui.Panel_Model = uix.BoxPanel('Parent', gui.Layout_Main_V_Right,...
-    'Title', 'Considered Muscles',...
+    'Title', 'Models',...
     'FontWeight', 'bold');
 
 gui.Layout_Muscle = uix.HBox('Parent', gui.Panel_Model,...
@@ -171,11 +171,19 @@ gui.ListBox_Posture = uicontrol( 'Style', 'list', ...
 gui.Panel_MuscleList = uix.Panel('Parent', gui.Layout_Muscle,...
     'Title', 'Muscle List');
 
+calculateTLEM2=str2func(data.Model);
+modelHandles=calculateTLEM2();
+data.activeMuscles = modelHandles.Muscles();
+% Get the indices of the muscles used in the current model
+mListValues = find(ismember(data.MuscleList(:,1), unique(cellfun(@(x) ...
+    regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
 gui.ListBox_MuscleList = uicontrol( 'Style', 'list', ...
     'BackgroundColor', 'w', ...
     'Parent', gui.Panel_MuscleList, ...
     'String', data.MuscleList(:,1),...
-    'Value', 1);
+    'Min', 1, ...
+    'Max', length(data.MuscleList),...
+    'Value', mListValues);
 
 %% Visualization Panel
 gui.Panel_Vis = uix.BoxPanel('Parent', gui.Layout_Main_V_Mid,...
@@ -204,7 +212,7 @@ set(gui.Label_SPD, 'String', data.SPD);
 set(gui.Label_SFL, 'String', data.SFL);
 set(gui.Label_SFW, 'String', data.SFW);
 data = globalizeTLEM2(data);
-visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis);
+visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis, 'Muscles', data.activeMuscles);
 
 gui.Axis_Vis.View = [90, 0];
 gui.Axis_Vis.CameraUpVector = [0, 1, 0];
@@ -257,7 +265,7 @@ gui.Layout_Res_HB = uix.HBox('Parent', gui.Layout_Res_V, 'Spacing', 3);
 gui.Panel_FV = uix.Panel('Parent', gui.Layout_Res_HT,'Title', 'Frontal View');
 gui.FV_Axis = axes(gui.Panel_FV);
 visualizeTLEM2(data.LE, data.MuscleList, gui.FV_Axis, ...
-    'Bones', 1, 'Joints', false, 'Muscles', false);
+    'Bones', 1, 'Joints', false, 'Muscles', {});
 gui.FV_Axis.View = [90, 0];
 gui.FV_Axis.CameraUpVector = [0, 1, 0];
 
@@ -265,8 +273,10 @@ gui.FV_Axis.CameraUpVector = [0, 1, 0];
 gui.Panel_SV = uix.Panel('Parent', gui.Layout_Res_HT,'Title', 'Sagittal View');
 gui.SV_Axis = axes(gui.Panel_SV);
 visualizeTLEM2(data.LE, data.MuscleList, gui.SV_Axis, ...
-    'Bones', 1, 'Joints', false, 'Muscles', false);
+    'Bones', 1, 'Joints', false, 'Muscles', {});
 switch data.Side
+    case 'R'
+        gui.SV_Axis.View = [0, 90];
     case 'L'
         gui.SV_Axis.View = [0, -90];
 end
@@ -474,6 +484,7 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
             
             load('TLEM2', 'LE', 'muscleList')
             data.LE = LE;
+            data.Side = Subjects{p}(end);
             
             [data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW, data.BW, data.rMagPo] =...
                 validateTLEM2(Subjects{p});
@@ -494,8 +505,6 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
             set(gui.Label_SFW, 'String', data.SFW);
             
             % Use the selected model to calculate the
-            calculateTLEM2=str2func(data.Model);
-            modelHandles=calculateTLEM2();
             data = globalizeTLEM2(data);
             [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rDir] = modelHandles.Calculation(data);
             
@@ -528,6 +537,7 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
             
             gui.IsUpdated = true;
             updateInterfaceTLEM2(data, gui);
+            drawnow
         end
     end
 end
