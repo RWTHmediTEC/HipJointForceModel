@@ -1,5 +1,32 @@
-function [rMag, rMagP, rPhi, rTheta, rDir] = calculateTLEM2(LE, BW, HRC, Side)
-% Calculate the hip joint reaction force according to Iglic 1990
+function funcHandles = OneLegStance_IglicEggert
+
+funcHandles.Position = @Position;
+funcHandles.Calculation = @Calculation;
+
+end
+
+%% Calculate the joint angles for positioning of the TLEM2
+function jointAngles = Position(data)
+
+% Inputs
+HRC=data.HRC;
+FL=data.FL;
+PelvicTilt=data.PelvicTilt;
+
+% Calculate the joint angles
+b = 0.48 * HRC/2;
+ny = asind(b/FL);
+jointAngles = {[0.5 0 -PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
+end
+
+% Calculate the HJF
+function [rMag, rMagP, rPhi, rTheta, rDir] = Calculation(data)
+
+% Inputs
+LE=data.LE;
+BW=data.BW;
+HRC=data.HRC;
+Side=data.Side;
 
 %% Active Muscles
 % Muscle elements required for Iglic including unknown average muscle tension f
@@ -100,9 +127,12 @@ for m = 1:length(activeMusclesIglic)
 end
 
 for m = 1:length(mop)
-    s(m,:) = (mip(m,:) - mop(m,:)) / norm(mip(m,:) - mop(m,:));                 % Unit vector s_n in the direction of the n-th muscle
-    muscleForce(m,:) = PCSA(m) * cell2sym(activeMusclesIglic(m,2)) .* s(m,:);   % Iglic 1990 equation 2
-    momentF(m,:) = cross(mop(m,:),muscleForce(m,:));                            % Moment of muscleForce around HRC
+    % Unit vector s_n in the direction of the n-th muscle
+    s(m,:) = (mip(m,:) - mop(m,:)) / norm(mip(m,:) - mop(m,:));
+    % Iglic 1990 equation 2
+    muscleForce(m,:) = PCSA(m) * cell2sym(activeMusclesIglic(m,2)) .* s(m,:);
+    % Moment of muscleForce around HRC
+    momentF(m,:) = cross(mop(m,:),muscleForce(m,:));
 end
 
 if Side == 'L'
@@ -111,11 +141,11 @@ else
     momentW = cross([0 0 -a],w); % Moment of bodyweight force around HRC
 end
 
-syms rX rY rZ % Hip joint forces
+syms rXsym rYsym rZsym % Hip joint forces
 
-eq1 =  sum(muscleForce(:,1)) + rX + w(1); % Iglic 1990 equation 4 for X-component
-eq2 =  sum(muscleForce(:,2)) + rY + w(2); % Iglic 1990 equation 4 for Y-component
-eq3 =  sum(muscleForce(:,3)) + rZ + w(3); % Iglic 1990 equation 4 for Z-component
+eq1 =  sum(muscleForce(:,1)) + rXsym + w(1); % Iglic 1990 equation 4 for X-component
+eq2 =  sum(muscleForce(:,2)) + rYsym + w(2); % Iglic 1990 equation 4 for Y-component
+eq3 =  sum(muscleForce(:,3)) + rZsym + w(3); % Iglic 1990 equation 4 for Z-component
 
 eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
 % eq5 = sum(momentF(:,2)) + momentW(2); % Iglic 1990 equation 5 for Y-component
@@ -123,10 +153,10 @@ eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
 
 hipJointForce = solve(eq1, eq2, eq3, eq4); % , eq5, eq6
 
-rX = double(hipJointForce.rX);
-rY = double(hipJointForce.rY);
-rZ = double(hipJointForce.rZ);
-fa = double(hipJointForce.fa);
+rX = double(hipJointForce.rXsym);
+rY = double(hipJointForce.rYsym);
+rZ = double(hipJointForce.rZsym);
+% fa = double(hipJointForce.fa);
 % ft = double(hipJointForce.ft)
 % fp = double(hipJointForce.fp)
 

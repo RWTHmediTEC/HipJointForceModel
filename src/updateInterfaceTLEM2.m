@@ -5,7 +5,7 @@ updateVisualization();
 updateResults();
 
 % Disable push button
-if gui.IsUpdated == true
+if gui.IsUpdated
     set(gui.PushButton_RC, 'BackgroundColor', 'g', 'Enable', 'off');
 else 
     set(gui.PushButton_RC, 'BackgroundColor', 'y', 'Enable', 'on');
@@ -33,7 +33,7 @@ end
 %-------------------------------------------------------------------------%
 function updateResults
     % Plot HJF vector
-    if gui.IsUpdated == true
+    if gui.IsUpdated
         
         % In frontal view
         delete(gui.FV_Axis.Children);
@@ -55,9 +55,11 @@ function updateResults
         gui.SV_Axis.CameraUpVector = [0, 1, 0];
         
         quiver3D(gui.SV_Axis, -data.rDir*40, data.rDir*40, 'r')
+        
+        drawnow
      end
-                
-     if gui.IsUpdated == true
+     
+     if gui.IsUpdated
          set(gui.Label_FM, 'String', data.rMag);
          set(gui.Label_FMP, 'String', data.rMagP);
          if data.Side == 'L'
@@ -66,6 +68,7 @@ function updateResults
          set(gui.Label_FA, 'String', data.rPhi);
          set(gui.Label_SA, 'String', data.rTheta);
      end
+     
 end
 %-------------------------------------------------------------------------%
 end

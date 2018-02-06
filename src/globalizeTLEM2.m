@@ -1,10 +1,6 @@
-function LE = globalizeTLEM2(LE, Stance, Side, PelvicTilt, HRC, FL)
-% Transformation of TLEM 2.0 data into a global coordinate system considering
-% selected stance:
-% Two-legged stance:    phi = hip rotation around x-axis
-% One-legged stance:    phi = hip rotation around x-axis 
-%                       ny  = femoral rotation around x-axis
-% further stances can be added
+function data = globalizeTLEM2(data)
+% Transformation of TLEM2 data into a global coordinate system
+LE=data.LE;
 
 %% Transformations from Local to Global Coordinate System
 NoB = length(LE);
@@ -25,28 +21,24 @@ end
 
 LE = transformTLEM2(LE, transTFM);
 
-%% Add Rotation
-switch Stance
-    case 1 % Two-legged Stance
-        jointAngles = {[-PelvicTilt 0 0], [0 0 0], 0, 0, 0, 0}; % in degree
-        
-    case 2 % One-legged Stance
-        b = 0.48 * HRC/2;
-        ny = asind(b/FL);
-        jointAngles = {[(-PelvicTilt+0.5) 0 0], [ny 0 0], 0, 0, -ny, 0}; % in degree
-        
-    case 3 % Sitting stance just as an example for further additions
-        jointAngles = {[-PelvicTilt 0 0], [0 0 75], 75, 75, 0, 0}; % in degree
-end
+%% Position TLEM2 according to the model
+calculateTLEM2=str2func(data.Model);
+modelHandles=calculateTLEM2();
+jointAngles = modelHandles.Position(data);
+% Sitting stance just as an example for further additions
+% jointAngles = {[0 0 -PelvicTilt], [0 0 75], 75, 75, 0, 0}; % in degree
 
 LE = positionTLEM2(LE, jointAngles);
 
-%% Side Selection
-if Side == 'L'
-mirrorTFM      = eye(4); 
-mirrorTFM(3,3) = -1;
-mirrorTFM      = repmat(mirrorTFM, 1, 1, length(LE));
-LE = transformTLEM2(LE, mirrorTFM);
+%% Mirror TLEM2 for the left side
+switch data.Side
+    case 'L'
+        mirrorTFM      = eye(4);
+        mirrorTFM(3,3) = -1;
+        mirrorTFM      = repmat(mirrorTFM, 1, 1, length(LE));
+        LE = transformTLEM2(LE, mirrorTFM);
 end
+
+data.LE=LE;
 
 end

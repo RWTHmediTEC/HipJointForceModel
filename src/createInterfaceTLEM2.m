@@ -1,6 +1,6 @@
 function gui = createInterfaceTLEM2(data)
-% Creation of the GUI
 
+% Creation of the GUI
 gui.Window = figure(...
     'Name', 'Hip Joint Reaction Force Model',...
     'NumberTitle', 'off',...
@@ -41,7 +41,7 @@ gui.RadioButton_Right = uicontrol('Parent', gui.RadioButtonBox_Side,...
     'Style', 'radiobutton',...
     'String', 'Right',...
     'Callback', @onRightSide);
-    
+
 % Panel Bodyweight
 gui.Panel_BW = uix.Panel('Parent', gui.Layout_PSP,...
     'Title', 'Bodyweight [kg]');
@@ -70,13 +70,13 @@ gui.EditText_HRC = uicontrol('Parent', gui.Panel_HRC,...
 
 % Scaling Parameters
 gui.Layout_SP = uix.HBox('Parent', gui.Layout_PSP,...
-     'Spacing', 3);
- 
+    'Spacing', 3);
+
 gui.Layout_P = uix.VBox('Parent', gui.Layout_SP,...
-     'Spacing', 3);
- 
+    'Spacing', 3);
+
 gui.Layout_S = uix.VBox('Parent', gui.Layout_SP,...
-     'Spacing', 3);
+    'Spacing', 3);
 
 % Panel Pelvic Width
 gui.Panel_PW = uix.Panel('Parent', gui.Layout_P,...
@@ -144,8 +144,40 @@ gui.Panel_SFW = uix.Panel('Parent', gui.Layout_S,...
 gui.Label_SFW = uicontrol('Parent', gui.Panel_SFW,...
     'Style', 'text');
 
-%% Visualization Panel
+%% Model Panel
+gui.Panel_Model = uix.BoxPanel('Parent', gui.Layout_Main_V_Right,...
+    'Title', 'Considered Muscles',...
+    'FontWeight', 'bold');
 
+gui.Layout_Muscle = uix.HBox('Parent', gui.Panel_Model,...
+    'Spacing', 3);
+
+% Panel Posture
+gui.Panel_Posture = uix.Panel('Parent', gui.Layout_Muscle,...
+    'Title', 'Posture');
+
+% Get models
+models=dir('src\models\*.m');
+[~, models]=arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
+data.Model=models{1};
+gui.ListBox_Posture = uicontrol( 'Style', 'list', ...
+    'BackgroundColor', 'w', ...
+    'Parent', gui.Panel_Posture, ...
+    'String', models,...
+    'Value', 1,...
+    'Callback', @onListSelection_Posture);
+
+% Panel Muscle List
+gui.Panel_MuscleList = uix.Panel('Parent', gui.Layout_Muscle,...
+    'Title', 'Muscle List');
+
+gui.ListBox_MuscleList = uicontrol( 'Style', 'list', ...
+    'BackgroundColor', 'w', ...
+    'Parent', gui.Panel_MuscleList, ...
+    'String', data.MuscleList(:,1),...
+    'Value', 1);
+
+%% Visualization Panel
 gui.Panel_Vis = uix.BoxPanel('Parent', gui.Layout_Main_V_Mid,...
     'Title', 'Visualization',...
     'FontWeight', 'bold');
@@ -171,8 +203,7 @@ set(gui.Label_SPH, 'String', data.SPH);
 set(gui.Label_SPD, 'String', data.SPD);
 set(gui.Label_SFL, 'String', data.SFL);
 set(gui.Label_SFW, 'String', data.SFW);
-data.LE = globalizeTLEM2...
-    (data.LE, data.Stance, data.Side, data.PelvicTilt, data.HRC, data.FL);
+data = globalizeTLEM2(data);
 visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis);
 
 gui.Axis_Vis.View = [90, 0];
@@ -212,36 +243,6 @@ gui.PushButton_Bottom = uicontrol('Parent', gui.Layout_Vis_HB,...
     'Style', 'PushButton',...
     'String', 'Bottom',...
     'Callback',@onPushButton_Bottom);
-
-%% Muscle Panel
-
-gui.Panel_Muscle = uix.BoxPanel('Parent', gui.Layout_Main_V_Right,...
-    'Title', 'Considered Muscles',...
-    'FontWeight', 'bold');
-
-gui.Layout_Muscle = uix.HBox('Parent', gui.Panel_Muscle,...
-    'Spacing', 3);
-
-% Panel Stance
-gui.Panel_Stance = uix.Panel('Parent', gui.Layout_Muscle,...
-    'Title', 'Stance');
-
-gui.ListBox_Stance = uicontrol( 'Style', 'list', ...
-   'BackgroundColor', 'w', ...
-   'Parent', gui.Panel_Stance, ...
-   'String', ["Two-legged Stance", "One-legged Stance", "Sitting"],...  
-   'Value', 1,...
-   'Callback', @onListSelection_Stance);
-
-% Panel Muscle List
-gui.Panel_MuscleList = uix.Panel('Parent', gui.Layout_Muscle,...
-    'Title', 'Muscle Selection');
-
-gui.ListBox_MuscleList = uicontrol( 'Style', 'list', ...
-   'BackgroundColor', 'w', ...
-   'Parent', gui.Panel_MuscleList, ...
-   'String', data.MuscleList(:,1),...
-   'Value', 1 );
 
 %% Results
 gui.Panel_Res = uix.BoxPanel('Parent', gui.Layout_Main_V_Right,...
@@ -320,14 +321,13 @@ gui.PushButton_RC = uicontrol('Parent', gui.Layout_Res_HB,...
     'Callback',@onPushButton_RC);
 
 %% Adjust Layout
-
 set(gui.Layout_Main_H,          'Width',    [-1, -2, -4])
 set(gui.Layout_PSP,             'Height',   [-1, -1, -1, -1, -5])
 set(gui.Layout_SP,              'Width',    [-2.5, -1])
 set(gui.Layout_Vis_V,           'Height',   [-28,-1,-1])
 set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
-set(gui.Layout_Res_V,       'Height',   [-9, -1])
-set(gui.Layout_Res_HT,      'Width',    [-746,-436])
+set(gui.Layout_Res_V,           'Height',   [-9, -1])
+set(gui.Layout_Res_HT,          'Width',    [-746,-436])
 
 % Functions
 %-------------------------------------------------------------------------%
@@ -422,7 +422,7 @@ set(gui.Layout_Res_HT,      'Width',    [-746,-436])
     function onPushButton_Left(~, ~)
         % User has pressed the Left button
         gui.Axis_Vis.View = [0, -90];
-        gui.Axis_Vis.CameraUpVector = [0, 1, 0]; 
+        gui.Axis_Vis.CameraUpVector = [0, 1, 0];
     end
 %-------------------------------------------------------------------------%
     function onPushButton_Right(~, ~)
@@ -437,9 +437,9 @@ set(gui.Layout_Res_HT,      'Width',    [-746,-436])
         gui.Axis_Vis.CameraUpVector = [1, 0, 0];
     end
 %-------------------------------------------------------------------------%
-    function onListSelection_Stance(src, ~ )
-        % User selected a Stance from the list
-        data.Stance = get(src, 'Value');
+    function onListSelection_Posture(src, ~ )
+        % User selected a Posture from the list
+        data.Model = models{get(src, 'Value')};
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
@@ -447,36 +447,36 @@ set(gui.Layout_Res_HT,      'Width',    [-746,-436])
     function onPushButton_RC(~, ~)
         % User has pressed the Run Calculation button
         set(gui.PushButton_RC, 'BackgroundColor', 'r', 'Enable', 'off');
-
-%         % TLEM2
-%         load('TLEM2', 'LE', 'muscleList')
-%         data.LE = LE;
-% 
-%         [data.LE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW] =...
-%             scaleTLEM2(data.LE, data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW);
-%         set(gui.Label_SPW, 'String', data.SPW);
-%         set(gui.Label_SPH, 'String', data.SPH);
-%         set(gui.Label_SPD, 'String', data.SPD);
-%         set(gui.Label_SFL, 'String', data.SFL);
-%         set(gui.Label_SFW, 'String', data.SFW);
-%         data.LE = globalizeTLEM2...
-%             (data.LE, data.Stance, data.Side, data.PelvicTilt, data.HRC, data.FL);
-%         [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rDir] =...
-%             calculateTLEM2(data.LE, data.BW, data.HRC, data.Side);
-% 
-%         gui.IsUpdated = true;
-%         updateInterfaceTLEM2(data, gui);         
-
-        % Validtion with Orthoload data
-        opat = {'H1L' 'H3L' 'H5L' 'H8L' 'H9L' 'H10R'}; % Orthoload patient
-        sex = {'m' 'm' 'w' 'm' 'm' 'w'};
-        for p = 1:length(opat)
         
+        % % TLEM2
+        % load('TLEM2', 'LE', 'muscleList')
+        % data.LE = LE;
+        %
+        % [data.LE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW] =...
+        %     scaleTLEM2(data.LE, data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW);
+        % set(gui.Label_SPW, 'String', data.SPW);
+        % set(gui.Label_SPH, 'String', data.SPH);
+        % set(gui.Label_SPD, 'String', data.SPD);
+        % set(gui.Label_SFL, 'String', data.SFL);
+        % set(gui.Label_SFW, 'String', data.SFW);
+        % data.LE = globalizeTLEM2...
+        %     (data.LE, data.Stance, data.Side, data.PelvicTilt, data.HRC, data.FL);
+        % [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rDir] =...
+        %     calculateTLEM2(data.LE, data.BW, data.HRC, data.Side);
+        %
+        % gui.IsUpdated = true;
+        % updateInterfaceTLEM2(data, gui);
+        
+        % Validtion with Orthoload data
+        Subjects = {'H1L' 'H3L' 'H5L' 'H8L' 'H9L' 'H10R'}; % Orthoload patient
+        sex = {'m' 'm' 'w' 'm' 'm' 'w'};
+        for p = 1:length(Subjects)
+            
             load('TLEM2', 'LE', 'muscleList')
             data.LE = LE;
-        
+            
             [data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW, data.BW, data.rMagPo] =...
-                validateTLEM2(opat{p});
+                validateTLEM2(Subjects{p});
             set(gui.EditText_BW,  'String', data.BW);
             set(gui.EditText_HRC, 'String', data.HRC);
             set(gui.EditText_PW,  'String', data.PW);
@@ -484,7 +484,7 @@ set(gui.Layout_Res_HT,      'Width',    [-746,-436])
             set(gui.EditText_PD,  'String', data.PD);
             set(gui.EditText_FL,  'String', data.FL);
             set(gui.EditText_FW,  'String', data.FW);
-        
+            
             [data.LE, data.RHRC, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW] =...
                 scaleTLEM2(data.LE, data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW);
             set(gui.Label_SPW, 'String', data.SPW);
@@ -492,12 +492,14 @@ set(gui.Layout_Res_HT,      'Width',    [-746,-436])
             set(gui.Label_SPD, 'String', data.SPD);
             set(gui.Label_SFL, 'String', data.SFL);
             set(gui.Label_SFW, 'String', data.SFW);
-            data.LE = globalizeTLEM2...
-                (data.LE, data.Stance, data.Side, data.PelvicTilt, data.HRC, data.FL);
-            [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rDir] =...
-                calculateTLEM2(data.LE, data.BW, data.HRC, data.Side);
             
-            VAL(p).patient = opat{p};
+            % Use the selected model to calculate the
+            calculateTLEM2=str2func(data.Model);
+            modelHandles=calculateTLEM2();
+            data = globalizeTLEM2(data);
+            [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rDir] = modelHandles.Calculation(data);
+            
+            VAL(p).patient = Subjects{p};
             VAL(p).sex = sex{p};
             
             % Scaling parameters
@@ -523,7 +525,7 @@ set(gui.Layout_Res_HT,      'Width',    [-746,-436])
             VAL(p).rTheta = data.rTheta;
             
             assignin('base', 'VAL', VAL);
-        
+            
             gui.IsUpdated = true;
             updateInterfaceTLEM2(data, gui);
         end

@@ -9,9 +9,8 @@ end
 
 data = struct(...
     'Side', 'R',...             % Side of the regarded hip joint, R:Right, L:Left
-    'BW', 45,...                % Patient bodyweight [Kg]
-    'PelvicTilt', 0,...         % Lateral pelvic tilt
-    'Stance', 1);               % Regarded stance, 1:Two-legged stance, 2:One-legged stance
+    'BW', 45,...                % Patient's body weight [kg]
+    'PelvicTilt', 0);           % Lateral pelvic tilt [°]
                   
 data.LE = LE;
 data.MuscleList = muscleList;
