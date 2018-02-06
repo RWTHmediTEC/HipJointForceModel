@@ -24,6 +24,7 @@ function [rMag, rMagP, rPhi, rTheta, rDir] = Calculation(data)
 
 % Inputs
 LE=data.LE;
+muscleList=data.MuscleList;
 BW=data.BW;
 HRC=data.HRC;
 Side=data.Side;
@@ -51,12 +52,6 @@ activeMusclesIglic = {'GluteusMediusAnterior1',   'fa';
                       'RectusFemoris2',           'fa';
                       'GluteusMinimusMid1',       'fa';
                       'GluteusMinimusMid2',       'fa';
-                      'GluteusMediusPosterior1',  'fa';
-                      'GluteusMediusPosterior2',  'fa';
-                      'GluteusMediusPosterior3',  'fa';
-                      'GluteusMediusPosterior4',  'fa';
-                      'GluteusMediusPosterior5',  'fa';
-                      'GluteusMediusPosterior6',  'fa';
                       'GluteusMinimusPosterior1', 'fa';
                       'GluteusMinimusPosterior2', 'fa';};
                   
@@ -94,46 +89,53 @@ ba = 0.48 * HRChalf;                    % Lever arm of the force wl
 ca = 1.01 * HRChalf;                    % Lever arm of the ground reaction force wb's attachment point
 a = (wb * ca - wl * ba) / (wb - wl);    % Lever arm of the force w's attachment point
 
-% Implement matrices for Muscle Origin Points (mop) and Muscle Insertion Points (mip)
-% which are equal to r and r' in Iglic 1990
+% Implement matrices for Muscle Origin Points (MOP) and Muscle Insertion 
+% Points (MIP) which are equal to r and r' in Iglic 1990
 % and Physiological Cross-Sectional Areas (PCSA)
-[mop, mip, PCSA] = deal([]);
 
-% Get PCSAs
-for m = 1:length(activeMusclesIglic)
-    fascicle = activeMusclesIglic{m};
-    fascicle = activeMusclesIglic{m}(:,(1:(end-1))); 
-    fitEnt = count(activeMusclesIglic(:,1), fascicle);
-    n = length(find(fitEnt));
-    % PCSA of the single muscle cord
-    cPCSA = LE(1).Muscle.(activeMusclesIglic{m}).PCSA / n;
-    PCSA = [PCSA, cPCSA];
-end
+% Number of active Muscles
+NoaM = length(activeMusclesIglic);
 
-% Get mops and mips
-for m = 1:length(activeMusclesIglic)
+% Get MOPs and MIPs
+MOP=zeros(NoaM,3);
+MIP=zeros(NoaM,3);
+for m = 1:NoaM
     for b = 1:length(LE)
         if ~isempty(LE(b).Muscle)
             muscles = fieldnames(LE(b).Muscle);
             if any(strcmp(muscles,activeMusclesIglic(m,1)))
                 if strcmp(LE(b).Muscle.(activeMusclesIglic{m}).Type, 'Origin')
-                    mop = [mop; LE(b).Muscle.(activeMusclesIglic{m}).Pos];                        
+                    MOP(m,:) = LE(b).Muscle.(activeMusclesIglic{m}).Pos;                        
                 else
-                    mip = [mip; LE(b).Muscle.(activeMusclesIglic{m}).Pos];
+                    MIP(m,:) = LE(b).Muscle.(activeMusclesIglic{m}).Pos;
                 end
             end
         end
     end
 end
 
-for m = 1:length(mop)
-    % Unit vector s_n in the direction of the n-th muscle
-    s(m,:) = (mip(m,:) - mop(m,:)) / norm(mip(m,:) - mop(m,:));
-    % Iglic 1990 equation 2
-    muscleForce(m,:) = PCSA(m) * cell2sym(activeMusclesIglic(m,2)) .* s(m,:);
-    % Moment of muscleForce around HRC
-    momentF(m,:) = cross(mop(m,:),muscleForce(m,:));
+PCSA=zeros(NoaM,1);
+% Get PCSAs
+for m = 1:NoaM
+    % PCSA of each fascicle
+    PCSA_Idx = strcmp(activeMusclesIglic{m}(1:end-1), muscleList(:,1));
+    PCSA(m)=muscleList{PCSA_Idx,5}/muscleList{PCSA_Idx,4};
 end
+
+% Unit vectors s in the direction of the muscles
+s=normalizeVector3d(MIP - MOP);
+% Iglic 1990 equation 2
+muscleForce = PCSA .* cell2sym(activeMusclesIglic(:,2)) .* s; 
+% Moment of muscleForce around HRC
+momentF = cross(MOP,muscleForce);
+% for m = 1:length(MOP)
+    % Unit vector s_m in the direction of the m-th muscle
+%     s(m,:) = (MIP(m,:) - MOP(m,:)) / norm(MIP(m,:) - MOP(m,:));
+    % Iglic 1990 equation 2
+%     muscleForce(m,:) = PCSA(m) * cell2sym(activeMusclesIglic(m,2)) .* s(m,:);
+    % Moment of muscleForce around HRC
+%     momentF(m,:) = cross(MOP(m,:),muscleForce(m,:));
+% end
 
 if Side == 'L'
     momentW = cross([0 0 a],w); % Moment of bodyweight force around HRC

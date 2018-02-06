@@ -94,16 +94,24 @@ muscleList(:,2) = num2cell(cmap,2);
 
 % Muscle bones 
 for m = 1:length(muscleList)
-    mBIdx = ismember(mRaw(:,1),muscleList{m});
+    mBIdx = ismember(mRaw(:,1),muscleList{m,1});
     muscleData = mRaw(mBIdx,:);
     muscleList{m,3} = find(ismember(Bones, unique(muscleData(:,4),'stable')));
     % Number of fascicles of the muscle
-    muscleList{m,4} = max(str2double(strrep(muscleData(:,2),muscleList{m},'')));
+    muscleList{m,4} = max(str2double(strrep(muscleData(:,2),muscleList{m,1},'')));
     % Check if each fascicle of one muscle has the same number of connection points
     NoC = size(muscleData,1)/muscleList{m,4};
     if ~isequal(repmat(muscleData(1:NoC,4),muscleList{m,4},1), muscleData(:,4))
-        warning(['Fascicles of ' muscleList{m} ' are inconsistent!'])
+        warning(['Fascicles of ' muscleList{m,1} ' are inconsistent!'])
     end
+    % Add PCSA for the muscle
+    tempRaw=cellfun(@(x) regexp(x,'\D+','match'), aRaw(:,1));
+    mBIdx = ismember(tempRaw,muscleList{m,1});
+    muscleData = aRaw(mBIdx,:);
+    % Check if PCSA value is the same for each fascicle of the muscle
+    musclePCSA=unique(cell2mat(muscleData(:,5)));
+    assert(length(musclePCSA)==1)
+    muscleList{m,5}=musclePCSA*100; % [cm²] to [mm²]
 end
 
 % Fascicle list
@@ -119,9 +127,6 @@ for b = 1:NoB
             % Create muscle field if it does not exist
             LE(b).Muscle.(Fascicles{m}).Type = mRaw(mIdx(m),3);
             LE(b).Muscle.(Fascicles{m}).Pos = mRaw{mIdx(m),5};
-            % Add the PCSA of the specific fascicle
-            aIdx = find(ismember(string(aRaw(:,1)), Fascicles{m}));
-            LE(b).Muscle.(Fascicles{m}).PCSA = cell2mat(aRaw(aIdx,5))*100; % [cm²] to [mm²]
         else
             % Append the muscle point to the muscle
             LE(b).Muscle.(Fascicles{m}).Type = ...

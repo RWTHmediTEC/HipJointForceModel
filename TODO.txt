@@ -1,0 +1,6 @@
+TODO
+1. Visualize only muscles used by the model
+
+
+TOTEST:
+1. Influence of pelvic tilt on the original Iglic model
