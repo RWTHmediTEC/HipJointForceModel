@@ -1,8 +1,7 @@
 function [HRC, PW, PH, PD, FL, FW, BW, rMagP] = validateTLEM2(Name)
-% Validation of TLEM 2.0 by comparison with in vivo measured data provided
-% by Orthoload
+% Validation of TLEM 2.0 by comparison with in vivo data from OrthoLoad
 
-%% Scaling with Orthoload data
+%% Scaling with OrthoLoad data
 % Load landmark data
 % Name -> H1L H3L* H5L* H8L H9L H10R *_Femur
 Side = Name(end);
@@ -61,8 +60,9 @@ PSIS=transformPoint3d(LM.(['PSIS_' Side]), pCSrot);
 PD=abs(ASIS(1)-PSIS(1));
 
 %% Load body weight and forces
-
 load([Name '_OLS' '.mat']) % OLS: One-legged stance
 BW = meanPFP.Weight_N / 9.81;
 
 rMagP = sqrt(sum(meanPFP.HJF_pBW.^2));
+
+end

@@ -24,28 +24,28 @@ end
 function activeMuscles = Muscles()
 %% Active Muscles
 % Muscle elements required for Iglic including unknown average muscle tension f
-activeMuscles =  {'GluteusMediusAnterior1',   'fa';
-                  'GluteusMediusAnterior2',   'fa';
-                  'GluteusMediusAnterior3',   'fa';
-                  'GluteusMediusAnterior4',   'fa';
-                  'GluteusMediusAnterior5',   'fa';
-                  'GluteusMediusAnterior6',   'fa';
-                  'GluteusMediusPosterior1',  'fa';
-                  'GluteusMediusPosterior2',  'fa';
-                  'GluteusMediusPosterior3',  'fa';
-                  'GluteusMediusPosterior4',  'fa';
-                  'GluteusMediusPosterior5',  'fa';
-                  'GluteusMediusPosterior6',  'fa';
-                  'GluteusMinimusAnterior1',  'fa';
-                  'GluteusMinimusAnterior2',  'fa';
-                  'TensorFasciaeLatae1',      'fa';
-                  'TensorFasciaeLatae2',      'fa';
-                  'RectusFemoris1',           'fa';
-                  'RectusFemoris2',           'fa';
-                  'GluteusMinimusMid1',       'fa';
-                  'GluteusMinimusMid2',       'fa';
-                  'GluteusMinimusPosterior1', 'fa';
-                  'GluteusMinimusPosterior2', 'fa';};
+activeMuscles =  {'GluteusMediusAnterior1';
+                  'GluteusMediusAnterior2';
+                  'GluteusMediusAnterior3';
+                  'GluteusMediusAnterior4';
+                  'GluteusMediusAnterior5';
+                  'GluteusMediusAnterior6';
+                  'GluteusMediusPosterior1';
+                  'GluteusMediusPosterior2';
+                  'GluteusMediusPosterior3';
+                  'GluteusMediusPosterior4';
+                  'GluteusMediusPosterior5';
+                  'GluteusMediusPosterior6';
+                  'GluteusMinimusAnterior1';
+                  'GluteusMinimusAnterior2';
+                  'TensorFasciaeLatae1';
+                  'TensorFasciaeLatae2';
+                  'RectusFemoris1';
+                  'RectusFemoris2';
+                  'GluteusMinimusMid1';
+                  'GluteusMinimusMid2';
+                  'GluteusMinimusPosterior1';
+                  'GluteusMinimusPosterior2';};
                   
 %                       'GluteusMinimusAnterior1',  'fa';
 %                       'GluteusMinimusAnterior2',  'fa';
@@ -98,7 +98,7 @@ a = (wb * ca - wl * ba) / (wb - wl);    % Lever arm of the force w's attachment 
 % and Physiological Cross-Sectional Areas (PCSA)
 
 % Number of active Muscles
-NoaM = length(activeMuscles);
+NoaM = size(activeMuscles,1);
 
 % Get MOPs and MIPs
 MOP=zeros(NoaM,3);
@@ -108,10 +108,10 @@ for m = 1:NoaM
         if ~isempty(LE(b).Muscle)
             muscles = fieldnames(LE(b).Muscle);
             if any(strcmp(muscles,activeMuscles(m,1)))
-                if strcmp(LE(b).Muscle.(activeMuscles{m}).Type, 'Origin')
-                    MOP(m,:) = LE(b).Muscle.(activeMuscles{m}).Pos;                        
+                if strcmp(LE(b).Muscle.(activeMuscles{m,1}).Type, 'Origin')
+                    MOP(m,:) = LE(b).Muscle.(activeMuscles{m,1}).Pos;                        
                 else
-                    MIP(m,:) = LE(b).Muscle.(activeMuscles{m}).Pos;
+                    MIP(m,:) = LE(b).Muscle.(activeMuscles{m,1}).Pos;
                 end
             end
         end
@@ -129,7 +129,7 @@ end
 % Unit vectors s in the direction of the muscles
 s=normalizeVector3d(MIP - MOP);
 % Iglic 1990 equation 2
-muscleForce = PCSA .* cell2sym(activeMuscles(:,2)) .* s; 
+muscleForce = PCSA .* cell2sym(repmat({'fa'}, NoaM,1)) .* s; 
 % Moment of muscleForce around HRC
 momentF = cross(MOP,muscleForce);
 % for m = 1:length(MOP)

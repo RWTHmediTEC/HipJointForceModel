@@ -4,10 +4,14 @@ function gui = createInterfaceTLEM2(data)
 gui.Window = figure(...
     'Name', 'Hip Joint Reaction Force Model',...
     'NumberTitle', 'off',...
-    'MenuBar', 'none',...
-    'Toolbar', 'figure',...
-    'units','normalized',...
-    'outerposition', [0 0 1 1]);
+    'MenuBar', 'figure',...
+    'Toolbar', 'figure');
+monitorsPosition = get(0,'MonitorPositions');
+if     size(monitorsPosition,1) == 1
+    set(gui.Window,'OuterPosition',monitorsPosition(1,:));
+elseif size(monitorsPosition,1) == 2
+    set(gui.Window,'OuterPosition',monitorsPosition(2,:));
+end
 
 gui.Layout_Main_H       = uix.HBox('Parent', gui.Window, 'Spacing', 3);
 gui.Layout_Main_V_Left  = uix.VBox('Parent', gui.Layout_Main_H, 'Spacing', 3);
@@ -81,7 +85,6 @@ gui.Layout_S = uix.VBox('Parent', gui.Layout_SP,...
 % Panel Pelvic Width
 gui.Panel_PW = uix.Panel('Parent', gui.Layout_P,...
     'Title', 'Pelvic Width [mm]');
-
 gui.EditText_PW = uicontrol('Parent', gui.Panel_PW,...
     'Style', 'edit',...
     'Callback', @onEditText_PW);
@@ -89,7 +92,6 @@ gui.EditText_PW = uicontrol('Parent', gui.Panel_PW,...
 % Panel Pelvic Height
 gui.Panel_PH = uix.Panel('Parent', gui.Layout_P,...
     'Title', 'Pelvic Height [mm]');
-
 gui.EditText_PH = uicontrol('Parent', gui.Panel_PH,...
     'Style', 'edit',...
     'Callback', @onEditText_PH);
@@ -97,7 +99,6 @@ gui.EditText_PH = uicontrol('Parent', gui.Panel_PH,...
 % Panel Pelvic Depth
 gui.Panel_PD = uix.Panel('Parent', gui.Layout_P,...
     'Title', 'Pelvic Depth [mm]');
-
 gui.EditText_PD = uicontrol('Parent', gui.Panel_PD,...
     'Style', 'edit',...
     'Callback', @onEditText_PD);
@@ -105,7 +106,6 @@ gui.EditText_PD = uicontrol('Parent', gui.Panel_PD,...
 % Panel Femoral Length
 gui.Panel_FL = uix.Panel('Parent', gui.Layout_P,...
     'Title', 'Femoral Length [mm]');
-
 gui.EditText_FL = uicontrol('Parent', gui.Panel_FL,...
     'Style', 'edit',...
     'Callback', @onEditText_FL);
@@ -113,7 +113,6 @@ gui.EditText_FL = uicontrol('Parent', gui.Panel_FL,...
 % Panel Femoral Width
 gui.Panel_FW = uix.Panel('Parent', gui.Layout_P,...
     'Title', 'Femoral Width [mm]');
-
 gui.EditText_FW = uicontrol('Parent', gui.Panel_FW,...
     'Style', 'edit',...
     'Callback', @onEditText_FW);
@@ -183,7 +182,8 @@ gui.ListBox_MuscleList = uicontrol( 'Style', 'list', ...
     'String', data.MuscleList(:,1),...
     'Min', 1, ...
     'Max', length(data.MuscleList),...
-    'Value', mListValues);
+    'Value', mListValues,...
+    'Callback', @onListSelection_MuscleList);
 
 %% Visualization Panel
 gui.Panel_Vis = uix.BoxPanel('Parent', gui.Layout_Main_V_Mid,...
@@ -334,7 +334,7 @@ gui.PushButton_RC = uicontrol('Parent', gui.Layout_Res_HB,...
 set(gui.Layout_Main_H,          'Width',    [-1, -2, -4])
 set(gui.Layout_PSP,             'Height',   [-1, -1, -1, -1, -5])
 set(gui.Layout_SP,              'Width',    [-2.5, -1])
-set(gui.Layout_Vis_V,           'Height',   [-28,-1,-1])
+set(gui.Layout_Vis_V,           'Height',   [-50,-1,-1])
 set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
 set(gui.Layout_Res_V,           'Height',   [-9, -1])
 set(gui.Layout_Res_HT,          'Width',    [-746,-436])
@@ -416,31 +416,26 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
         gui.Axis_Vis.View = [90 ,0];
         gui.Axis_Vis.CameraUpVector = [0, 1, 0];
     end
-%-------------------------------------------------------------------------%
     function onPushButton_Back(~, ~)
         % User has pressed the Back button
         gui.Axis_Vis.View = [-90, 0];
         gui.Axis_Vis.CameraUpVector = [0, 1, 0];
     end
-%-------------------------------------------------------------------------%
     function onPushButton_Top(~, ~)
         % User has pressed the Top button
         gui.Axis_Vis.View = [0, 180];
         gui.Axis_Vis.CameraUpVector = [1, 0, 0];
     end
-%-------------------------------------------------------------------------%
     function onPushButton_Left(~, ~)
         % User has pressed the Left button
         gui.Axis_Vis.View = [0, -90];
         gui.Axis_Vis.CameraUpVector = [0, 1, 0];
     end
-%-------------------------------------------------------------------------%
     function onPushButton_Right(~, ~)
         % User has pressed the Right button
         gui.Axis_Vis.View = [0, 90];
         gui.Axis_Vis.CameraUpVector = [0, 1, 0];
     end
-%-------------------------------------------------------------------------%
     function onPushButton_Bottom(~, ~)
         % User has pressed the Bottom button
         gui.Axis_Vis.View = [0, 0];
@@ -450,6 +445,21 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
     function onListSelection_Posture(src, ~ )
         % User selected a Posture from the list
         data.Model = models{get(src, 'Value')};
+        gui.IsUpdated = false;
+        updateInterfaceTLEM2(data, gui);
+    end
+
+    function onListSelection_MuscleList(src, ~ )
+        % User selects muscles from the list
+        tempMuscleIdx=get(src, 'Value');
+        tempMuscles = data.MuscleList(tempMuscleIdx,[1,4]);
+        NoF=sum(cell2mat(tempMuscles(:,2)));
+        tempFascicles = {};
+        for m=1:size(tempMuscles,1)
+            tempFascicles = [tempFascicles; ...
+                cellstr(num2str((1:tempMuscles{m,2})', [tempMuscles{m,1} '%d']))];
+        end
+        data.activeMuscles=tempFascicles;
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
@@ -477,9 +487,10 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
         % gui.IsUpdated = true;
         % updateInterfaceTLEM2(data, gui);
         
-        % Validtion with Orthoload data
+        % Validtion with OrthoLoad data
         Subjects = {'H1L' 'H3L' 'H5L' 'H8L' 'H9L' 'H10R'}; % Orthoload patient
         sex = {'m' 'm' 'w' 'm' 'm' 'w'};
+        Results=repmat(struct('patient',[],'sex',[]),length(Subjects),1);
         for p = 1:length(Subjects)
             
             load('TLEM2', 'LE', 'muscleList')
@@ -508,36 +519,35 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
             data = globalizeTLEM2(data);
             [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rDir] = modelHandles.Calculation(data);
             
-            VAL(p).patient = Subjects{p};
-            VAL(p).sex = sex{p};
+            Results(p).patient = Subjects{p};
+            Results(p).sex = sex{p};
             
             % Scaling parameters
-            VAL(p).BW = data.BW;
-            VAL(p).HRC = data.HRC;
-            VAL(p).RHRC = data.RHRC;
-            VAL(p).PW = data.PW;
-            VAL(p).SPW = data.SPW;
-            VAL(p).PH = data.PH;
-            VAL(p).SPH = data.SPH;
-            VAL(p).PD = data.PD;
-            VAL(p).SPD = data.SPD;
-            VAL(p).FL = data.FL;
-            VAL(p).SFL = data.SFL;
-            VAL(p).FW = data.FW;
-            VAL(p).SFW = data.SFW;
+            Results(p).BW = data.BW;
+            Results(p).HRC = data.HRC;
+            Results(p).RHRC = data.RHRC;
+            Results(p).PW = data.PW;
+            Results(p).SPW = data.SPW;
+            Results(p).PH = data.PH;
+            Results(p).SPH = data.SPH;
+            Results(p).PD = data.PD;
+            Results(p).SPD = data.SPD;
+            Results(p).FL = data.FL;
+            Results(p).SFL = data.SFL;
+            Results(p).FW = data.FW;
+            Results(p).SFW = data.SFW;
             
             % Force parameters
-            VAL(p).rMag = data.rMag;
-            VAL(p).rMagP = data.rMagP;
-            VAL(p).rMagPo = data.rMagPo;
-            VAL(p).rPhi = data.rPhi;
-            VAL(p).rTheta = data.rTheta;
-            
-            assignin('base', 'VAL', VAL);
+            Results(p).rMag = data.rMag;
+            Results(p).rMagP = data.rMagP;
+            Results(p).rMagPo = data.rMagPo;
+            Results(p).rPhi = data.rPhi;
+            Results(p).rTheta = data.rTheta;
             
             gui.IsUpdated = true;
             updateInterfaceTLEM2(data, gui);
             drawnow
         end
+        writetable(struct2table(Results), 'Results.xlsx')
     end
 end

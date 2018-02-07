@@ -14,7 +14,7 @@ function [LE, HRC, PW, PH, PD, FL, FW, varargout] = scaleTLEM2(LE, varargin)
 % FW  = Femoral width measured as the absolute distance between greater trochanter 
 %       and HRC
 
-%% TLEM2 Parameters (t_)
+%% TLEM2 Parameters (t*)
 tHRC = abs(min(LE(1).Mesh.vertices(:,3)) * 2);  % No consideration of width of symphysis pubica
 tPW  = LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(3) - ...
         LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos(3);
