@@ -18,8 +18,14 @@ gui.Layout_Main_V_Left  = uix.VBox('Parent', gui.Layout_Main_H, 'Spacing', 3);
 gui.Layout_Main_V_Mid   = uix.VBox('Parent', gui.Layout_Main_H, 'Spacing', 3);
 gui.Layout_Main_V_Right = uix.VBox('Parent', gui.Layout_Main_H, 'Spacing', 3);
 
-%% Patient Specific Parameters Panel
 
+
+
+%¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
+%                                  PANELS                                 %
+%_________________________________________________________________________%
+
+%% Patient Specific Parameters Panel
 gui.Panel_PSP = uix.BoxPanel('Parent', gui.Layout_Main_V_Left,...
     'Title', 'Patient Specific Parameters',...
     'FontWeight', 'bold');
@@ -167,8 +173,9 @@ gui.ListBox_Posture = uicontrol( 'Style', 'list', ...
     'Callback', @onListSelection_Posture);
 
 % Panel Muscle List
-gui.Panel_MuscleList = uix.Panel('Parent', gui.Layout_Muscle,...
+gui.Panel_Muscle = uix.Panel('Parent', gui.Layout_Muscle,...
     'Title', 'Muscle List');
+gui.Panel_Muscle_V=uix.VBox('Parent', gui.Panel_Muscle, 'Spacing', 3);
 
 calculateTLEM2=str2func(data.Model);
 modelHandles=calculateTLEM2();
@@ -178,12 +185,17 @@ mListValues = find(ismember(data.MuscleList(:,1), unique(cellfun(@(x) ...
     regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
 gui.ListBox_MuscleList = uicontrol( 'Style', 'list', ...
     'BackgroundColor', 'w', ...
-    'Parent', gui.Panel_MuscleList, ...
+    'Parent', gui.Panel_Muscle_V, ...
     'String', data.MuscleList(:,1),...
     'Min', 1, ...
     'Max', length(data.MuscleList),...
     'Value', mListValues,...
     'Callback', @onListSelection_MuscleList);
+
+gui.ListBox_MuscleReset = uicontrol('Parent', gui.Panel_Muscle_V,'Style', 'PushButton',...
+    'String', 'Reset','Callback',@onPushButton_MuscleReset);
+
+set(gui.Panel_Muscle_V, 'Height', [-15,-1])
 
 %% Visualization Panel
 gui.Panel_Vis = uix.BoxPanel('Parent', gui.Layout_Main_V_Mid,...
@@ -219,40 +231,26 @@ gui.Axis_Vis.CameraUpVector = [0, 1, 0];
 gui.Axis_Vis.FontSize = 8;
 
 % Push Buttons
-gui.Layout_Vis_HT = uix.HBox('Parent', gui.Layout_Vis_V, 'Spacing', 3);
-gui.Layout_Vis_HB = uix.HBox('Parent', gui.Layout_Vis_V, 'Spacing', 3);
+gui.Layout_Vis_G = uix.Grid('Parent', gui.Layout_Vis_V, 'Spacing', 3);
 
-gui.PushButton_Front = uicontrol('Parent', gui.Layout_Vis_HT,...
-    'Style', 'PushButton',...
+uicontrol('Parent', gui.Layout_Vis_G,'Style', 'PushButton',...
     'String', 'Front',...
     'Callback',@onPushButton_Front);
+uicontrol('Parent', gui.Layout_Vis_G,'Style', 'PushButton',...
+    'String', 'Back','Callback',@onPushButton_Back);
+uicontrol('Parent', gui.Layout_Vis_G,'Style', 'PushButton',...
+    'String', 'Top','Callback',@onPushButton_Top);
+uicontrol('Parent', gui.Layout_Vis_G,'Style', 'PushButton',...
+    'String', 'Bottom','Callback',@onPushButton_Bottom);
+uicontrol('Parent', gui.Layout_Vis_G,'Style', 'PushButton',...
+    'String', 'Right','Callback',@onPushButton_Right);
+uicontrol('Parent', gui.Layout_Vis_G,'Style', 'PushButton',...
+    'String', 'Left','Callback',@onPushButton_Left);
 
-gui.PushButton_Back = uicontrol('Parent', gui.Layout_Vis_HT,...
-    'Style', 'PushButton',...
-    'String', 'Back',...
-    'Callback',@onPushButton_Back);
+set(gui.Layout_Vis_V, 'Height', [-50,-2])
+set(gui.Layout_Vis_G, 'Widths', [-1 -1 -1], 'Heights', [-1 -1]);
 
-gui.PushButton_Top = uicontrol('Parent', gui.Layout_Vis_HT,...
-    'Style', 'PushButton',...
-    'String', 'Top',...
-    'Callback',@onPushButton_Top);
-
-gui.PushButton_Left = uicontrol('Parent', gui.Layout_Vis_HB,...
-    'Style', 'PushButton',...
-    'String', 'Left',...
-    'Callback',@onPushButton_Left);
-
-gui.PushButton_Right = uicontrol('Parent', gui.Layout_Vis_HB,...
-    'Style', 'PushButton',...
-    'String', 'Right',...
-    'Callback',@onPushButton_Right);
-
-gui.PushButton_Bottom = uicontrol('Parent', gui.Layout_Vis_HB,...
-    'Style', 'PushButton',...
-    'String', 'Bottom',...
-    'Callback',@onPushButton_Bottom);
-
-%% Results
+%% Results Panel
 gui.Panel_Res = uix.BoxPanel('Parent', gui.Layout_Main_V_Right,...
     'Title', 'Results',...
     'FontWeight', 'bold');
@@ -334,83 +332,88 @@ gui.PushButton_RC = uicontrol('Parent', gui.Layout_Res_HB,...
 set(gui.Layout_Main_H,          'Width',    [-1, -2, -4])
 set(gui.Layout_PSP,             'Height',   [-1, -1, -1, -1, -5])
 set(gui.Layout_SP,              'Width',    [-2.5, -1])
-set(gui.Layout_Vis_V,           'Height',   [-50,-1,-1])
 set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
 set(gui.Layout_Res_V,           'Height',   [-9, -1])
-set(gui.Layout_Res_HT,          'Width',    [-746,-436])
+set(gui.Layout_Res_HT,          'Width',    [-1.5,-1])
 
-% Functions
-%-------------------------------------------------------------------------%
+
+
+%¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
+%                                FUNCTIONS                                %
+%_________________________________________________________________________%
+
+%% Patient Specific Parameters Panel
     function onRightSide(~, ~)
         % User has set the hip Side to Right
         data.Side = 'R';
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onLeftSide(~, ~)
         % User has set the hip Side to Left
         data.Side = 'L';
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onEditText_BW(scr, ~)
         % User is editing the Bodyweight
         data.BW = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onEditText_PelvicTilt(scr, ~)
         % User is editing the Pelvic Tilt
         data.PelvicTilt = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onEditText_HRC(scr, ~)
         % User is editing the distance between Hip Rotation Centers
         data.HRC = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onEditText_PW(scr, ~)
         % User is editing the Pelvic Width
         data.PW = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onEditText_PH(scr, ~)
         % User is editing the Pelvic Height
         data.PH = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onEditText_PD(scr, ~)
         % User is editing the Pelvic Depth
         data.PD = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onEditText_FL(scr, ~)
         % User is editing Femoral Length
         data.FL = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
     function onEditText_FW(scr, ~)
         % User is editing the Femoral Width
         data.FW = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
+%% Visualization Panel
     function onPushButton_Front(~, ~)
         % User has pressed the Front button
         gui.Axis_Vis.View = [90 ,0];
@@ -441,7 +444,8 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
         gui.Axis_Vis.View = [0, 0];
         gui.Axis_Vis.CameraUpVector = [1, 0, 0];
     end
-%-------------------------------------------------------------------------%
+
+%% Model Panel
     function onListSelection_Posture(src, ~ )
         % User selected a Posture from the list
         data.Model = models{get(src, 'Value')};
@@ -453,7 +457,6 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
         % User selects muscles from the list
         tempMuscleIdx=get(src, 'Value');
         tempMuscles = data.MuscleList(tempMuscleIdx,[1,4]);
-        NoF=sum(cell2mat(tempMuscles(:,2)));
         tempFascicles = {};
         for m=1:size(tempMuscles,1)
             tempFascicles = [tempFascicles; ...
@@ -463,7 +466,20 @@ set(gui.Layout_Res_HT,          'Width',    [-746,-436])
         gui.IsUpdated = false;
         updateInterfaceTLEM2(data, gui);
     end
-%-------------------------------------------------------------------------%
+
+    function onPushButton_MuscleReset(~, ~ )
+        calculateTLEM2=str2func(data.Model);
+        modelHandles=calculateTLEM2();
+        data.activeMuscles = modelHandles.Muscles();
+        % Get the indices of the muscles used in the current model
+        tempListValues = find(ismember(data.MuscleList(:,1), unique(cellfun(@(x) ...
+            regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
+        gui.ListBox_MuscleList.Value=tempListValues;
+        gui.IsUpdated = false;
+        updateInterfaceTLEM2(data, gui);
+    end
+
+%% Results Panel
     function onPushButton_RC(~, ~)
         % User has pressed the Run Calculation button
         set(gui.PushButton_RC, 'BackgroundColor', 'r', 'Enable', 'off');
