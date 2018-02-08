@@ -5,4 +5,3 @@ addpath(genpath('data'))
 
 data = createDataTLEM2();
 gui = createInterfaceTLEM2(data);
-updateInterfaceTLEM2(data, gui);

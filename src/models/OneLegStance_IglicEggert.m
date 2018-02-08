@@ -21,55 +21,35 @@ ny = asind(b/FL);
 jointAngles = {[0.5 0 -PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
 end
 
-function activeMuscles = Muscles()
+function [activeMuscles, enable] = Muscles()
 %% Active Muscles
-% Muscle elements required for Iglic including unknown average muscle tension f
-activeMuscles =  {'GluteusMediusAnterior1';
-                  'GluteusMediusAnterior2';
-                  'GluteusMediusAnterior3';
-                  'GluteusMediusAnterior4';
-                  'GluteusMediusAnterior5';
-                  'GluteusMediusAnterior6';
-                  'GluteusMediusPosterior1';
-                  'GluteusMediusPosterior2';
-                  'GluteusMediusPosterior3';
-                  'GluteusMediusPosterior4';
-                  'GluteusMediusPosterior5';
-                  'GluteusMediusPosterior6';
-                  'GluteusMinimusAnterior1';
-                  'GluteusMinimusAnterior2';
-                  'TensorFasciaeLatae1';
-                  'TensorFasciaeLatae2';
-                  'RectusFemoris1';
-                  'RectusFemoris2';
-                  'GluteusMinimusMid1';
-                  'GluteusMinimusMid2';
-                  'GluteusMinimusPosterior1';
-                  'GluteusMinimusPosterior2';};
-                  
-%                       'GluteusMinimusAnterior1',  'fa';
-%                       'GluteusMinimusAnterior2',  'fa';
-%                       'TensorFasciaeLatae1',      'fa';
-%                       'TensorFasciaeLatae2',      'fa';
-%                       'RectusFemoris1',           'fa';
-%                       'RectusFemoris2',           'fa';
-%                       'GluteusMinimusMid1',       'fa';
-%                       'GluteusMinimusMid2',       'fa';
-%                       'GluteusMediusPosterior1',  'fa';
-%                       'GluteusMediusPosterior2',  'fa';
-%                       'GluteusMediusPosterior3',  'fa';
-%                       'GluteusMediusPosterior4',  'fa';
-%                       'GluteusMediusPosterior5',  'fa';
-%                       'GluteusMediusPosterior6',  'fa';
-%                       'GluteusMinimusPosterior1', 'fa';
-%                       'GluteusMinimusPosterior2', 'fa';
-%                       'Piriformis1',              'fa';
-%                       'GluteusMaximusSuperior1',  'fa';
-%                       'GluteusMaximusSuperior2',  'fa';
-%                       'GluteusMaximusSuperior3',  'fa';
-%                       'GluteusMaximusSuperior4',  'fa';
-%                       'GluteusMaximusSuperior5',  'fa';
-%                       'GluteusMaximusSuperior6',  'fa';
+% Is the user allowed to edit the default values
+enable='on';
+
+% Default fascicles of the model
+activeMuscles =  {...
+    'GluteusMediusAnterior1';
+    'GluteusMediusAnterior2';
+    'GluteusMediusAnterior3';
+    'GluteusMediusAnterior4';
+    'GluteusMediusAnterior5';
+    'GluteusMediusAnterior6';
+    'GluteusMediusPosterior1';
+    'GluteusMediusPosterior2';
+    'GluteusMediusPosterior3';
+    'GluteusMediusPosterior4';
+    'GluteusMediusPosterior5';
+    'GluteusMediusPosterior6';
+    'GluteusMinimusAnterior1';
+    'GluteusMinimusAnterior2';
+    'TensorFasciaeLatae1';
+    'TensorFasciaeLatae2';
+    'RectusFemoris1';
+    'RectusFemoris2';
+    'GluteusMinimusMid1';
+    'GluteusMinimusMid2';
+    'GluteusMinimusPosterior1';
+    'GluteusMinimusPosterior2';};
 end
 
 %% Calculation of the HJF
