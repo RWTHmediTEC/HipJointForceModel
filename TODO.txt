@@ -3,4 +3,4 @@ Bug in OneLegStance_IglicEggert if muscles have via points
 
 
 TOTEST:
-1. Influence of pelvic tilt on the original Iglic model
+1. Influence of pelvic tilt on the original Iglic model.
