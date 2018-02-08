@@ -190,7 +190,7 @@ gui.ListBox_MuscleList = uicontrol( 'Style', 'list', ...
     'Min', 1, ...
     'Max', length(data.MuscleList),...
     'Value', mListValues,...
-    'Callback', @onListSelection_MuscleList);
+    'Callback', @onListSelection_Muscles);
 
 gui.ListBox_MuscleReset = uicontrol('Parent', gui.Panel_Muscle_V,'Style', 'PushButton',...
     'String', 'Reset','Callback',@onPushButton_MuscleReset);
@@ -453,7 +453,7 @@ set(gui.Layout_Res_HT,          'Width',    [-1.5,-1])
         updateInterfaceTLEM2(data, gui);
     end
 
-    function onListSelection_MuscleList(src, ~ )
+    function onListSelection_Muscles(src, ~ )
         % User selects muscles from the list
         tempMuscleIdx=get(src, 'Value');
         tempMuscles = data.MuscleList(tempMuscleIdx,[1,4]);
