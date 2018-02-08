@@ -1,5 +1,5 @@
 TODO:
-Bug in OneLegStance_IglicEggert if muscles have via points
+Bug in OneLegStance_IglicEggert if muscles have via points.
 
 
 TOTEST:
