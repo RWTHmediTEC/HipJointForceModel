@@ -1,0 +1,15 @@
+# Markups fiducial file version = 4.9
+# CoordinateSystem = 0
+# columns = id,x,y,z,ow,ox,oy,oz,vis,sel,lock,label,desc,associatedNodeID
+vtkMRMLMarkupsFiducialNode_7,-92.5282,-18.7542,1526.33,4.34325e-311,0,1.26414e-315,2.122e-314,1,0,1,HJC_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_8,92.7013,-22.8415,1539.74,4.34325e-311,0,2.50233e-315,2.122e-314,1,0,1,HJC_R,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_18,-118.417,48.6854,1605.51,0,0,0,1,1,0,1,ASIS_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_19,108.616,39.1441,1617.95,0,0,0,1,1,0,1,ASIS_R,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_20,42.5336,-114.237,1625.53,0,0,0,1,1,0,1,PSIS_R,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_21,-63.4618,-110.407,1620.16,0,0,0,1,1,0,1,PSIS_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_24,-22.736,33.7821,1513.56,0,0,0,1,1,0,1,PT_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_25,15.4964,32.8857,1509.48,0,0,0,1,1,0,1,PT_R,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_3,-148.605,-23.1681,1523.6,4.34331e-311,0,2.45089e-315,2.122e-314,1,0,1,GT_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_4,-97.96,-30.3753,1466.92,4.34331e-311,0,4.17561e-315,2.122e-314,1,0,1,LT_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_5,-52.3524,-27.6076,1117.28,4.34331e-311,0,4.17133e-315,2.122e-314,1,0,1,MEC_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_6,-131.461,-27.7878,1111.76,4.34331e-311,0,4.17135e-315,2.122e-314,1,0,1,LEC_L,,vtkMRMLScalarVolumeNode1

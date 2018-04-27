@@ -1,4 +1,4 @@
-function funcHandles = TestFile_OneLegStance_Iglic1990
+function funcHandles = OneLegStance_Iglic1990
 
 funcHandles.Position = @Position;
 funcHandles.Muscles = @Muscles;
@@ -52,7 +52,8 @@ activeMuscles =  {...
     'GluteusMediusPosterior6', 'fp';
     'GluteusMinimusPosterior1', 'fp';
     'GluteusMinimusPosterior2', 'fp';
-    'Piriformis1','fp';};
+    'Piriformis1','fp';
+    };
 end
 
 %% Calculation of the HJF
@@ -109,10 +110,14 @@ for m = 1:NoaM
     PCSA(m)=muscleList{PCSA_Idx,5}/muscleList{PCSA_Idx,4};
 end
 
+
+
 % Unit vectors s in the direction of the muscles
 s=normalizeVector3d(MIP - MOP);
 % Iglic 1990 equation 2
-muscleForce = PCSA .* cell2sym(activeMuscles(:,2)) .* s; 
+f=cell2sym(activeMuscles(:,2));
+% assume(f, 'positive')
+muscleForce = PCSA .* f .* s; 
 % Moment of muscleForce around HRC
 momentF = cross(MOP,muscleForce);
 
@@ -137,9 +142,11 @@ hipJointForce = solve(eq1, eq2, eq3, eq4, eq5, eq6);
 rX = double(hipJointForce.rXsym);
 rY = double(hipJointForce.rYsym);
 rZ = double(hipJointForce.rZsym);
-% fa = double(hipJointForce.fa);
-% ft = double(hipJointForce.ft)
-% fp = double(hipJointForce.fp)
+fa = double(hipJointForce.fa);
+ft = double(hipJointForce.ft);
+fp = double(hipJointForce.fp);
+
+disp([fa, ft, fp])
 
 rMag = norm([rX rY rZ]);        % Magnitude of hip joint reaction force in [N]
 rMagP = rMag / abs(wb) * 100;   % Magnitude of hip joint reaction force in [BW%]
