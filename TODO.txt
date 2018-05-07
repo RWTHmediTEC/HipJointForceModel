@@ -1,6 +1,15 @@
 TODO:
-Bug in OneLegStance_IglicEggert if muscles have via points.
 
+- Darstellung der Hüftgelenkskraft (Pelvis/Femur)
+- Neue OrthoLoad Daten der Validierung hinzufügen
+- Änderungen (TLEM2.1) in MATLAB einarbeiten
+- Revision der PCSAs; Vergleich mit AnyBody
+- Betrachtung der Parameter in Iglic
+
+- Einarbeitung der via points und wrapping surfaces
+- Implementierung des Pelvic tilt
+- Implementierung des LBS; Validierung mit OrthoLoad
+- Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
+- Modelle für weitere ADLs implementieren
 
 TOTEST:
-1. Influence of pelvic tilt on the original Iglic model.
