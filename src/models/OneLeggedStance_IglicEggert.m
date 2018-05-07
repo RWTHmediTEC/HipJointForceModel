@@ -1,4 +1,4 @@
-function funcHandles = OneLegStance_IglicEggert
+function funcHandles = OneLeggedStance_IglicEggert
 
 funcHandles.Position = @Position;
 funcHandles.Muscles = @Muscles;
@@ -6,28 +6,27 @@ funcHandles.Calculation = @Calculation;
 
 end
 
-
 %% Calculate the joint angles for positioning of the TLEM2
 function jointAngles = Position(data)
 
 % Inputs
-HRC=data.HRC;
-FL=data.FL;
-PelvicTilt=data.PelvicTilt;
+HRC = data.HRC;
+FL  = data.FL;
+PB  = data.PB;
 
 % Calculate the joint angles
 b = 0.48 * HRC/2;
 ny = asind(b/FL);
-jointAngles = {[0.5 0 -PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
+jointAngles = {[0.5 0 PB], [ny 0 0], 0, 0, -ny, 0};
 end
 
-function [activeMuscles, enable] = Muscles()
 %% Active Muscles
+function [activeMuscles, enable] = Muscles()
 % Is the user allowed to edit the default values
-enable='on';
+enable = 'on';
 
 % Default fascicles of the model
-activeMuscles =  {...
+activeMuscles = {...
     'GluteusMediusAnterior1';
     'GluteusMediusAnterior2';
     'GluteusMediusAnterior3';
@@ -49,19 +48,20 @@ activeMuscles =  {...
     'GluteusMinimusMid1';
     'GluteusMinimusMid2';
     'GluteusMinimusPosterior1';
-    'GluteusMinimusPosterior2';};
+    'GluteusMinimusPosterior2';
+    'Piriformis1'};
 end
 
 %% Calculation of the HJF
-function [rMag, rMagP, rPhi, rTheta, rDir] = Calculation(data)
+function [rMag, rMagP, rPhi, rTheta, rAlpha, rDir, rX, rYfemur, rZfemur] = Calculation(data)
 
 % Inputs
-LE=data.LE;
-muscleList=data.MuscleList;
-BW=data.BW;
-HRC=data.HRC;
-activeMuscles=data.activeMuscles;
-Side=data.Side;
+LE            = data.LE;
+muscleList    = data.MuscleList;
+BW            = data.BW;
+HRC           = data.HRC;
+activeMuscles = data.activeMuscles;
+Side          = data.Side;
                                  
 %% Define Parameters
 G = -9.81;                              % Weight force
@@ -81,50 +81,50 @@ a = (wb * ca - wl * ba) / (wb - wl);    % Lever arm of the force w's attachment 
 NoaM = size(activeMuscles,1);
 
 % Get MOPs and MIPs
-MOP=zeros(NoaM,3);
-MIP=zeros(NoaM,3);
+[MOP, MIP] = deal(zeros(NoaM,3));
 for m = 1:NoaM
     for b = 1:length(LE)
         if ~isempty(LE(b).Muscle)
             muscles = fieldnames(LE(b).Muscle);
             if any(strcmp(muscles,activeMuscles(m,1)))
-                if strcmp(LE(b).Muscle.(activeMuscles{m,1}).Type, 'Origin')
-                    MOP(m,:) = LE(b).Muscle.(activeMuscles{m,1}).Pos;                        
-                else
-                    MIP(m,:) = LE(b).Muscle.(activeMuscles{m,1}).Pos;
+                for t = 1:length(LE(b).Muscle.(activeMuscles{m,1}).Type)
+                    if strcmp(LE(b).Muscle.(activeMuscles{m,1}).Type(t), 'Origin')
+                        MOP(m,:) = LE(b).Muscle.(activeMuscles{m,1}).Pos(t,:);                        
+                    elseif strcmp(LE(b).Muscle.(activeMuscles{m,1}).Type(t), 'Via')
+                        continue
+                    elseif strcmp(LE(b).Muscle.(activeMuscles{m,1}).Type(t), 'Insertion')
+                        MIP(m,:) = LE(b).Muscle.(activeMuscles{m,1}).Pos(t,:);
+                    end
                 end
             end
         end
     end
 end
 
-PCSA=zeros(NoaM,1);
+PCSA = zeros(NoaM,1);
 % Get PCSAs
 for m = 1:NoaM
     % PCSA of each fascicle
     PCSA_Idx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
-    PCSA(m)=muscleList{PCSA_Idx,5}/muscleList{PCSA_Idx,4};
+    PCSA(m) = muscleList{PCSA_Idx,5} / muscleList{PCSA_Idx,4};
 end
 
 % Unit vectors s in the direction of the muscles
-s=normalizeVector3d(MIP - MOP);
+s = normalizeVector3d(MIP - MOP);
 % Iglic 1990 equation 2
-muscleForce = PCSA .* cell2sym(repmat({'fa'}, NoaM,1)) .* s; 
+syms f % Symbolic average muscle tension f
+for m = 1:NoaM % loop not needed for latest Matlab version
+muscleForce(m,:) = PCSA(m) * f * s(m,:);
+end
+% muscleForce = PCSA .* cell2sym(repmat({'fa'}, NoaM,1)) .* s; 
+
 % Moment of muscleForce around HRC
-momentF = cross(MOP,muscleForce);
-% for m = 1:length(MOP)
-    % Unit vector s_m in the direction of the m-th muscle
-%     s(m,:) = (MIP(m,:) - MOP(m,:)) / norm(MIP(m,:) - MOP(m,:));
-    % Iglic 1990 equation 2
-%     muscleForce(m,:) = PCSA(m) * cell2sym(activeMuscles(m,2)) .* s(m,:);
-    % Moment of muscleForce around HRC
-%     momentF(m,:) = cross(MOP(m,:),muscleForce(m,:));
-% end
+momentF = cross(MOP, muscleForce);
 
 if Side == 'L'
-    momentW = cross([0 0 a],w); % Moment of bodyweight force around HRC
+    momentW = cross([0 0 a], w);  % Moment of bodyweight force around HRC
 else
-    momentW = cross([0 0 -a],w); % Moment of bodyweight force around HRC
+    momentW = cross([0 0 -a], w); % Moment of bodyweight force around HRC
 end
 
 syms rXsym rYsym rZsym % Hip joint forces
@@ -134,22 +134,22 @@ eq2 =  sum(muscleForce(:,2)) + rYsym + w(2); % Iglic 1990 equation 4 for Y-compo
 eq3 =  sum(muscleForce(:,3)) + rZsym + w(3); % Iglic 1990 equation 4 for Z-component
 
 eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
-% eq5 = sum(momentF(:,2)) + momentW(2); % Iglic 1990 equation 5 for Y-component
-% eq6 = sum(momentF(:,3)) + momentW(3); % Iglic 1990 equation 5 for Z-component
 
-hipJointForce = solve(eq1, eq2, eq3, eq4); % , eq5, eq6
+hipJointForce = solve(eq1, eq2, eq3, eq4);
 
-rX = double(hipJointForce.rXsym);
-rY = double(hipJointForce.rYsym);
-rZ = double(hipJointForce.rZsym);
-% fa = double(hipJointForce.fa);
-% ft = double(hipJointForce.ft)
-% fp = double(hipJointForce.fp)
+rX = -double(hipJointForce.rXsym);
+rY = -double(hipJointForce.rYsym);
+rZ = -double(hipJointForce.rZsym);
+f = double(hipJointForce.f);
 
-rMag = norm([rX rY rZ]);        % Magnitude of hip joint reaction force in [N]
-rMagP = rMag / abs(wb) * 100;   % Magnitude of hip joint reaction force in [BW%]
-rPhi = -atand(rZ / rY);         % Angle in frontal plane
-rTheta = -atand(rX / rY);       % Angle in sagital plane
-rDir=normalizeVector3d([rX rY rZ]);
+ny = asind(ba/data.FL);
+rYfemur = cosd(ny)*rY + sind(ny)*rZ;
+rZfemur = -sind(ny)*rY + cosd(ny)*rZ;                                    
+rMag = norm([rX rYfemur rZfemur]);                          % Magnitude of hip joint reaction force in [N]
+rMagP = rMag / abs(wb) * 100;                               % Magnitude of hip joint reaction force in [BW%]
+rPhi = atand(rZfemur / rYfemur);                            % Angle in frontal plane
+rTheta = atand(rX / rYfemur);                               % Angle in sagittal plane
+rAlpha = atand(rX / rZfemur);                               % Angle in horizontal plane
+rDir = normalizeVector3d([rX rYfemur rZfemur]);
 
 end

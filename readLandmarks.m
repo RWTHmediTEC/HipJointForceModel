@@ -4,8 +4,8 @@ addpath(genpath('src'))
 addpath(genpath('data'))
 
 %% Load landmark data
-Subject.Name='H10R';
-Suffix='';
+Subject.Name='H6R';
+Suffix='_Pelvis';
 
 % Read landmark file
 tempContent = read_mixed_csv([Subject.Name '_Landmarks' Suffix '.fcsv'], ',');

@@ -13,8 +13,8 @@ for b = 1:length(LE)
                 transformPoint3d(LE(b).Joints.(joints{j}).Pos, TFM(:,:,b));
             % Joint axis
             if isfield(LE(b).Joints.(joints{j}), 'Axis')
-                LE(b).Joints.(joints{j}).Axis =...
-                    transformVector3d(LE(b).Joints.(joints{j}).Axis, TFM(:,:,b));
+%                 LE(b).Joints.(joints{j}).Axis =...
+%                     transformVector3d(LE(b).Joints.(joints{j}).Axis, TFM(:,:,b));
             end
         end
         % Muscles

@@ -89,29 +89,29 @@ mRaw(:,6:7) = [];
 % Muscles list
 muscleList(cellfun(@isempty, muscleList)) = [];
 % Create colormap
-cmap = prism(length(muscleList));
+cmap = rand(length(muscleList),3);
 muscleList(:,2) = num2cell(cmap,2);
 
 % Muscle bones 
 for m = 1:length(muscleList)
-    mBIdx = ismember(mRaw(:,1),muscleList{m,1});
+    mBIdx = ismember(mRaw(:,1), muscleList{m,1});
     muscleData = mRaw(mBIdx,:);
     muscleList{m,3} = find(ismember(Bones, unique(muscleData(:,4),'stable')));
     % Number of fascicles of the muscle
-    muscleList{m,4} = max(str2double(strrep(muscleData(:,2),muscleList{m,1},'')));
+    muscleList{m,4} = max(str2double(strrep(muscleData(:,2), muscleList{m,1}, '')));
     % Check if each fascicle of one muscle has the same number of connection points
-    NoC = size(muscleData,1)/muscleList{m,4};
-    if ~isequal(repmat(muscleData(1:NoC,4),muscleList{m,4},1), muscleData(:,4))
+    NoC = size(muscleData,1) / muscleList{m,4};
+    if ~isequal(repmat(muscleData(1:NoC,4), muscleList{m,4},1), muscleData(:,4))
         warning(['Fascicles of ' muscleList{m,1} ' are inconsistent!'])
     end
     % Add PCSA for the muscle
-    tempRaw=cellfun(@(x) regexp(x,'\D+','match'), aRaw(:,1));
-    mBIdx = ismember(tempRaw,muscleList{m,1});
+    tempRaw = cellfun(@(x) regexp(x,'\D+','match'), aRaw(:,1));
+    mBIdx = ismember(tempRaw, muscleList{m,1});
     muscleData = aRaw(mBIdx,:);
     % Check if PCSA value is the same for each fascicle of the muscle
-    musclePCSA=unique(cell2mat(muscleData(:,5)));
+    musclePCSA = unique(cell2mat(muscleData(:,5)));
     assert(length(musclePCSA)==1)
-    muscleList{m,5}=musclePCSA*100; % [cm²] to [mm²]
+    muscleList{m,5} = musclePCSA * 100; % [cm²] to [mm²]
 end
 
 % Fascicle list

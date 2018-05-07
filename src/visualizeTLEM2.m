@@ -2,15 +2,15 @@ function visualizeTLEM2(LE, muscleList, axH, varargin)
 
 % Input parsing
 p = inputParser;
-valFctBones=@(x) validateattributes(x,{'numeric'},{'>=',1,'<=',length(LE)});
-addParameter(p,'Bones',length(LE),valFctBones);
-addParameter(p,'Joints',false,@islogical);
-addParameter(p,'Muscles',{},@iscell);
-parse(p,varargin{:});
+valFctBones = @(x) validateattributes(x, {'numeric'}, {'>=',1, '<=',length(LE)});
+addParameter(p, 'Bones', length(LE), valFctBones);
+addParameter(p, 'Joints', false, @islogical);
+addParameter(p, 'Muscles', {}, @iscell);
+parse(p, varargin{:});
 
 NoB = p.Results.Bones;
 visJoints = p.Results.Joints;
-visMuscles=p.Results.Muscles;
+visMuscles = p.Results.Muscles;
 
 %% Visualization of the model
 hold(axH,'on')
@@ -44,10 +44,10 @@ if visJoints
                 jAxis = LE(b).Joints.(joints{j}).Axis;
                 % Draw joint center
                 % drawPoint3d(axH, jCenter, pointProps);
-                jAxisOrigin = jCenter - 60*jAxis;
-                % jAxisEnd = jAxisOrigin + 120*jAxis;
+                jAxisOrigin = jCenter - 60 * jAxis;
+                % jAxisEnd = jAxisOrigin + 120 * jAxis;
                 % text(axH, jAxisEnd(1), jAxisEnd(2), jAxisEnd(3), joints{j});
-                quiver3D(axH, jAxisOrigin, 120*jAxis, rand(1,3), 0.9);
+                quiver3D(axH, jAxisOrigin, 120 * jAxis, rand(1,3), 0.9);
             end
         end
     end
@@ -78,7 +78,7 @@ if ~isempty(visMuscles)
                     matchingMuscle = fieldnames(LE(bb).Muscle);
                     if any(strcmp(Muscles(m), matchingMuscle))
                         % Check if there are Via points on the bone
-                        vIdx=strcmp(LE(bb).Muscle.(Muscles{m}).Type, 'Via');
+                        vIdx = strcmp(LE(bb).Muscle.(Muscles{m}).Type, 'Via');
                         if any(vIdx)
                             Via = [Via; LE(bb).Muscle.(Muscles{m}).Pos(vIdx,:)];
                         end
@@ -103,7 +103,7 @@ if ~isempty(visMuscles)
     end
 end
 
-axis(axH, 'equal','tight');
+axis(axH, 'equal', 'tight');
 xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
 
 end
