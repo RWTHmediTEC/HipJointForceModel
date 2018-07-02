@@ -21,9 +21,14 @@ patchProps.EdgeLighting = 'gouraud';
 patchProps.FaceLighting = 'gouraud';
 
 % Visualize bones
-meshHandle = zeros(NoB);
-for n = 1:NoB
-    meshHandle(n) = patch(axH, LE(n).Mesh, patchProps);
+
+if NoB == 1 || NoB == 2
+    meshHandle = patch(axH, LE(NoB).Mesh, patchProps);
+else
+    for n = 1:NoB
+        meshHandle = zeros(NoB);
+        meshHandle(n) = patch(axH, LE(n).Mesh, patchProps);
+    end
 end
 
 H_Light(1) = light(axH); light(axH, 'Position', -1*(get(H_Light(1),'Position')));

@@ -1,10 +1,11 @@
 TODO:
 
-- Darstellung der Hüftgelenkskraft (Pelvis/Femur)
-- Neue OrthoLoad Daten der Validierung hinzufügen
+x Darstellung der Hüftgelenkskraft (Pelvis/Femur)
+x Neue OrthoLoad Daten der Validierung hinzufügen
 - Änderungen (TLEM2.1) in MATLAB einarbeiten
 - Revision der PCSAs; Vergleich mit AnyBody
 - Betrachtung der Parameter in Iglic
+- weiterer GUI Tab für Validierung
 
 - Einarbeitung der via points und wrapping surfaces
 - Implementierung des Pelvic tilt
@@ -13,3 +14,9 @@ TODO:
 - Modelle für weitere ADLs implementieren
 
 TOTEST:
+
+NOTES:
+
+- Landmarke GT für Subject H4L fehlt
+- Ergebnisse für Iglic überprüfen (Kraftrichtung)
+- Ergebnisse für lokales oder globales KOS angeben?

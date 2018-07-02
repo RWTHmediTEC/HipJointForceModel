@@ -8,10 +8,11 @@ else
 end
 
 data = struct(...
+    'View', 1,...               % View of the HJF
     'Side', 'R',...             % Side of the regarded hip joint, R:Right, L:Left
     'BW', 45,...                % Patient's body weight [kg]
     'PB', 0);                   % Pelvic Bend [°]
                   
-data.LE = LE;
+data.originalLE = LE;
 data.MuscleList = muscleList;
 end

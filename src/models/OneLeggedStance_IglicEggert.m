@@ -106,7 +106,8 @@ PCSA = zeros(NoaM,1);
 for m = 1:NoaM
     % PCSA of each fascicle
     PCSA_Idx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
-    PCSA(m) = muscleList{PCSA_Idx,5} / muscleList{PCSA_Idx,4};
+    %PCSA(m) = muscleList{PCSA_Idx,5} / muscleList{PCSA_Idx,4};
+    PCSA(m) = muscleList{PCSA_Idx,5};
 end
 
 % Unit vectors s in the direction of the muscles

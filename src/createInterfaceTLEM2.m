@@ -1,6 +1,6 @@
 function gui = createInterfaceTLEM2(data)
-% Creation of the GUI
 
+% Create GUI
 gui.Window = figure(...
     'Name', 'Hip Joint Reaction Force Model',...
     'NumberTitle', 'off',...
@@ -14,22 +14,57 @@ elseif size(monitorsPosition,1) == 2
     set(gui.Window,'OuterPosition',monitorsPosition(2,:));
 end
 
-gui.Layout_Main_H       = uix.HBox('Parent', gui.Window,        'Spacing', 3);
-gui.Layout_Main_V_Left  = uix.VBox('Parent', gui.Layout_Main_H, 'Spacing', 3);
-gui.Layout_Main_V_Mid   = uix.VBox('Parent', gui.Layout_Main_H, 'Spacing', 3);
-gui.Layout_Main_V_Right = uix.VBox('Parent', gui.Layout_Main_H, 'Spacing', 3);
+gui.Tabs = uiextras.TabPanel('Parent', gui.Window, 'TabSize', 100);
+
+% Create Home Tab
+gui.Layout_Home_Main_H       = uix.HBox('Parent', gui.Tabs,               'Spacing', 3);
+gui.Layout_Home_Main_V_Left  = uix.VBox('Parent', gui.Layout_Home_Main_H, 'Spacing', 3);
+gui.Layout_Home_Main_V_Mid   = uix.VBox('Parent', gui.Layout_Home_Main_H, 'Spacing', 3);
+gui.Layout_Home_Main_V_Right = uix.VBox('Parent', gui.Layout_Home_Main_H, 'Spacing', 3);
+
+% Create Validation Tab
+gui.Layout_Validation_Main_H       = uix.HBox('Parent', gui.Tabs,                     'Spacing', 3);
+gui.Layout_Validation_Main_V_Left  = uix.VBox('Parent', gui.Layout_Validation_Main_H, 'Spacing', 3);
+gui.Layout_Validation_Main_V_Right = uix.VBox('Parent', gui.Layout_Validation_Main_H, 'Spacing', 3);
+
+gui.Tabs.TabNames = {'Home', 'Validation'};
+gui.Tabs.SelectedChild = 1;
+
+%¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
+%                                 HOME TAB                                %
+%_________________________________________________________________________%
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
 %                                  PANELS                                 %
 %_________________________________________________________________________%
 
 %% Patient Specific Parameters Panel
-gui.Panel_PSP = uix.BoxPanel('Parent', gui.Layout_Main_V_Left,...
+gui.Panel_PSP = uix.BoxPanel('Parent', gui.Layout_Home_Main_V_Left,...
     'Title', 'Patient Specific Parameters',...
     'FontWeight', 'bold');
 
 gui.Layout_PSP = uix.VBox('Parent', gui.Panel_PSP,...
     'Spacing', 3);
+
+% Panel HJF Selection
+gui.Panel_HJF = uix.Panel('Parent', gui.Layout_PSP,...
+    'Title', 'Show HJF for');
+
+gui.RadioButtonBox_HJF = uix.VButtonBox('Parent', gui.Panel_HJF,...
+    'Spacing', 3,...
+    'HorizontalAlignment', 'left',...
+    'ButtonSize', [80 20]);
+
+gui.RadioButton_Pelvis = uicontrol('Parent', gui.RadioButtonBox_HJF,...
+    'Style', 'radiobutton',...
+    'String', 'Pelvis',...
+    'Value', 1,...
+    'Callback', @onPelvis);
+
+gui.RadioButton_Femur = uicontrol('Parent', gui.RadioButtonBox_HJF,...
+    'Style', 'radiobutton',...
+    'String', 'Femur',...
+    'Callback', @onFemur);
 
 % Panel Side Selection
 gui.Panel_Side = uix.Panel('Parent', gui.Layout_PSP,...
@@ -61,13 +96,13 @@ gui.EditText_BW = uicontrol('Parent', gui.Panel_BW,...
     'Callback', @onEditText_BW);
 
 % Panel Pelvic Bend
-% gui.Panel_PB = uix.Panel('Parent', gui.Layout_PSP,...
-%     'Title', 'Pelvic Bend [°]');
-% 
-% gui.EditText_PB = uicontrol('Parent', gui.Panel_PB,...
-%     'Style', 'edit',...
-%     'String', data.PB,...
-%     'Callback', @onEditText_PB);
+gui.Panel_PB = uix.Panel('Parent', gui.Layout_PSP,...
+    'Title', 'Pelvic Bend [°]');
+
+gui.EditText_PB = uicontrol('Parent', gui.Panel_PB,...
+    'Style', 'edit',...
+    'String', data.PB,...
+    'Callback', @onEditText_PB);
 
 % Panel Distance HRC
 gui.Panel_HRC = uix.Panel('Parent', gui.Layout_PSP,...
@@ -148,11 +183,17 @@ gui.Label_SFL = uicontrol('Parent', gui.Panel_SFL,...
 % gui.Label_SFW = uicontrol('Parent', gui.Panel_SFW,...
 %     'Style', 'text');
 
-set(gui.Layout_PSP, 'Height', [-1, -1, -1, -4])
+gui.PushButton_ResetScaling = uicontrol('Parent', gui.Layout_PSP,...
+    'Style', 'PushButton',...
+    'String', 'Reset',...
+    'Callback', @onPushButton_ResetScaling);
+gui.ResetScaling = false;
+
+set(gui.Layout_PSP, 'Height', [-1, -1, -1, -1, -1, -4, -0.5])
 set(gui.Layout_SP,  'Width',  [-2.5, -1])
 
 %% Model Panel
-gui.Panel_Model = uix.BoxPanel('Parent', gui.Layout_Main_V_Right,...
+gui.Panel_Model = uix.BoxPanel('Parent', gui.Layout_Home_Main_V_Right,...
     'Title', 'Model',...
     'FontWeight', 'bold');
 
@@ -196,7 +237,7 @@ gui.ListBox_MuscleReset = uicontrol('Parent', gui.Panel_Muscle_V,...
 set(gui.Panel_Muscle_V, 'Height', [-10, -1])
 
 %% Visualization Panel
-gui.Panel_Vis = uix.BoxPanel('Parent', gui.Layout_Main_V_Mid,...
+gui.Panel_Vis = uix.BoxPanel('Parent', gui.Layout_Home_Main_V_Mid,...
     'Title', 'Visualization',...
     'FontWeight', 'bold');
 
@@ -209,7 +250,7 @@ gui.Axis_Vis = axes('Parent', gui.Panel_Vis);
 
 [data.LE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
     data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
-    scaleTLEM2(data.LE);
+    scaleTLEM2(data.originalLE);
 set(gui.EditText_HRC, 'String', data.HRC);
 set(gui.EditText_PW,  'String', data.PW);
 set(gui.EditText_PH,  'String', data.PH);
@@ -247,7 +288,7 @@ set(gui.Layout_Vis_V, 'Height', [-18, -1])
 set(gui.Layout_Vis_G, 'Widths', [-1, -1, -1], 'Heights', [-1, -1]);
 
 %% Results Panel
-gui.Panel_Res = uix.BoxPanel('Parent', gui.Layout_Main_V_Right,...
+gui.Panel_Res = uix.BoxPanel('Parent', gui.Layout_Home_Main_V_Right,...
     'Title', 'Results',...
     'FontWeight', 'bold');
 
@@ -344,85 +385,138 @@ gui.PushButton_RC = uicontrol('Parent', gui.Layout_Res_HB,...
     'BackgroundColor', 'y',...
     'Callback',@onPushButton_RC);
 
-set(gui.Layout_Res_V, 'Height', [-9, -1])
+gui.Checkbox_VAL = uicontrol('Parent', gui.Layout_Res_HB,...
+    'Style', 'Checkbox',...
+    'String', 'and Validation');
+
+set(gui.Layout_Res_V,  'Height', [-9, -1])
+set(gui.Layout_Res_HB, 'Width',  [-2, -2, -2, -2, -2, -1.5, -1.5])
+
+%¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
+%                              VALIDATION TAB                             %
+%_________________________________________________________________________%
+
+%¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
+%                                  PANELS                                 %
+%_________________________________________________________________________%
+
+gui.Panel_HJF_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Left,...
+    'Title', 'Magnitude of Force [BW%]',...
+    'FontWeight', 'bold');
+gui.HJF_VAL_Axis = axes(gui.Panel_HJF_VAL);
+
+gui.Panel_FA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Right,...
+    'Title', 'Frontal Angle',...
+    'FontWeight', 'bold');
+gui.FA_VAL_Axis = axes(gui.Panel_FA_VAL);
+
+gui.Panel_SA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Left,...
+    'Title', 'Sagittal Angle',...
+    'FontWeight', 'bold');
+gui.SA_VAL_Axis = axes(gui.Panel_SA_VAL);
+
+gui.Panel_HA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Right,...
+    'Title', 'Horizontal Angle',...
+    'FontWeight', 'bold');
+gui.HA_VAL_Axis = axes(gui.Panel_HA_VAL);
 
 %% Adjust main Layout
-set(gui.Layout_Main_H,          'Width',    [-1, -2, -4])
-set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
+set(gui.Layout_Home_Main_H,          'Width',    [-1, -2, -4])
+set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
 %                           CALLBACK FUNCTIONS                            %
 %_________________________________________________________________________%
 
 %% Patient Specific Parameters Panel
+    function onPelvis(~, ~)
+        % User has set HJF for Pelvis
+        data.View = 1;
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onFemur(~, ~)
+        % User has set HJF for Femur
+        data.View = 2;
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
     function onRightSide(~, ~)
         % User has set the hip Side to Right
         data.Side = 'R';
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onLeftSide(~, ~)
         % User has set the hip Side to Left
         data.Side = 'L';
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onEditText_BW(scr, ~)
         % User is editing the Bodyweight
         data.BW = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onEditText_PB(scr, ~)
         % User is editing the Pelvic Bend
         data.PB = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onEditText_HRC(scr, ~)
         % User is editing the distance between Hip Rotation Centers
         data.HRC = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onEditText_PW(scr, ~)
         % User is editing the Pelvic Width
         data.PW = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onEditText_PH(scr, ~)
         % User is editing the Pelvic Height
         data.PH = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onEditText_PD(scr, ~)
         % User is editing the Pelvic Depth
         data.PD = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onEditText_FL(scr, ~)
         % User is editing Femoral Length
         data.FL = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
-    function onEditText_FW(scr, ~)
-        % User is editing the Femoral Width
-        data.FW = str2double(get(scr, 'String'));
+%     function onEditText_FW(scr, ~)
+%         % User is editing the Femoral Width
+%         data.FW = str2double(get(scr, 'String'));
+%         gui.IsUpdated = false;
+%         updateHomeTab();
+%     end
+
+    function onPushButton_ResetScaling(~, ~)
+        gui.ResetScaling = true;
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
 %% Visualization Panel
@@ -457,7 +551,7 @@ set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
         data.Model = models{get(src, 'Value')};
         gui.IsUpdated = false;
         updatePosture()
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onListSelection_Muscles(src, ~)
@@ -469,15 +563,15 @@ set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
             tempFascicles = [tempFascicles;...
                 cellstr(num2str((1:tempMuscles{m,2})', [tempMuscles{m,1} '%d']))];
         end
-        data.activeMuscles=tempFascicles;
+        data.activeMuscles = tempFascicles;
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
     function onPushButton_MuscleReset(~, ~)
         [data.activeMuscles, gui.MuscleListEnable] = gui.modelHandle.Muscles();
         gui.IsUpdated = false;
-        updateInterfaceTLEM2();
+        updateHomeTab();
     end
 
 %% Results Panel
@@ -486,138 +580,29 @@ set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
         set(gui.PushButton_RC, 'BackgroundColor', 'r', 'Enable', 'off');
         
         % Validtion with OrthoLoad data
-        Subjects = {'H1L' 'H8L' 'H9L' 'H10R'}; % Orthoload patient
-        Sex = {'m' 'm' 'm' 'w'};
-        Results = repmat(struct('Patient', [], 'Sex', []), length(Subjects),1);
-        for p = 1:length(Subjects)
-            
-            load('TLEM2', 'LE', 'muscleList')
-            data.LE = LE;
-            data.Side = Subjects{p}(end);
-            
-            [data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW, data.BW,...
-                data.OrMagP, data.OrPhi, data.OrTheta, data.OrAlpha] =...
-                validateTLEM2(Subjects{p});
-%             set(gui.EditText_BW,  'String', data.BW);
-%             set(gui.EditText_HRC, 'String', data.HRC);
-%             set(gui.EditText_PW,  'String', data.PW);
-%             set(gui.EditText_PH,  'String', data.PH);
-%             set(gui.EditText_PD,  'String', data.PD);
-%             set(gui.EditText_FL,  'String', data.FL);
-%             set(gui.EditText_FW,  'String', data.FW);
-            
-            [data.LE, data.RHRC, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW] =...
-                scaleTLEM2(data.LE, data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW);
-%             set(gui.Label_SPW, 'String', data.SPW);
-%             set(gui.Label_SPH, 'String', data.SPH);
-%             set(gui.Label_SPD, 'String', data.SPD);
-%             set(gui.Label_SFL, 'String', data.SFL);
-%             set(gui.Label_SFW, 'String', data.SFW);
-            
-            % Use the selected model to calculate the HJF
-            data = globalizeTLEM2(data);
-            [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rAlpha,...
-                data.rDir, data.rX, data.rY, data.rZ] =...
-                gui.modelHandle.Calculation(data);
-            
-            Results(p).Patient = Subjects{p};
-            Results(p).Sex = Sex{p};
-            
-            % Scaling parameters
-%             Results(p).BW   = data.BW;
-%             Results(p).HRC  = data.HRC;
-%             Results(p).RHRC = data.RHRC;
-%             Results(p).PW   = data.PW;
-%             Results(p).SPW  = data.SPW;
-%             Results(p).PH   = data.PH;
-%             Results(p).SPH  = data.SPH;
-%             Results(p).PD   = data.PD;
-%             Results(p).SPD  = data.SPD;
-%             Results(p).FL   = data.FL;
-%             Results(p).SFL  = data.SFL;
-%             Results(p).FW   = data.FW;
-%             Results(p).SFW  = data.SFW;
-            
-            % Force parameters
-            Results(p).rX         = data.rX;
-            Results(p).rY         = data.rY;
-            Results(p).rZ         = data.rZ;
-            Results(p).rMag       = data.rMag;
-            Results(p).rMagP      = data.rMagP;
-            Results(p).OrMagP     = data.OrMagP;
-                errP = abs((data.rMagP - data.OrMagP) / data.OrMagP * 100);
-            Results(p).errP       = errP;
-            Results(p).rPhi       = data.rPhi;          
-            Results(p).OrPhi      = data.OrPhi;
-                errPhi = abs(abs(data.rPhi) - abs(data.OrPhi));
-            Results(p).errPhi     = errPhi;
-            Results(p).rTheta     = data.rTheta;
-            Results(p).OrTheta    = data.OrTheta;
-                errTheta = abs(data.rTheta - data.OrTheta);
-            Results(p).errTheta   = errTheta;
-            Results(p).rAlpha     = data.rAlpha;
-            Results(p).OrAlpha    = data.OrAlpha;
-                errAlpha = abs(data.rAlpha - data.OrAlpha);
-            Results(p).errAlpha = errAlpha;
+        if gui.Checkbox_VAL.Value == 1
+            data.Results = validateTLEM2(data, gui);
+            writetable(struct2table(data.Results), 'Results.xlsx')
+            updateValidationTab();
         end
-        
-        % TLEM2
-        dataTLEM = createDataTLEM2();
-        data.LE = dataTLEM.LE;
-        data.BW = dataTLEM.BW;
-        data.Side = dataTLEM.Side;
-        
-        [data.LE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
-            data.HRC,data.PW, data.PH, data.PD, data.FL, data.FW] =...
-            scaleTLEM2(data.LE);
-%         set(gui.Label_SPW, 'String', data.SPW);
-%         set(gui.Label_SPH, 'String', data.SPH);
-%         set(gui.Label_SPD, 'String', data.SPD);
-%         set(gui.Label_SFL, 'String', data.SFL);
-%         set(gui.Label_SFW, 'String', data.SFW);
-        
-        % Use the selected model to calculate the HJF
-        data = globalizeTLEM2(data);
+
+        % Calculation with inserted data
         [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rAlpha,...
             data.rDir, data.rX, data.rY, data.rZ] =...
-            gui.modelHandle.Calculation(data);       
+            gui.modelHandle.Calculation(data);
         
-        Results(7).Patient = 'TLEM 2.0';
-        Results(7).Sex = 'm';
-%         Results(7).BW   = data.BW;
-%         Results(7).HRC  = data.HRC;
-%         Results(7).PW   = data.PW;
-%         Results(7).SPW  = data.SPW;
-%         Results(7).PH   = data.PH;
-%         Results(7).SPH  = data.SPH;
-%         Results(7).PD   = data.PD;
-%         Results(7).SPD  = data.SPD;
-%         Results(7).FL   = data.FL;
-%         Results(7).SFL  = data.SFL;
-%         Results(7).FW   = data.FW;
-%         Results(7).SFW  = data.SFW;
-        Results(7).rX        = data.rX;
-        Results(7).rY        = data.rY;
-        Results(7).rZ        = data.rZ;
-        Results(7).rMag      = data.rMag;
-        Results(7).rMagP     = data.rMagP;
-        Results(7).rPhi      = data.rPhi;
-        Results(7).rTheta    = data.rTheta;
-        Results(7).rAlpha    = data.rAlpha;
-             
         gui.IsUpdated = true;
-        updateInterfaceTLEM2();
+        updateResults();
         drawnow
-
-        writetable(struct2table(Results), 'Results.xlsx')
     end
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
 %                             UPDATE FUNCTIONS                            %
 %_________________________________________________________________________%
 
-%% Update whole GUI
-    function updateInterfaceTLEM2()
+%% Update Home Tab
+    function updateHomeTab()
+        updateHJFView();
         updateSideSelection();
         updateMuscleList()
         updateVisualization();
@@ -625,6 +610,17 @@ set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
     end
 
 %% Patient Specific Parameters Panel
+    function updateHJFView()
+        set(gui.RadioButton_Pelvis,  'Value', 0);
+        set(gui.RadioButton_Femur, 'Value', 0);
+        switch data.View
+            case 1 % Pelvis
+                set(gui.RadioButton_Pelvis, 'Value', 1);
+            case 2 % Femur
+                set(gui.RadioButton_Femur, 'Value', 1);
+        end
+    end
+
     function updateSideSelection()
         set(gui.RadioButton_Left,  'Value', 0);
         set(gui.RadioButton_Right, 'Value', 0);
@@ -653,6 +649,29 @@ set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
 
 %% Visualization Panel
     function updateVisualization()
+        
+        % Reset LE
+        data.LE = data.originalLE;
+        
+        if gui.ResetScaling
+            data.Side = 'R';
+            updateSideSelection();
+            data.BW = 45;
+            set(gui.EditText_BW, 'String', data.BW);
+            [data.LE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
+                data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
+            scaleTLEM2(data.LE);
+            gui.ResetScaling = false;
+        else
+            [data.LE, data.RHRC, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW] =...
+                scaleTLEM2(data.LE, data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW);
+        end
+        set(gui.Label_SPW, 'String', data.SPW);
+        set(gui.Label_SPH, 'String', data.SPH);
+        set(gui.Label_SPD, 'String', data.SPD);
+        set(gui.Label_SFL, 'String', data.SFL);
+        % set(gui.Label_SFW, 'String', data.SFW);
+        data = globalizeTLEM2(data);
         delete(gui.Axis_Vis.Children);
         visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis, 'Muscles', data.activeMuscles);
     end
@@ -662,44 +681,30 @@ set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
         % Plot HJF vector
         if gui.IsUpdated
             
-% Visualize HJF on femur
-% data.vis.LE = load('TLEM2', 'LE');
-% data.vis.patchProps.EdgeColor    = 'none';
-% data.vis.patchProps.FaceColor    = [0.95 0.91 0.8];
-% data.vis.patchProps.FaceAlpha    = 1;
-% data.vis.patchProps.EdgeLighting = 'gouraud';
-% data.vis.patchProps.FaceLighting = 'gouraud';
-% figure('color', 'white')
-% patch(data.vis.LE.LE(2).Mesh,data.vis.patchProps)
-% data.H_Light(1) = light(gca); light(gca, 'Position', -1*(get(data.H_Light(1),'Position')));
-% axis(gca, 'equal','tight');
-% xlabel(gca, 'x'); ylabel(gca, 'y'); zlabel(gca, 'z');
-% 
-% quiver3D( ([0 359.1 0] -data.rDir*80), data.rDir*65, 'r')
-% gui.Ax = gca;
-% gui.Ax.Visible = 'off';
-%         gui.Ax.View = [90 ,0];
-%         gui.Ax.CameraUpVector = [0, 1, 0];
-% 
-%         gui.Ax.View = [0, 180];
-%         gui.Ax.CameraUpVector = [1, 0, 0];
-% 
-%         gui.Ax.View = [0, 90];
-%         gui.Ax.CameraUpVector = [0, 1, 0];
+            delete([gui.FV_Axis.Children, gui.SV_Axis.Children, gui.HV_Axis.Children]);
 
-            % In frontal view
-            delete(gui.FV_Axis.Children);
             visualizeTLEM2(data.LE, data.MuscleList, gui.FV_Axis,...
-                'Bones', 1, 'Joints', false, 'Muscles', {});
-            gui.FV_Axis.View = [90, 0];
-            gui.FV_Axis.CameraUpVector = [0, 1, 0];
-            
-            quiver3D(gui.FV_Axis, -data.rDir*40, data.rDir*40, 'r')
-            
-            % In sagittal view
-            delete(gui.SV_Axis.Children);
+                'Bones', data.View, 'Joints', false, 'Muscles', {});
             visualizeTLEM2(data.LE, data.MuscleList, gui.SV_Axis,...
-                'Bones', 1, 'Joints', false, 'Muscles', {});
+                'Bones', data.View, 'Joints', false, 'Muscles', {});
+            visualizeTLEM2(data.LE, data.MuscleList, gui.HV_Axis,...
+                'Bones', data.View, 'Joints', false, 'Muscles', {});
+                     
+            switch data.View
+                case 1 % Pelvis
+                    posSign = 1; 
+                    magSign = -1;
+                    HVAngle = 0;
+                    
+                case 2 % Femur
+                    posSign = -1; 
+                    magSign = 1;
+                    HVAngle = 180;
+            end
+            
+            gui.FV_Axis.View = [90 ,0];
+            gui.FV_Axis.CameraUpVector = [0, 1, 0];
+                    
             switch data.Side
                 case 'R'
                     gui.SV_Axis.View = [0, 90];
@@ -708,32 +713,78 @@ set(gui.Layout_Main_V_Right,    'Height',   [-1, -2])
             end
             gui.SV_Axis.CameraUpVector = [0, 1, 0];
             
-            quiver3D(gui.SV_Axis, -data.rDir*40, data.rDir*40, 'r')
-            
-            % In horizontal view
-            delete(gui.HV_Axis.Children);
-            visualizeTLEM2(data.LE, data.MuscleList, gui.HV_Axis,...
-                'Bones', 1, 'Joints', false, 'Muscles', {});
-            gui.HV_Axis.View = [0, 0];
+            gui.HV_Axis.View = [0, HVAngle];
             gui.HV_Axis.CameraUpVector = [1, 0, 0];
             
-            quiver3D(gui.HV_Axis, -data.rDir*40, data.rDir*40, 'r')
-        end
+            quiver3D(gui.FV_Axis, posSign*data.rDir*75, magSign*data.rDir*60, 'r')
+            quiver3D(gui.SV_Axis, posSign*data.rDir*75, magSign*data.rDir*60, 'r')
+            quiver3D(gui.HV_Axis, posSign*data.rDir*75, magSign*data.rDir*60, 'r')
         
-        if gui.IsUpdated
             set(gui.Label_FM,  'String', data.rMag);
             set(gui.Label_FMP, 'String', data.rMagP);
             set(gui.Label_FA,  'String', abs(data.rPhi));
             set(gui.Label_SA,  'String', abs(data.rTheta));
             set(gui.Label_HA,  'String', abs(data.rAlpha));     
-        end
         
-        % Disable push button
-        if gui.IsUpdated
+            % Disable push button
             set(gui.PushButton_RC, 'BackgroundColor', 'g', 'Enable', 'off');
         else
             set(gui.PushButton_RC, 'BackgroundColor', 'y', 'Enable', 'on');
         end
     end
 
+%% Update Validation Tab
+    function updateValidationTab
+        l = length(data.Results);
+        delete([gui.HJF_VAL_Axis.Children, gui.FA_VAL_Axis.Children, gui.SA_VAL_Axis.Children, gui.HA_VAL_Axis.Children]);
+        [gui.HJF_VAL_Axis.XLim, gui.FA_VAL_Axis.XLim, gui.SA_VAL_Axis.XLim, gui.HA_VAL_Axis.XLim] = deal([0,length(data.Results)+1]);
+        [gui.HJF_VAL_Axis.XTick, gui.FA_VAL_Axis.XTick, gui.SA_VAL_Axis.XTick, gui.HA_VAL_Axis.XTick] = deal(0:1:length(data.Results)+1);
+        [gui.HJF_VAL_Axis.XTickLabel, gui.FA_VAL_Axis.XTickLabel, gui.SA_VAL_Axis.XTickLabel, gui.HA_VAL_Axis.XTickLabel] = deal({"", data.Results.Subject, ""});
+        aMean = mean(horzcat(cat(1,data.Results(2:l).rMagP),cat(1,data.Results(2:l).OrrMagP),...
+                             cat(1,data.Results(2:l).rPhi),cat(1,data.Results(2:l).OrPhi),...
+                             cat(1,data.Results(2:l).rTheta),cat(1,data.Results(2:l).OrTheta),...
+                             cat(1,data.Results(2:l).rAlpha),cat(1,data.Results(2:l).OrAlpha)));
+        % Magnitude Panel
+        hold (gui.HJF_VAL_Axis,'on')
+        for n = 1:length(data.Results)
+            drawPoint(gui.HJF_VAL_Axis, n, data.Results(n).rMagP, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
+            if n > 1
+            drawPoint(gui.HJF_VAL_Axis, n, data.Results(n).OrrMagP, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
+            end
+        end
+        plot(gui.HJF_VAL_Axis, [2,l], [aMean(1),aMean(1)], 'color', 'b')
+        plot(gui.HJF_VAL_Axis, [2,l], [aMean(2),aMean(2)], 'color', 'g')
+        % Frontal Angle Panel
+        hold (gui.FA_VAL_Axis,'on')
+        for n = 1:length(data.Results)
+            drawPoint(gui.FA_VAL_Axis, n, data.Results(n).rPhi, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
+            if n > 1
+            drawPoint(gui.FA_VAL_Axis, n, data.Results(n).OrPhi, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
+            end
+        end
+        plot(gui.FA_VAL_Axis, [2,l], [aMean(3),aMean(3)], 'color', 'b')
+        plot(gui.FA_VAL_Axis, [2,l], [aMean(4),aMean(4)], 'color', 'g')
+        % Sagittal Angle Panel
+        hold (gui.SA_VAL_Axis,'on')
+        for n = 1:length(data.Results)
+            drawPoint(gui.SA_VAL_Axis, n, data.Results(n).rTheta, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
+            if n > 1
+            drawPoint(gui.SA_VAL_Axis, n, data.Results(n).OrTheta, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
+            end
+        end
+        plot(gui.SA_VAL_Axis, [2,l], [aMean(5),aMean(5)], 'color', 'b')
+        plot(gui.SA_VAL_Axis, [2,l], [aMean(6),aMean(6)], 'color', 'g')
+        % Horizontal Angle Panel
+        hold (gui.HA_VAL_Axis,'on')
+        for n = 1:length(data.Results)
+            calc(n) = drawPoint(gui.HA_VAL_Axis, n, data.Results(n).rAlpha, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
+            if n > 1
+            orig(n) = drawPoint(gui.HA_VAL_Axis, n, data.Results(n).OrAlpha, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
+            end
+        end
+        plot(gui.HA_VAL_Axis, [2,l], [aMean(7),aMean(7)], 'color', 'b')
+        plot(gui.HA_VAL_Axis, [2,l], [aMean(8),aMean(8)], 'color', 'g')
+%         hold (gui.HA_VAL_Axis,'off')
+%         legend(gui.HA_VAL_Axis, [calc(2) orig(2)], 'Calculated Value', 'Measured Value')
+    end
 end

@@ -55,7 +55,7 @@ activeMuscles = {...
 end
 
 %% Calculation of the HJF
-function [rMag, rMagP, rPhi, rPhiFemur, rTheta, rAlpha, rDir, rX, rY, rZ] = Calculation(data)
+function [rMag, rMagP, rPhi, rTheta, rAlpha, rDir, rX, rY, rZ] = Calculation(data)
 
 % Inputs
 LE            = data.LE;
@@ -149,7 +149,7 @@ rMag = norm([rX rY rZ]);                                    % Magnitude of hip j
 rMagP = rMag / abs(wb) * 100;                               % Magnitude of hip joint reaction force in [BW%]
 ny = asind(ba/data.FL);
 rPhi = sign(atand(rZ / rY)) * 0.5 + (atand(rZ / rY));       % Angle in frontal plane
-rPhiFemur = sign(atand(rZ / rY)) * ny + (atand(rZ / rY));   % Angle in frontal plane
+%rPhiFemur = sign(atand(rZ / rY)) * ny + (atand(rZ / rY));   % Angle in frontal plane
 rTheta = atand(rX / rY) + data.PB;                          % Angle in sagittal plane
 rAlpha = atand(rX / rZ);                                    % Angle in horizontal plane
 rDir = normalizeVector3d([rX rY rZ]);
