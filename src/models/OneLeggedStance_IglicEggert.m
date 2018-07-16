@@ -53,15 +53,17 @@ activeMuscles = {...
 end
 
 %% Calculation of the HJF
-function [rMag, rMagP, rPhi, rTheta, rAlpha, rDir, rX, rYfemur, rZfemur] = Calculation(data)
+function [rMag, rMagP, rPhi, rTheta, rAlpha, rDir, rX, rY, rZ] = Calculation(data)
 
 % Inputs
 LE            = data.LE;
 muscleList    = data.MuscleList;
 BW            = data.BW;
+PB            = data.PB;
 HRC           = data.HRC;
 activeMuscles = data.activeMuscles;
 Side          = data.Side;
+rView         = data.View;
                                  
 %% Define Parameters
 G = -9.81;                              % Weight force
@@ -138,19 +140,49 @@ eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
 
 hipJointForce = solve(eq1, eq2, eq3, eq4);
 
-rX = -double(hipJointForce.rXsym);
-rY = -double(hipJointForce.rYsym);
-rZ = -double(hipJointForce.rZsym);
-f = double(hipJointForce.f);
+rX = double(hipJointForce.rXsym);
+rY = double(hipJointForce.rYsym);
+rZ = double(hipJointForce.rZsym);
+%f = double(hipJointForce.f);
 
-ny = asind(ba/data.FL);
-rYfemur = cosd(ny)*rY + sind(ny)*rZ;
-rZfemur = -sind(ny)*rY + cosd(ny)*rZ;                                    
-rMag = norm([rX rYfemur rZfemur]);                          % Magnitude of hip joint reaction force in [N]
-rMagP = rMag / abs(wb) * 100;                               % Magnitude of hip joint reaction force in [BW%]
-rPhi = atand(rZfemur / rYfemur);                            % Angle in frontal plane
-rTheta = atand(rX / rYfemur);                               % Angle in sagittal plane
-rAlpha = atand(rX / rZfemur);                               % Angle in horizontal plane
-rDir = normalizeVector3d([rX rYfemur rZfemur]);
+rMag = norm([rX rY rZ]);
+rMagP = rMag / abs(wb) * 100;
+rDir = normalizeVector3d([rX rY rZ]);
+
+if Side == 'L'
+    rZ = -1 * rZ;
+end
+
+% Rotation matrices for local pelvic COS
+TFMx = createRotationOx(degtorad(0.5));
+TFMy = createRotationOy(0);
+TFMz = createRotationOz(degtorad(PB));
+
+if rView == 2
+    rDir = -1 * rDir;
+    
+    ny = asin(ba/data.FL);
+    
+    % Rotation matrices for local femur COS
+    TFMx = createRotationOx(ny);
+    TFMy = createRotationOy();
+    TFMz = createRotationOz();
+end
+
+[rX, rY, rZ] = transformPoint3d(rX, rY, rZ, TFMx*TFMy*TFMz);
+
+rPhi   = atand(rZ / rY);                               % Angle in frontal plane
+rTheta = atand(rX / rY);                               % Angle in sagittal plane
+rAlpha = atand(rX / rZ);                               % Angle in horizontal plane
+
+% ny = asind(ba/data.FL);
+% rYfemur = cosd(ny)*rY + sind(ny)*rZ;
+% rZfemur = -sind(ny)*rY + cosd(ny)*rZ;                                    
+% rMag = norm([rX rYfemur rZfemur]);                          % Magnitude of hip joint reaction force in [N]
+% rMagP = rMag / abs(wb) * 100;                               % Magnitude of hip joint reaction force in [BW%]
+% rPhi = atand(rZfemur / rYfemur);                            % Angle in frontal plane
+% rTheta = atand(rX / rYfemur);                               % Angle in sagittal plane
+% rAlpha = atand(rX / rZfemur);                               % Angle in horizontal plane
+% rDir = normalizeVector3d([rX rYfemur rZfemur]);
 
 end

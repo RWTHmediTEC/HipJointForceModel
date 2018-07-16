@@ -1,3 +1,5 @@
+%% Not up to date!!!
+
 function funcHandles = OneLeggedStance_Iglic1990
 
 funcHandles.Position = @Position;

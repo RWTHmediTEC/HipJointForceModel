@@ -1,5 +1,7 @@
 TODO:
 
+- Berechnung überprüfen/ links, rechts
+
 x Darstellung der Hüftgelenkskraft (Pelvis/Femur)
 x Neue OrthoLoad Daten der Validierung hinzufügen
 - Änderungen (TLEM2.1) in MATLAB einarbeiten
@@ -9,7 +11,7 @@ x Neue OrthoLoad Daten der Validierung hinzufügen
 
 - Einarbeitung der via points und wrapping surfaces
 - Implementierung des Pelvic tilt
-- Implementierung des LBS; Validierung mit OrthoLoad
+- Implementierung des LBS(Offset, CCD, Antetorsion, Femurlänge); Validierung mit OrthoLoad
 - Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
 - Modelle für weitere ADLs implementieren
 

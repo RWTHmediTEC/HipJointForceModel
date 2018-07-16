@@ -8,7 +8,7 @@ gui.Window = figure(...
     'Toolbar', 'figure');
 
 monitorsPosition = get(0,'MonitorPositions');
-if     size(monitorsPosition,1) == 1
+if size(monitorsPosition,1) == 1
     set(gui.Window,'OuterPosition',monitorsPosition(1,:));
 elseif size(monitorsPosition,1) == 2
     set(gui.Window,'OuterPosition',monitorsPosition(2,:));
@@ -207,13 +207,13 @@ gui.Panel_Posture = uix.Panel('Parent', gui.Layout_Muscle,...
 % Get Models
 models = dir('src\models\*.m');
 [~, models] = arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
-data.Model = models{1};
+data.Model = models{2};
 updatePosture()
 gui.ListBox_Posture = uicontrol( 'Style', 'list', ...
     'BackgroundColor', 'w', ...
     'Parent', gui.Panel_Posture, ...
     'String', models,...
-    'Value', 1,...
+    'Value', 2,...
     'Callback', @onListSelection_Posture);
 
 % Panel Muscle List
@@ -692,13 +692,8 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
                      
             switch data.View
                 case 1 % Pelvis
-                    posSign = 1; 
-                    magSign = -1;
-                    HVAngle = 0;
-                    
+                    HVAngle = 0;                    
                 case 2 % Femur
-                    posSign = -1; 
-                    magSign = 1;
                     HVAngle = 180;
             end
             
@@ -716,9 +711,9 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
             gui.HV_Axis.View = [0, HVAngle];
             gui.HV_Axis.CameraUpVector = [1, 0, 0];
             
-            quiver3D(gui.FV_Axis, posSign*data.rDir*75, magSign*data.rDir*60, 'r')
-            quiver3D(gui.SV_Axis, posSign*data.rDir*75, magSign*data.rDir*60, 'r')
-            quiver3D(gui.HV_Axis, posSign*data.rDir*75, magSign*data.rDir*60, 'r')
+            quiver3D(gui.FV_Axis, -data.rDir*75, data.rDir*55, 'r')
+            quiver3D(gui.SV_Axis, -data.rDir*75, data.rDir*55, 'r')
+            quiver3D(gui.HV_Axis, -data.rDir*75, data.rDir*55, 'r')
         
             set(gui.Label_FM,  'String', data.rMag);
             set(gui.Label_FMP, 'String', data.rMagP);
@@ -777,14 +772,13 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
         % Horizontal Angle Panel
         hold (gui.HA_VAL_Axis,'on')
         for n = 1:length(data.Results)
-            calc(n) = drawPoint(gui.HA_VAL_Axis, n, data.Results(n).rAlpha, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
+            drawPoint(gui.HA_VAL_Axis, n, data.Results(n).rAlpha, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
             if n > 1
-            orig(n) = drawPoint(gui.HA_VAL_Axis, n, data.Results(n).OrAlpha, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
+            drawPoint(gui.HA_VAL_Axis, n, data.Results(n).OrAlpha, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
             end
         end
         plot(gui.HA_VAL_Axis, [2,l], [aMean(7),aMean(7)], 'color', 'b')
         plot(gui.HA_VAL_Axis, [2,l], [aMean(8),aMean(8)], 'color', 'g')
-%         hold (gui.HA_VAL_Axis,'off')
 %         legend(gui.HA_VAL_Axis, [calc(2) orig(2)], 'Calculated Value', 'Measured Value')
     end
 end
