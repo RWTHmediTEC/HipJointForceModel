@@ -18,7 +18,7 @@ for b = 1:NoB
         stlRead([tempFileName Bones{b} BoneSuffix{b} '.stl']);
 end
 
-%% Import Joint Center for Transformation Matrices
+%% Import Joint Centers for Transformation Matrices
 [~,~,jRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A6 - Joint Center and Axes.xlsx');
 % Delete the first 3 lines
 jRaw(1:3,:) = [];
@@ -83,7 +83,7 @@ mRaw(emptyIdx+1,3) = {'Origin'};
 % Delete empty Origins
 mRaw(emptyIdx,:) = [];
 % Convert coordinates
-mRaw(:,5) = num2cell(1000*cell2mat(mRaw(:,5:7)),2); % [m] to [mm]
+mRaw(:,5) = num2cell(1000 * cell2mat(mRaw(:,5:7)),2); % [m] to [mm]
 mRaw(:,6:7) = [];
 
 % Muscles list

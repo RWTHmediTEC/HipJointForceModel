@@ -47,6 +47,26 @@ gui.Layout_PSP = uix.VBox('Parent', gui.Panel_PSP,...
     'Spacing', 3);
 
 % Panel HJF Selection
+gui.Panel_Dataset = uix.Panel('Parent', gui.Layout_PSP,...
+    'Title', 'Used dataset');
+
+gui.RadioButtonBox_Dataset = uix.VButtonBox('Parent', gui.Panel_Dataset,...
+    'Spacing', 3,...
+    'HorizontalAlignment', 'left',...
+    'ButtonSize', [80 20]);
+
+gui.RadioButton_TLEM2 = uicontrol('Parent', gui.RadioButtonBox_Dataset,...
+    'Style', 'radiobutton',...
+    'String', 'TLEM 2',...
+    'Value', 1,...
+    'Callback', @onTLEM2);
+
+gui.RadioButton_TLEM21 = uicontrol('Parent', gui.RadioButtonBox_Dataset,...
+    'Style', 'radiobutton',...
+    'String', 'TLEM 2.1',...
+    'Callback', @onTLEM21);
+
+% Panel HJF Selection
 gui.Panel_HJF = uix.Panel('Parent', gui.Layout_PSP,...
     'Title', 'Show HJF for');
 
@@ -189,7 +209,7 @@ gui.PushButton_ResetScaling = uicontrol('Parent', gui.Layout_PSP,...
     'Callback', @onPushButton_ResetScaling);
 gui.ResetScaling = false;
 
-set(gui.Layout_PSP, 'Height', [-1, -1, -1, -1, -1, -4, -0.5])
+set(gui.Layout_PSP, 'Height', [-1, -1, -1, -1, -1, -1, -4, -0.5])
 set(gui.Layout_SP,  'Width',  [-2.5, -1])
 
 %% Model Panel
@@ -429,6 +449,30 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 %_________________________________________________________________________%
 
 %% Patient Specific Parameters Panel
+
+    function onTLEM2(~, ~)
+        % User has chosen TLEM 2 dataset
+        data.Dataset = 1;
+        load('TLEM2', 'LE', 'muscleList')
+        data.originalLE = LE;
+        [data.originalLE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
+            data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
+        scaleTLEM2(data.originalLE);
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onTLEM21(~, ~)
+        % User has chosen TLEM 2.1 dataset
+        data.Dataset = 2;
+        data.originalLE = importDataTLEM2_1(data.originalLE, data.MuscleList);
+        [data.originalLE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
+            data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
+        scaleTLEM2(data.originalLE);
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
     function onPelvis(~, ~)
         % User has set HJF for Pelvis
         data.View = 1;
@@ -602,6 +646,7 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 
 %% Update Home Tab
     function updateHomeTab()
+        updateDataset();
         updateHJFView();
         updateSideSelection();
         updateMuscleList()
@@ -610,6 +655,17 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
     end
 
 %% Patient Specific Parameters Panel
+    function updateDataset()
+        set(gui.RadioButton_TLEM2,  'Value', 0);
+        set(gui.RadioButton_TLEM21, 'Value', 0);
+        switch data.Dataset
+            case 1 % TLEM 2
+                set(gui.RadioButton_TLEM2, 'Value', 1);
+            case 2 % TLEM 2.1
+                set(gui.RadioButton_TLEM21, 'Value', 1);
+        end
+    end
+
     function updateHJFView()
         set(gui.RadioButton_Pelvis,  'Value', 0);
         set(gui.RadioButton_Femur, 'Value', 0);

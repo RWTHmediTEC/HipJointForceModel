@@ -1,18 +1,20 @@
 function data = createDataTLEM2()
 % Build structure which contains default data
 
-if exist('data\TLEM2.mat', 'file')
-    load('TLEM2', 'LE', 'muscleList')
-else
+if exist('data\TLEM2.mat', 'file') ~= 2
     importDataTLEM2
 end
+load('TLEM2', 'LE', 'muscleList')
 
 data = struct(...
-    'View', 1,...               % View of the HJF
+    'Dataset', 1,...            % Choosen dataset, 1:TLEM 2, 2:TLEM 2.1
+    'View', 1,...               % View of the HJF, 1:Pelvis, 2:Femur
     'Side', 'R',...             % Side of the regarded hip joint, R:Right, L:Left
     'BW', 45,...                % Patient's body weight [kg]
     'PB', 0);                   % Pelvic Bend [°]
                   
 data.originalLE = LE;
 data.MuscleList = muscleList;
+
+% data.originalLE = importDataTLEM2_1(data.originalLE, data.MuscleList);
 end

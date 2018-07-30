@@ -9,8 +9,8 @@ function [LE, HRC, PW, PH, PD, FL, FW, varargout] = scaleTLEM2(LE, varargin)
 %       Y-Axis
 % PD  = Pelvic depth measured as the distance between ASIS and PSIS along
 %       X-Axis
-% FL  = Femoral length measured as the distance between greater trochanter
-%       and the midpoint between medial and lateral epicondyle along y-Axis
+% FL  = Femoral length measured as the distance between HRC and the 
+%       midpoint between medial and lateral epicondyle along y-Axis
 % FW  = Femoral width measured as the absolute distance between greater trochanter 
 %       and HRC
 
