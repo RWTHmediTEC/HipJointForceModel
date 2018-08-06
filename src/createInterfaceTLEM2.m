@@ -453,7 +453,7 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
     function onTLEM2(~, ~)
         % User has chosen TLEM 2 dataset
         data.Dataset = 1;
-        load('TLEM2', 'LE', 'muscleList')
+        load('TLEM2', 'LE')
         data.originalLE = LE;
         [data.originalLE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
             data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
@@ -465,7 +465,11 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
     function onTLEM21(~, ~)
         % User has chosen TLEM 2.1 dataset
         data.Dataset = 2;
-        data.originalLE = importDataTLEM2_1(data.originalLE, data.MuscleList);
+        if ~exist('data\TLEM2_1.mat', 'file')
+            importDataTLEM2_1(data.originalLE, data.MuscleList);
+        end
+        load('TLEM2_1', 'LE')
+        data.originalLE = LE;
         [data.originalLE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
             data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
         scaleTLEM2(data.originalLE);

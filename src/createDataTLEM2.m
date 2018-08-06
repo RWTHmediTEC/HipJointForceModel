@@ -1,7 +1,7 @@
 function data = createDataTLEM2()
 % Build structure which contains default data
 
-if exist('data\TLEM2.mat', 'file') ~= 2
+if ~exist('data\TLEM2.mat', 'file')
     importDataTLEM2
 end
 load('TLEM2', 'LE', 'muscleList')
@@ -16,5 +16,4 @@ data = struct(...
 data.originalLE = LE;
 data.MuscleList = muscleList;
 
-% data.originalLE = importDataTLEM2_1(data.originalLE, data.MuscleList);
 end

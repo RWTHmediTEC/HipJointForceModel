@@ -1,13 +1,12 @@
 TODO:
 
-- Berechnung überprüfen/ links, rechts
-
+x Berechnung überprüfen/ links, rechts
 x Darstellung der Hüftgelenkskraft (Pelvis/Femur)
 x Neue OrthoLoad Daten der Validierung hinzufügen
+x weiterer GUI Tab für Validierung
 - Änderungen (TLEM2.1) in MATLAB einarbeiten
 - Revision der PCSAs; Vergleich mit AnyBody
 - Betrachtung der Parameter in Iglic
-- weiterer GUI Tab für Validierung
 
 - Einarbeitung der via points und wrapping surfaces
 - Implementierung des Pelvic tilt
@@ -17,8 +16,13 @@ x Neue OrthoLoad Daten der Validierung hinzufügen
 
 TOTEST:
 
+- Zeitaufwand der einzelnen Funktionen (tictoc)
+
 NOTES:
 
 - Landmarke GT für Subject H4L fehlt
-- Ergebnisse für Iglic überprüfen (Kraftrichtung)
-- Ergebnisse für lokales oder globales KOS angeben?
+- Review lines of action:
+	rectusfemoris
+	tensorfasciaelatae
+- Review via points:
+	sartorius

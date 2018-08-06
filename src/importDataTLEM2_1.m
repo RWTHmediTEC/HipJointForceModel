@@ -1,4 +1,4 @@
-function [LE] = importDataTLEM2_1(LE, muscleList)
+function importDataTLEM2_1(LE, muscleList)
 % Update TLEM 2 to TLEM 2.1
 % Hardcoding of changes made in the AnyBody model due to the reviewed TLEM
 
@@ -6,7 +6,11 @@ function [LE] = importDataTLEM2_1(LE, muscleList)
 
 % Update Calculation of HRC in scaleTLEM2
 % Joint Centers
-LE(1).Joints.Hip.       Pos = [-0.03697295    -0.07767031    0.08159202  ] .* 1000; % [m] in [mm]
+HipJointTLEM2   = [-0.0338      -0.0807      0.0843    ] .* 1000; % [m] in [mm];
+HipJointTLEM2_1 = [-0.03697295  -0.07767031  0.08159202] .* 1000; % [m] in [mm];
+% Hip joint center in AnyBody file differs from TLEM2 dataset, therefore
+% the difference is used to reconstruct the translation of the joint center
+LE(1).Joints.Hip.       Pos = HipJointTLEM2_1 - HipJointTLEM2;
 LE(2).Joints.Hip.       Pos = [-0.004290743    0.3616561    -0.0006287179] .* 1000; % [m] in [mm]
 LE(2).Joints.Knee.      Pos = [-0.009683742   -0.006310877   0.001295266 ] .* 1000; % [m] in [mm]
 LE(2).Joints.Patella.   Pos = [ 0.001859503    0.01200243   -0.004400671 ] .* 1000; % [m] in [mm]
@@ -109,7 +113,7 @@ LE(2).Muscle.Piriformis1.Pos = [0.00153,0.36326,0.05249] * 1000; % [m] in [mm]
 % Tibial muscle elements
 LE(3).Muscle.TensorFasciaeLatae1.Pos = [0.01568,0.32738,0.03194] * 1000; % [m] in [mm]
 % LE(3).Muscle.TensorFasciaeLatae2.Pos = [] * 1000; % [m] in [mm] % same as node 1
-LE(3).Muscle.Sartorius1.Pos = [0.01796,0.29020,-0.01085] * 1000; % [m] in [mm]
+% LE(3).Muscle.Sartorius1.Pos = [0.01796,0.29020,-0.01085] * 1000; % [m] in [mm] % review needed
 
 % Patellar muscle elements
 LE(4).Muscle.RectusFemoris1.Pos = [0.00290,0.01391,- 0.00732] * 1000; % [m] in [mm]
