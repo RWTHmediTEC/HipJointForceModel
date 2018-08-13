@@ -5,9 +5,16 @@ x Darstellung der Hüftgelenkskraft (Pelvis/Femur)
 x Neue OrthoLoad Daten der Validierung hinzufügen
 x weiterer GUI Tab für Validierung
 - Änderungen (TLEM2.1) in MATLAB einarbeiten
-- Revision der PCSAs; Vergleich mit AnyBody
+- Revision der PCSAs
+	- Vergleich mit AnyBody. AnyBody passt die PCSAs anhand eines "Scaling Laws" an.
+	- PCSA = MuscleVolume/OptimalFiberLength
+	- Sowohl MuscleVolume als auch OptimalFiberLength können patienten-spezifisch 
+	  über ein Skalierungsgesetz angepasst werden.
+	- Hier werden die Daten vom TLEM1 (Klein Horsman) verwendet:
+		- MuscleVolume = Mass/1.056 (MuscleDensity) 
+		- OptimalFiberLength (Lopt)
+	
 - Betrachtung der Parameter in Iglic
-
 - Einarbeitung der via points und wrapping surfaces
 - Implementierung des Pelvic tilt
 - Implementierung des LBS(Offset, CCD, Antetorsion, Femurlänge); Validierung mit OrthoLoad

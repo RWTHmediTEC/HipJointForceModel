@@ -111,7 +111,7 @@ for m = 1:length(muscleList)
     % Check if PCSA value is the same for each fascicle of the muscle
     musclePCSA = unique(cell2mat(muscleData(:,5)));
     assert(length(musclePCSA)==1)
-    muscleList{m,5} = musclePCSA * 100; % [cm²] to [mm²]
+    muscleList{m,5} = muscleList{m,4} * musclePCSA * 100; % [cm²] to [mm²]
 end
 
 % Fascicle list

@@ -108,8 +108,7 @@ PCSA = zeros(NoaM,1);
 for m = 1:NoaM
     % PCSA of each fascicle
     PCSA_Idx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
-    %PCSA(m) = muscleList{PCSA_Idx,5} / muscleList{PCSA_Idx,4};
-    PCSA(m) = muscleList{PCSA_Idx,5};
+    PCSA(m) = muscleList{PCSA_Idx,5} / muscleList{PCSA_Idx,4};
 end
 
 % Unit vectors s in the direction of the muscles
@@ -117,7 +116,7 @@ s = normalizeVector3d(MIP - MOP);
 % Iglic 1990 equation 2
 syms f % Symbolic average muscle tension f
 for m = 1:NoaM % loop not needed for latest Matlab version
-muscleForce(m,:) = PCSA(m) * f * s(m,:);
+    muscleForce(m,:) = PCSA(m) * f * s(m,:);
 end
 % muscleForce = PCSA .* cell2sym(repmat({'fa'}, NoaM,1)) .* s; 
 
