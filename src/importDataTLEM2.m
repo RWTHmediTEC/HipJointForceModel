@@ -137,6 +137,18 @@ for b = 1:NoB
     end
 end
 
+%% Save node closest to femoral muscle insertion
+
+femurNS = createns(LE(2).Mesh.vertices);
+Fascicles = fieldnames(LE(2).Muscle);
+% [IDX,D] = deal([]);
+for m = 1:length(Fascicles)
+    LE(2).Muscle.(Fascicles{m}).Node = knnsearch(femurNS, LE(2).Muscle.(Fascicles{m}).Pos);
+%     [idx, d] = knnsearch(femurNS, LE(2).Muscle.(Fascicles{m}).Pos);
+%     IDX = [IDX; idx];
+%     D = [D; d];
+end
+
 %% Import Bony Landmarks required for Scaling
 [~,~,lRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A2 - Bony landmarks.xlsx');
 
