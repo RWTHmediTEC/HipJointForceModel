@@ -1,10 +1,15 @@
 TODO:
+- Warum sind die Winkel und Validierungsergebnisse unterschiedlich, wenn die 
+		Ansicht der Hüftkraft zwischen Femur und Hüfte wechselt?
+- Wechsel zwischen Skalierungsmethoden ermöglichen. 
+- Umstrukturierung der data variable. (T)emplate und (S)ubjectparameter sauber trennen.
+	- data.T.LE <-- in createDataTLEM2 erstellen
+    - data.T.Scale <-- in createDataTLEM2 erstellen
+	- data.S.LE
+    - ...
+- femoralCS_RM.mat\orthoload2TLEM_RM enthält das gleiche wie femurTLEM2Controls.mat\fwTFM2AFCS
+		Bitte das zweite nutzen
 
-x Berechnung überprüfen/ links, rechts
-x Darstellung der Hüftgelenkskraft (Pelvis/Femur)
-x Neue OrthoLoad Daten der Validierung hinzufügen
-x weiterer GUI Tab für Validierung
-- Änderungen (TLEM2.1) in MATLAB einarbeiten
 - Revision der PCSAs
 	- Vergleich mit AnyBody. AnyBody passt die PCSAs anhand eines "Scaling Laws" an.
 	- PCSA = MuscleVolume/OptimalFiberLength
@@ -13,20 +18,24 @@ x weiterer GUI Tab für Validierung
 	- Hier werden die Daten vom TLEM1 (Klein Horsman) verwendet:
 		- MuscleVolume = Mass/1.056 (MuscleDensity) 
 		- OptimalFiberLength (Lopt)
-	
-- Betrachtung der Parameter in Iglic
-- Einarbeitung der via points und wrapping surfaces
+
+- Weitere Modelle für One-Leg-Stance importieren (Pauwels, Debrunner, ...)
+- Parameterstudie für Iglic
+- Skalierung der Via points und Wrapping surfaces
 - Implementierung des Pelvic tilt
-- Implementierung des LBS(Offset, CCD, Antetorsion, Femurlänge); Validierung mit OrthoLoad
+- Implementierung des LBS für die Hüfte
 - Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
 - Modelle für weitere ADLs implementieren
 
-TOTEST:
+TODO GUI:
+- Umbenennen der Horizontal plane/angle in Transverse plane/angle
+- Add box-plots to validation tab
+- Remove TLEM2 results from validation tab
 
+TOTEST:
 - Zeitaufwand der einzelnen Funktionen (tictoc)
 
 NOTES:
-
 - Landmarke GT für Subject H4L fehlt
 - Review lines of action:
 	rectusfemoris

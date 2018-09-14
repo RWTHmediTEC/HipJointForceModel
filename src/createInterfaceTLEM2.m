@@ -55,16 +55,16 @@ gui.RadioButtonBox_Dataset = uix.VButtonBox('Parent', gui.Panel_Dataset,...
     'HorizontalAlignment', 'left',...
     'ButtonSize', [80 20]);
 
-gui.RadioButton_TLEM2 = uicontrol('Parent', gui.RadioButtonBox_Dataset,...
+gui.RadioButton_TLEM2_0 = uicontrol('Parent', gui.RadioButtonBox_Dataset,...
     'Style', 'radiobutton',...
     'String', 'TLEM 2',...
     'Value', 1,...
-    'Callback', @onTLEM2);
+    'Callback', @onTLEM2_0);
 
-gui.RadioButton_TLEM21 = uicontrol('Parent', gui.RadioButtonBox_Dataset,...
+gui.RadioButton_TLEM2_1 = uicontrol('Parent', gui.RadioButtonBox_Dataset,...
     'Style', 'radiobutton',...
     'String', 'TLEM 2.1',...
-    'Callback', @onTLEM21);
+    'Callback', @onTLEM2_1);
 
 % Panel HJF Selection
 gui.Panel_HJF = uix.Panel('Parent', gui.Layout_PSP,...
@@ -124,13 +124,13 @@ gui.EditText_PB = uicontrol('Parent', gui.Panel_PB,...
     'String', data.PB,...
     'Callback', @onEditText_PB);
 
-% Panel Distance HRC
-gui.Panel_HRC = uix.Panel('Parent', gui.Layout_PSP,...
-    'Title', 'Distance between HRCs [mm]');
+% Panel Hip Joint Width
+gui.Panel_HJW = uix.Panel('Parent', gui.Layout_PSP,...
+    'Title', 'Hip Joint Width [mm]');
 
-gui.EditText_HRC = uicontrol('Parent', gui.Panel_HRC,...
+gui.EditText_HJW = uicontrol('Parent', gui.Panel_HJW,...
     'Style', 'edit',...
-    'Callback', @onEditText_HRC);
+    'Callback', @onEditText_HJW);
 
 % Scaling Parameters
 gui.Layout_SP = uix.HBox('Parent', gui.Layout_PSP,...
@@ -170,13 +170,6 @@ gui.EditText_FL = uicontrol('Parent', gui.Panel_FL,...
     'Style', 'edit',...
     'Callback', @onEditText_FL);
 
-% Panel Femoral Width
-% gui.Panel_FW = uix.Panel('Parent', gui.Layout_P,...
-%     'Title', 'Femoral Width [mm]');
-% gui.EditText_FW = uicontrol('Parent', gui.Panel_FW,...
-%     'Style', 'edit',...
-%     'Callback', @onEditText_FW);
-
 % Scale Panels
 gui.Panel_SPW = uix.Panel('Parent', gui.Layout_S,...
     'Title', 'Scale');
@@ -197,11 +190,6 @@ gui.Panel_SFL = uix.Panel('Parent', gui.Layout_S,...
     'Title', 'Scale');
 gui.Label_SFL = uicontrol('Parent', gui.Panel_SFL,...
     'Style', 'text');
-
-% gui.Panel_SFW = uix.Panel('Parent', gui.Layout_S,...
-%     'Title', 'Scale');
-% gui.Label_SFW = uicontrol('Parent', gui.Panel_SFW,...
-%     'Style', 'text');
 
 gui.PushButton_ResetScaling = uicontrol('Parent', gui.Layout_PSP,...
     'Style', 'PushButton',...
@@ -268,20 +256,16 @@ gui.Panel_Vis = uix.Panel('Parent', gui.Layout_Vis_V);
 
 gui.Axis_Vis = axes('Parent', gui.Panel_Vis);
 
-[data.LE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
-    data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
-    scaleTLEM2(data.originalLE);
-set(gui.EditText_HRC, 'String', data.HRC);
-set(gui.EditText_PW,  'String', data.PW);
-set(gui.EditText_PH,  'String', data.PH);
-set(gui.EditText_PD,  'String', data.PD);
-set(gui.EditText_FL,  'String', data.FL);
-% set(gui.EditText_FW,  'String', data.FW);
-set(gui.Label_SPW, 'String', data.SPW);
-set(gui.Label_SPH, 'String', data.SPH);
-set(gui.Label_SPD, 'String', data.SPD);
-set(gui.Label_SFL, 'String', data.SFL);
-% set(gui.Label_SFW, 'String', data.SFW);
+data = scaleTLEM2(data);
+set(gui.EditText_HJW, 'String', data.S.Scale(1).HipJointWidth);
+set(gui.EditText_PW,  'String', data.S.Scale(1).PelvicWidth);
+set(gui.EditText_PH,  'String', data.S.Scale(1).PelvicHeight);
+set(gui.EditText_PD,  'String', data.S.Scale(1).PelvicDepth);
+set(gui.EditText_FL,  'String', data.S.Scale(2).FemoralLength);
+set(gui.Label_SPW, 'String', data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth);
+set(gui.Label_SPH, 'String', data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight);
+set(gui.Label_SPD, 'String', data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth);
+set(gui.Label_SFL, 'String', data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength);
 data = globalizeTLEM2(data);
 visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis, 'Muscles', data.activeMuscles);
 
@@ -422,22 +406,22 @@ set(gui.Layout_Res_HB, 'Width',  [-2, -2, -2, -2, -2, -1.5, -1.5])
 
 gui.Panel_HJF_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Left,...
     'Title', 'Magnitude of Force [BW%]',...
-    'FontWeight', 'bold');
+    'FontWeight', 'bold','BackgroundColor','w');
 gui.HJF_VAL_Axis = axes(gui.Panel_HJF_VAL);
 
 gui.Panel_FA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Right,...
     'Title', 'Frontal Angle',...
-    'FontWeight', 'bold');
+    'FontWeight', 'bold','BackgroundColor','w');
 gui.FA_VAL_Axis = axes(gui.Panel_FA_VAL);
 
 gui.Panel_SA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Left,...
     'Title', 'Sagittal Angle',...
-    'FontWeight', 'bold');
+    'FontWeight', 'bold','BackgroundColor','w');
 gui.SA_VAL_Axis = axes(gui.Panel_SA_VAL);
 
 gui.Panel_HA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Right,...
     'Title', 'Horizontal Angle',...
-    'FontWeight', 'bold');
+    'FontWeight', 'bold','BackgroundColor','w');
 gui.HA_VAL_Axis = axes(gui.Panel_HA_VAL);
 
 %% Adjust main Layout
@@ -450,29 +434,18 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 
 %% Patient Specific Parameters Panel
 
-    function onTLEM2(~, ~)
-        % User has chosen TLEM 2 dataset
-        data.Dataset = 1;
-        load('TLEM2', 'LE')
-        data.originalLE = LE;
-        [data.originalLE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
-            data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
-        scaleTLEM2(data.originalLE);
+    function onTLEM2_0(~, ~)
+        % User has chosen TLEM 2.0 dataset
+        data = createDataTLEM2(data, 'TLEM2_0');
+        data = scaleTLEM2(data);
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onTLEM21(~, ~)
+    function onTLEM2_1(~, ~)
         % User has chosen TLEM 2.1 dataset
-        data.Dataset = 2;
-        if ~exist('data\TLEM2_1.mat', 'file')
-            importDataTLEM2_1(data.originalLE, data.MuscleList);
-        end
-        load('TLEM2_1', 'LE')
-        data.originalLE = LE;
-        [data.originalLE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
-            data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
-        scaleTLEM2(data.originalLE);
+        data = createDataTLEM2(data, 'TLEM2_1');
+        data = scaleTLEM2(data);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -519,47 +492,40 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
         updateHomeTab();
     end
 
-    function onEditText_HRC(scr, ~)
+    function onEditText_HJW(scr, ~)
         % User is editing the distance between Hip Rotation Centers
-        data.HRC = str2double(get(scr, 'String'));
+        data.S.Scale(1).HipJointWidth = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onEditText_PW(scr, ~)
         % User is editing the Pelvic Width
-        data.PW = str2double(get(scr, 'String'));
+        data.S.Scale(1).PelvicWidth = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onEditText_PH(scr, ~)
         % User is editing the Pelvic Height
-        data.PH = str2double(get(scr, 'String'));
+        data.S.Scale(1).PelvicHeight = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onEditText_PD(scr, ~)
         % User is editing the Pelvic Depth
-        data.PD = str2double(get(scr, 'String'));
+        data.S.Scale(1).PelvicDepth = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onEditText_FL(scr, ~)
         % User is editing Femoral Length
-        data.FL = str2double(get(scr, 'String'));
+        data.S.Scale(2).FemoralLength = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
-
-%     function onEditText_FW(scr, ~)
-%         % User is editing the Femoral Width
-%         data.FW = str2double(get(scr, 'String'));
-%         gui.IsUpdated = false;
-%         updateHomeTab();
-%     end
 
     function onPushButton_ResetScaling(~, ~)
         gui.ResetScaling = true;
@@ -660,13 +626,15 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 
 %% Patient Specific Parameters Panel
     function updateDataset()
-        set(gui.RadioButton_TLEM2,  'Value', 0);
-        set(gui.RadioButton_TLEM21, 'Value', 0);
+        set(gui.RadioButton_TLEM2_0,  'Value', 0);
+        set(gui.RadioButton_TLEM2_1, 'Value', 0);
         switch data.Dataset
-            case 1 % TLEM 2
-                set(gui.RadioButton_TLEM2, 'Value', 1);
-            case 2 % TLEM 2.1
-                set(gui.RadioButton_TLEM21, 'Value', 1);
+            case 'TLEM2_0'
+                set(gui.RadioButton_TLEM2_0, 'Value', 1);
+            case 'TLEM2_1'
+                set(gui.RadioButton_TLEM2_1, 'Value', 1);
+                otherwise
+                    error('No valid TLEM version')
         end
     end
 
@@ -709,28 +677,28 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 
 %% Visualization Panel
     function updateVisualization()
-        
         % Reset LE
-        data.LE = data.originalLE;
+        data.LE = data.T.LE;
         
         if gui.ResetScaling
-            data.Side = 'R';
-            updateSideSelection();
-            data.BW = 45;
-            set(gui.EditText_BW, 'String', data.BW);
-            [data.LE, ~, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW,...
-                data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW] =...
-            scaleTLEM2(data.LE);
+            data.S.Scale(1).PelvicWidth = data.T.Scale(1).PelvicWidth;
+            data.S.Scale(1).PelvicHeight = data.T.Scale(1).PelvicHeight;
+            data.S.Scale(1).PelvicDepth = data.T.Scale(1).PelvicDepth;
+            data.S.Scale(2).FemoralLength = data.T.Scale(2).FemoralLength;
+            data = scaleTLEM2(data);
             gui.ResetScaling = false;
         else
-            [data.LE, data.RHRC, data.SPW, data.SPH, data.SPD, data.SFL, data.SFW] =...
-                scaleTLEM2(data.LE, data.HRC, data.PW, data.PH, data.PD, data.FL, data.FW);
+            data = scaleTLEM2(data);
         end
-        set(gui.Label_SPW, 'String', data.SPW);
-        set(gui.Label_SPH, 'String', data.SPH);
-        set(gui.Label_SPD, 'String', data.SPD);
-        set(gui.Label_SFL, 'String', data.SFL);
-        % set(gui.Label_SFW, 'String', data.SFW);
+        set(gui.EditText_HJW, 'String', data.S.Scale(1).HipJointWidth);
+        set(gui.EditText_PW,  'String', data.S.Scale(1).PelvicWidth);
+        set(gui.EditText_PH,  'String', data.S.Scale(1).PelvicHeight);
+        set(gui.EditText_PD,  'String', data.S.Scale(1).PelvicDepth);
+        set(gui.EditText_FL,  'String', data.S.Scale(2).FemoralLength);
+        set(gui.Label_SPW, 'String', data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth);
+        set(gui.Label_SPH, 'String', data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight);
+        set(gui.Label_SPD, 'String', data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth);
+        set(gui.Label_SFL, 'String', data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength);
         data = globalizeTLEM2(data);
         delete(gui.Axis_Vis.Children);
         visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis, 'Muscles', data.activeMuscles);
@@ -790,55 +758,64 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 
 %% Update Validation Tab
     function updateValidationTab
-        l = length(data.Results);
-        delete([gui.HJF_VAL_Axis.Children, gui.FA_VAL_Axis.Children, gui.SA_VAL_Axis.Children, gui.HA_VAL_Axis.Children]);
-        [gui.HJF_VAL_Axis.XLim, gui.FA_VAL_Axis.XLim, gui.SA_VAL_Axis.XLim, gui.HA_VAL_Axis.XLim] = deal([0,length(data.Results)+1]);
-        [gui.HJF_VAL_Axis.XTick, gui.FA_VAL_Axis.XTick, gui.SA_VAL_Axis.XTick, gui.HA_VAL_Axis.XTick] = deal(0:1:length(data.Results)+1);
-        [gui.HJF_VAL_Axis.XTickLabel, gui.FA_VAL_Axis.XTickLabel, gui.SA_VAL_Axis.XTickLabel, gui.HA_VAL_Axis.XTickLabel] = deal({"", data.Results.Subject, ""});
-        aMean = mean(horzcat(cat(1,data.Results(2:l).rMagP),cat(1,data.Results(2:l).OrrMagP),...
-                             cat(1,data.Results(2:l).rPhi),cat(1,data.Results(2:l).OrPhi),...
-                             cat(1,data.Results(2:l).rTheta),cat(1,data.Results(2:l).OrTheta),...
-                             cat(1,data.Results(2:l).rAlpha),cat(1,data.Results(2:l).OrAlpha)));
+        NoS = length(data.Results);
+        delete([gui.HJF_VAL_Axis.Children, gui.FA_VAL_Axis.Children, ...
+            gui.SA_VAL_Axis.Children, gui.HA_VAL_Axis.Children]);
+        [gui.HJF_VAL_Axis.XTick, gui.FA_VAL_Axis.XTick, ...
+            gui.SA_VAL_Axis.XTick, gui.HA_VAL_Axis.XTick] = deal(1:length(data.Results));
+        [gui.HJF_VAL_Axis.XTickLabel, gui.FA_VAL_Axis.XTickLabel, ...
+            gui.SA_VAL_Axis.XTickLabel, gui.HA_VAL_Axis.XTickLabel] = deal({data.Results.Subject});
+        [gui.HJF_VAL_Axis.XLim, gui.FA_VAL_Axis.XLim, ...
+            gui.SA_VAL_Axis.XLim, gui.HA_VAL_Axis.XLim] = deal([0.5,length(data.Results)+0.5]);
+
+        markerProps.Marker='x';
+        markerProps.Markersize=7;
         % Magnitude Panel
         hold (gui.HJF_VAL_Axis,'on')
-        for n = 1:length(data.Results)
-            drawPoint(gui.HJF_VAL_Axis, n, data.Results(n).rMagP, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
-            if n > 1
-            drawPoint(gui.HJF_VAL_Axis, n, data.Results(n).OrrMagP, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
-            end
-        end
-        plot(gui.HJF_VAL_Axis, [2,l], [aMean(1),aMean(1)], 'color', 'b')
-        plot(gui.HJF_VAL_Axis, [2,l], [aMean(2),aMean(2)], 'color', 'g')
+        drawPoint(gui.HJF_VAL_Axis, 1:NoS, [data.Results(:).rMagP], 'color', 'b', markerProps);
+        drawPoint(gui.HJF_VAL_Axis, 1:NoS, [data.Results(:).OrrMagP], 'color', 'g', markerProps)
+        S.rMagP.mean=mean([data.Results(:).rMagP]);
+        O.rMagP.mean=mean([data.Results(:).OrrMagP]);
+        plot(gui.HJF_VAL_Axis, [1,NoS], [S.rMagP.mean,S.rMagP.mean], 'color', 'b')
+        plot(gui.HJF_VAL_Axis, [1,NoS], [O.rMagP.mean,O.rMagP.mean], 'color', 'g')
         % Frontal Angle Panel
         hold (gui.FA_VAL_Axis,'on')
-        for n = 1:length(data.Results)
-            drawPoint(gui.FA_VAL_Axis, n, data.Results(n).rPhi, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
-            if n > 1
-            drawPoint(gui.FA_VAL_Axis, n, data.Results(n).OrPhi, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
-            end
-        end
-        plot(gui.FA_VAL_Axis, [2,l], [aMean(3),aMean(3)], 'color', 'b')
-        plot(gui.FA_VAL_Axis, [2,l], [aMean(4),aMean(4)], 'color', 'g')
+        drawPoint(gui.FA_VAL_Axis, 1:NoS, [data.Results(:).rPhi], 'color', 'b', markerProps);
+        drawPoint(gui.FA_VAL_Axis, 1:NoS, [data.Results(:).OrPhi], 'color', 'g', markerProps);
+        S.rPhi.mean=mean([data.Results(:).rPhi]);
+        O.rPhi.mean=mean([data.Results(:).OrPhi]);
+        plot(gui.FA_VAL_Axis, [1,NoS], [S.rPhi.mean,S.rPhi.mean], 'color', 'b')
+        plot(gui.FA_VAL_Axis, [1,NoS], [O.rPhi.mean,O.rPhi.mean], 'color', 'g')
         % Sagittal Angle Panel
         hold (gui.SA_VAL_Axis,'on')
-        for n = 1:length(data.Results)
-            drawPoint(gui.SA_VAL_Axis, n, data.Results(n).rTheta, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
-            if n > 1
-            drawPoint(gui.SA_VAL_Axis, n, data.Results(n).OrTheta, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
-            end
-        end
-        plot(gui.SA_VAL_Axis, [2,l], [aMean(5),aMean(5)], 'color', 'b')
-        plot(gui.SA_VAL_Axis, [2,l], [aMean(6),aMean(6)], 'color', 'g')
+        drawPoint(gui.SA_VAL_Axis, 1:NoS, [data.Results(:).rTheta], 'color', 'b', markerProps);
+        drawPoint(gui.SA_VAL_Axis, 1:NoS, [data.Results(:).OrTheta], 'color', 'g', markerProps);
+        S.rTheta.mean=mean([data.Results(:).rTheta]);
+        O.rTheta.mean=mean([data.Results(:).OrTheta]);
+        plot(gui.SA_VAL_Axis, [1,NoS], [S.rTheta.mean,S.rTheta.mean], 'color', 'b')
+        plot(gui.SA_VAL_Axis, [1,NoS], [O.rTheta.mean,O.rTheta.mean], 'color', 'g')
         % Horizontal Angle Panel
         hold (gui.HA_VAL_Axis,'on')
-        for n = 1:length(data.Results)
-            drawPoint(gui.HA_VAL_Axis, n, data.Results(n).rAlpha, 'color', 'b', 'Marker', 'x', 'Markersize', 7);
-            if n > 1
-            drawPoint(gui.HA_VAL_Axis, n, data.Results(n).OrAlpha, 'color', 'g', 'Marker', 'x', 'Markersize', 7);        
-            end
-        end
-        plot(gui.HA_VAL_Axis, [2,l], [aMean(7),aMean(7)], 'color', 'b')
-        plot(gui.HA_VAL_Axis, [2,l], [aMean(8),aMean(8)], 'color', 'g')
-%         legend(gui.HA_VAL_Axis, [calc(2) orig(2)], 'Calculated Value', 'Measured Value')
+        drawPoint(gui.HA_VAL_Axis, 1:NoS, [data.Results(:).rAlpha], 'color', 'b', markerProps);
+        drawPoint(gui.HA_VAL_Axis, 1:NoS, [data.Results(:).OrAlpha], 'color', 'g', markerProps);
+        S.rAlpha.mean=mean([data.Results(:).rAlpha]);
+        O.rAlpha.mean=mean([data.Results(:).OrAlpha]);
+        plot(gui.HA_VAL_Axis, [1,NoS], [S.rAlpha.mean,S.rAlpha.mean], 'color', 'b')
+        plot(gui.HA_VAL_Axis, [1,NoS], [O.rAlpha.mean,O.rAlpha.mean], 'color', 'g')
+        
+%         legend(gui.HJF_VAL_Axis, [calc(2) orig(2)], 'Calculated Value', 'Measured Value')
+        figure('Color','w')
+        subplot(2,2,1)
+        boxplot([[data.Results(:).OrrMagP]',[data.Results(:).rMagP]'],{'In-vivio','Simulated'})
+        title('R [%BW]')
+        subplot(2,2,2)
+        boxplot([[data.Results(:).OrPhi]',[data.Results(:).rPhi]'],{'In-vivio','Simulated'})
+        title('Frontal Angle [°]')
+        subplot(2,2,3)
+        boxplot([[data.Results(:).OrTheta]',[data.Results(:).rTheta]'],{'In-vivio','Simulated'})
+        title('Sagittal Angle [°]')
+        subplot(2,2,4)
+        boxplot([[data.Results(:).OrAlpha]',[data.Results(:).rAlpha]'],{'In-vivio','Simulated'})
+        title('Transverse Angle [°]')
     end
 end

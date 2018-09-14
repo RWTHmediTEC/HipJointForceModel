@@ -10,8 +10,8 @@ end
 function jointAngles = Position(data)
 
 % Inputs
-HRC = data.HRC;
-FL  = data.FL;
+HRC = data.S.Scale(1).HipJointWidth; % ??? From the template or the subject ???
+FL  = data.S.Scale(2).FemoralLength; % ??? From the template or the subject ???
 PB  = data.PB;
 
 % Calculate the joint angles
@@ -60,14 +60,14 @@ LE            = data.LE;
 muscleList    = data.MuscleList;
 BW            = data.BW;
 PB            = data.PB;
-HRC           = data.HRC;
+HRC           = data.S.Scale(1).HipJointWidth;
 activeMuscles = data.activeMuscles;
 Side          = data.Side;
 rView         = data.View;
-                                 
+
 %% Define Parameters
 G = -9.81;                              % Weight force
-wb = BW * G;                            % Resultant force of total bodyweight 
+wb = BW * G;                            % Resultant force of total bodyweight
 wl = 0.161 * wb;                        % Resultant force of the supporting limb
 w = [0, wb - wl, 0];                    % Resultant bodyweight force
 HRChalf = HRC/2;                        % Half the distance between the two hip rotation centers
@@ -75,7 +75,7 @@ ba = 0.48 * HRChalf;                    % Lever arm of the force wl
 ca = 1.01 * HRChalf;                    % Lever arm of the ground reaction force wb's attachment point
 a = (wb * ca - wl * ba) / (wb - wl);    % Lever arm of the force w's attachment point
 
-% Implement matrices for Muscle Origin Points (MOP) and Muscle Insertion 
+% Implement matrices for Muscle Origin Points (MOP) and Muscle Insertion
 % Points (MIP) which are equal to r and r' in Iglic 1990
 % and Physiological Cross-Sectional Areas (PCSA)
 
@@ -91,7 +91,7 @@ for m = 1:NoaM
             if any(strcmp(muscles,activeMuscles(m,1)))
                 for t = 1:length(LE(b).Muscle.(activeMuscles{m,1}).Type)
                     if strcmp(LE(b).Muscle.(activeMuscles{m,1}).Type(t), 'Origin')
-                        MOP(m,:) = LE(b).Muscle.(activeMuscles{m,1}).Pos(t,:);                        
+                        MOP(m,:) = LE(b).Muscle.(activeMuscles{m,1}).Pos(t,:);
                     elseif strcmp(LE(b).Muscle.(activeMuscles{m,1}).Type(t), 'Via')
                         continue
                     elseif strcmp(LE(b).Muscle.(activeMuscles{m,1}).Type(t), 'Insertion')
@@ -118,7 +118,7 @@ syms f % Symbolic average muscle tension f
 for m = 1:NoaM % loop not needed for latest Matlab version
     muscleForce(m,:) = PCSA(m) * f * s(m,:);
 end
-% muscleForce = PCSA .* cell2sym(repmat({'fa'}, NoaM,1)) .* s; 
+% muscleForce = PCSA .* cell2sym(repmat({'fa'}, NoaM,1)) .* s;
 
 % Moment of muscleForce around HRC
 momentF = cross(MOP, muscleForce);
@@ -160,7 +160,7 @@ TFMz = createRotationOz(degtorad(PB));
 if rView == 2
     rDir = -1 * rDir;
     
-    ny = asin(ba/data.FL);
+    ny = asin(ba/data.S.Scale(2).FemoralLength);
     
     % Rotation matrices for local femur COS
     TFMx = createRotationOx(ny);
@@ -176,7 +176,7 @@ rAlpha = atand(rX / rZ);                               % Angle in horizontal pla
 
 % ny = asind(ba/data.FL);
 % rYfemur = cosd(ny)*rY + sind(ny)*rZ;
-% rZfemur = -sind(ny)*rY + cosd(ny)*rZ;                                    
+% rZfemur = -sind(ny)*rY + cosd(ny)*rZ;
 % rMag = norm([rX rYfemur rZfemur]);                          % Magnitude of hip joint reaction force in [N]
 % rMagP = rMag / abs(wb) * 100;                               % Magnitude of hip joint reaction force in [BW%]
 % rPhi = atand(rZfemur / rYfemur);                            % Angle in frontal plane

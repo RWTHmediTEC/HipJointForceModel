@@ -5,6 +5,14 @@ Subject = {'H1L' 'H2R' 'H3L' 'H4L' 'H5L' 'H6R' 'H7R' 'H8L' 'H9L' 'H10R'};
 Sex = {'m' 'm' 'm' 'm' 'f' 'm' 'm' 'm' 'm' 'f'};
 OL = repmat(struct('Subject', [], 'Sex', []), length(Subject),1);
 
+%% Hardcoding of implant parameters from '2016 - Bergmann - Standardized Loads Acting in Hip Implants'
+
+NL =     [ 55.6  59.3  56.6  63.3  55.6 55.6  63.3 59.3  59.3 59.6]; % Neck length
+alphaX = [ 2.3   4.1   4.0   7.5   4.0  5.8   6.3  4.6   4.6  1.7];
+alphaY = [-2.3   0.6  -3.0  -1.7  -2.3 -1.7  -1.7 -1.7   0.6 -1.2];
+alphaZ = [-15.0 -13.8 -13.8 -18.9 -2.3 -31.0 -2.4 -15.5 -2.3 -9.7]; % Femoral version [FV]
+CCD = 135; % CCD angle is always 135°
+
 for s = 1:length(Subject)
     
 OL(s).Subject = Subject{s};
@@ -23,13 +31,7 @@ for t = 1:size(tempContent,1)
     OL(s).LM.(tempContent{t,12}) = tempPos(t,:);
 end
 
-%% Calculate scaling parameters HRC, PW, PH, PD, FL and FW
-
-% Femoral parameters
-midPointEC = midPoint3d(OL(s).LM.(['LEC_' Side]), OL(s).LM.(['MEC_' Side]));
-OL(s).FL = distancePoints3d(midPointEC, OL(s).LM.(['HJC_' Side]));
-%FW = distancePoints3d(OL(s).LM.(['GT_' Side]), OL(s).LM.(['HJC_' Side]));
-OL(s).FW = 70; % changed because GT for H4L is missing
+%% Calculate scaling parameters HRC, PW, PH, PD and FL
 
 % Pelvic parameters
 OL(s).HRC = distancePoints3d(OL(s).LM.HJC_R, OL(s).LM.HJC_L);
@@ -51,6 +53,16 @@ OL(s).PH = abs(ASIS(2) - HJC(2));
 % Pelvic depth
 PSIS = transformPoint3d(OL(s).LM.(['PSIS_' Side]), pCSrot);
 OL(s).PD = abs(ASIS(1) - PSIS(1));
+
+% Femoral length [Wu2002]
+midPointEC = midPoint3d(OL(s).LM.(['LEC_' Side]), OL(s).LM.(['MEC_' Side]));
+OL(s).FL = distancePoints3d(midPointEC, OL(s).LM.(['HJC_' Side]));
+
+%% Add skinning parameters neck length [NL], femoral version [FV] and CCD angle [CCD]
+
+OL(s).NL = NL(s);
+OL(s).FV = alphaZ(s);
+OL(s).CCD = CCD;
 
 %% Load bodyweight and forces
 load([Subject{s} '_OLS' '.mat']) % OLS: One-legged stance
