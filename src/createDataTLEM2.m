@@ -3,11 +3,10 @@ function data = createDataTLEM2(data, TLEMversion)
 if nargin == 0
     TLEMversion='TLEM2_0';
     % Build structure which contains default data
-    data = struct(...
-        'View', 1,...               % View of the HJF, 1:Pelvis, 2:Femur
-        'Side', 'R',...             % Side of the hip joint, R:Right, L:Left
-        'BW', 45,...                % Patient's body weight [kg]
-        'PB', 0);                   % Pelvic Bend [°]
+    data.View=1;               % View of the HJF, 1:Pelvis, 2:Femur
+    data.T.Side='R';           % Side of the hip joint, R:Right, L:Left
+    data.T.BodyWeight=45;      % Patient's body weight [kg]
+    data.T.PelvicBend=0;       % Pelvic Bend [°] ??? Is this Bend or Tilt ???
 end
 
 data.Dataset=TLEMversion;
@@ -48,6 +47,7 @@ data.T.Scale(1).PelvicDepth  = ...
     LE(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos(1);
 % Femur
 % ??? What's the definition of this value by landmarks: Wu2002 ???
+%       Should be the same as in OrthoLoad
 data.T.Scale(2).FemoralLength  = LE(2).Joints.Hip.Pos(2);
 % Load Controls [Bergmann2016]
 load('femurTLEM2Controls', 'Controls','LMIdx')
@@ -67,8 +67,14 @@ data.T.Scale(2).CCD = rad2deg(vectorAngle3d(Controls(3,:)-Controls(2,:), Control
 % Neck length of the TLEM2 femur
 data.T.Scale(2).NeckLength = distancePoints3d(Controls(1,:),Controls(2,:));
 
-%% Save initally as (T)emplate and (S)ubject
 data.T.LE = LE;
+
+%% Save initally as (T)emplate and (S)ubject
+              
+data.S.Side=data.T.Side;
+data.S.BodyWeight=data.T.BodyWeight;
+data.S.PelvicBend=data.T.PelvicBend;
+
 data.LE = data.T.LE; % !!! Change to data.S.LE !!!
 data.S.Scale = data.T.Scale;
 

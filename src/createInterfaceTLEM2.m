@@ -112,7 +112,7 @@ gui.Panel_BW = uix.Panel('Parent', gui.Layout_PSP,...
 
 gui.EditText_BW = uicontrol('Parent', gui.Panel_BW,...
     'Style', 'edit',...
-    'String', data.BW,...
+    'String', data.S.BodyWeight,...
     'Callback', @onEditText_BW);
 
 % Panel Pelvic Bend
@@ -121,7 +121,7 @@ gui.Panel_PB = uix.Panel('Parent', gui.Layout_PSP,...
 
 gui.EditText_PB = uicontrol('Parent', gui.Panel_PB,...
     'Style', 'edit',...
-    'String', data.PB,...
+    'String', data.S.PelvicBend,...
     'Callback', @onEditText_PB);
 
 % Panel Hip Joint Width
@@ -313,7 +313,7 @@ gui.Panel_SV = uix.Panel('Parent', gui.Layout_Res_HT, 'Title', 'Sagittal View');
 gui.SV_Axis = axes(gui.Panel_SV);
 visualizeTLEM2(data.LE, data.MuscleList, gui.SV_Axis,...
     'Bones', 1, 'Joints', false, 'Muscles', {});
-switch data.Side
+switch data.S.Side
     case 'R'
         gui.SV_Axis.View = [0, 90];
     case 'L'
@@ -466,28 +466,28 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 
     function onRightSide(~, ~)
         % User has set the hip Side to Right
-        data.Side = 'R';
+        data.S.Side = 'R';
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onLeftSide(~, ~)
         % User has set the hip Side to Left
-        data.Side = 'L';
+        data.S.Side = 'L';
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onEditText_BW(scr, ~)
         % User is editing the Bodyweight
-        data.BW = str2double(get(scr, 'String'));
+        data.S.BodyWeight = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onEditText_PB(scr, ~)
         % User is editing the Pelvic Bend
-        data.PB = str2double(get(scr, 'String'));
+        data.S.PelvicBend = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -652,7 +652,7 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
     function updateSideSelection()
         set(gui.RadioButton_Left,  'Value', 0);
         set(gui.RadioButton_Right, 'Value', 0);
-        switch data.Side
+        switch data.S.Side
             case 'L'
                 set(gui.RadioButton_Left,  'Value', 1);
             case 'R'
@@ -728,7 +728,7 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
             gui.FV_Axis.View = [90 ,0];
             gui.FV_Axis.CameraUpVector = [0, 1, 0];
                     
-            switch data.Side
+            switch data.S.Side
                 case 'R'
                     gui.SV_Axis.View = [0, 90];
                 case 'L'

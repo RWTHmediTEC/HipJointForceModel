@@ -1,7 +1,7 @@
 TODO:
 - Warum sind die Winkel und Validierungsergebnisse unterschiedlich, wenn die 
 		Ansicht der Hüftkraft zwischen Femur und Hüfte wechselt?
-- Wechsel zwischen Skalierungsmethoden ermöglichen. 
+- Wechsel zwischen Skalierungsmethoden ermöglichen.
 - Umstrukturierung der data variable. (T)emplate und (S)ubjectparameter sauber trennen.
 	- data.T.LE <-- in createDataTLEM2 erstellen
     - data.T.Scale <-- in createDataTLEM2 erstellen

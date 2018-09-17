@@ -1,6 +1,6 @@
 clearvars; close all; opengl hardware
-
-addpath(genpath('D:\Biomechanics\General\Code\#external\#Mesh\gptoolbox'))
+% [List.f, List.p] = matlab.codetools.requiredFilesAndProducts([mfilename '.m']);
+% List.f = List.f'; List.p = List.p';
 
 addpath(genpath('src'))
 addpath(genpath('data'))

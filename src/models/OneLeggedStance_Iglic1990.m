@@ -14,7 +14,7 @@ function jointAngles = Position(data)
 % Inputs
 HRC = data.S.Scale(1).HipJointWidth;
 FL  = data.S.Scale(2).FemoralLength;
-PB  = data.PB;
+PB  = data.S.PelvicBend;
 
 % Calculate the joint angles
 b = 0.48 * HRC/2;
@@ -62,10 +62,10 @@ function [rMag, rMagP, rPhi, rTheta, rAlpha, rDir, rX, rY, rZ] = Calculation(dat
 % Inputs
 LE            = data.LE;
 muscleList    = data.MuscleList;
-BW            = data.BW;
+BW            = data.S.BodyWeight;
 HRC           = data.S.Scale(1).HipJointWidth;
 activeMuscles = data.activeMuscles;
-Side          = data.Side;
+Side          = data.S.Side;
 
 %% Define Parameters
 G = -9.81;                              % Weight force
@@ -152,7 +152,7 @@ rMagP = rMag / abs(wb) * 100;                               % Magnitude of hip j
 ny = asind(ba/data.S.Scale(2).FemoralLength);
 rPhi = sign(atand(rZ / rY)) * 0.5 + (atand(rZ / rY));       % Angle in frontal plane
 %rPhiFemur = sign(atand(rZ / rY)) * ny + (atand(rZ / rY));   % Angle in frontal plane
-rTheta = atand(rX / rY) + data.PB;                          % Angle in sagittal plane
+rTheta = atand(rX / rY) + data.S.PelvicBend;                          % Angle in sagittal plane
 rAlpha = atand(rX / rZ);                                    % Angle in horizontal plane
 rDir = normalizeVector3d([rX rY rZ]);
 

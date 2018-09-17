@@ -29,7 +29,7 @@ jointAngles = modelHandles.Position(data);
 LE = positionTLEM2(LE, jointAngles);
 
 %% Mirror TLEM2 for the left side
-switch data.Side
+switch data.S.Side
     case 'L'
         mirrorTFM      = eye(4);
         mirrorTFM(3,3) = -1;

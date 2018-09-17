@@ -12,7 +12,7 @@ function jointAngles = Position(data)
 % Inputs
 HRC = data.S.Scale(1).HipJointWidth; % ??? From the template or the subject ???
 FL  = data.S.Scale(2).FemoralLength; % ??? From the template or the subject ???
-PB  = data.PB;
+PB  = data.S.PelvicBend;
 
 % Calculate the joint angles
 b = 0.48 * HRC/2;
@@ -58,11 +58,11 @@ function [rMag, rMagP, rPhi, rTheta, rAlpha, rDir, rX, rY, rZ] = Calculation(dat
 % Inputs
 LE            = data.LE;
 muscleList    = data.MuscleList;
-BW            = data.BW;
-PB            = data.PB;
+BW            = data.S.BodyWeight;
+PB            = data.S.PelvicBend;
 HRC           = data.S.Scale(1).HipJointWidth;
 activeMuscles = data.activeMuscles;
-Side          = data.Side;
+Side          = data.S.Side;
 rView         = data.View;
 
 %% Define Parameters
