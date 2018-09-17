@@ -1,7 +1,9 @@
 TODO:
 - Warum sind die Winkel und Validierungsergebnisse unterschiedlich, wenn die 
 		Ansicht der Hüftkraft zwischen Femur und Hüfte wechselt?
+        In der Validierung immer Femur CS.
 - Wechsel zwischen Skalierungsmethoden ermöglichen.
+    Skinning in eigene Datei auslagern.
 - Umstrukturierung der data variable. (T)emplate und (S)ubjectparameter sauber trennen.
 	- data.T.LE <-- in createDataTLEM2 erstellen
     - data.T.Scale <-- in createDataTLEM2 erstellen
@@ -20,14 +22,15 @@ TODO:
 		- OptimalFiberLength (Lopt)
 
 - Weitere Modelle für One-Leg-Stance importieren (Pauwels, Debrunner, ...)
-- Parameterstudie für Iglic
+- Parameterstudie für Iglic (Modell-Konstanten variieren)
 - Skalierung der Via points und Wrapping surfaces
-- Implementierung des Pelvic tilt
+- Implementierung des Pelvic tilt (bezieht sich im Moment auf Wu2002)
 - Implementierung des LBS für die Hüfte
 - Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
 - Modelle für weitere ADLs implementieren
 
 TODO GUI:
+- Umbenennen Pelvic Bend zu Pelvic Tilt
 - Umbenennen der Horizontal plane/angle in Transverse plane/angle
 - Add box-plots to validation tab
 - Remove TLEM2 results from validation tab

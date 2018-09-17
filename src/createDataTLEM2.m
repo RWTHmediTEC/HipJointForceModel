@@ -9,7 +9,7 @@ if nargin == 0
     data.T.PelvicBend=0;       % Pelvic Bend [°] ??? Is this Bend or Tilt ???
 end
 
-data.Dataset=TLEMversion;
+data.Dataset=TLEMversion; % !!! Rename to Version
 
 switch TLEMversion
     case 'TLEM2_0'

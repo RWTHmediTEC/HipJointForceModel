@@ -35,12 +35,9 @@ scaleTFM(2,2,3:6) = FL;
 %% Scale
 LE = transformTLEM2(LE, scaleTFM);
 
-%% Skinning
-
+%% Femoral Skinning
 % Linear blend skinning (LBS) of femur changing femoral length (FL), offset
 % (Offset), CCD angle (CCD) and antetorsion (AT)
-
-V=LE(2).Mesh.vertices;
 
 % Load Controls
 load('femurTLEM2Controls', 'Controls','LMIdx')
@@ -70,6 +67,7 @@ postConds=transformPoint3d([...
     LE(2).Mesh.vertices(LMIdx.LateralPosteriorCondyle,:)], scaleFemur);
 transversePlane=createPlane(newControls(3,:), newControls(2,:)-newControls(3,:));
 projPostCond=projPointOnPlane(postConds,transversePlane);
+% Posterior condyle line projected onto the transverse plane
 projPostCondLine=createLine3d(projPostCond(1,:),projPostCond(2,:));
 
 % Implant parameters
@@ -85,9 +83,7 @@ else
     neckLength=S.Scale(2).NeckLength;
 end
 
-skinnedMesh = LE(2).Mesh;
-
-% Femoral Version  <-- !!! Check how femoral length is affected by the following adaptions !!!
+% Femoral Version
 % Calculate the version of the TLEM2 femur
 projNeckPoints = projPointOnPlane(newControls(1:2,:),transversePlane);
 projNeckLine = createLine3d(projNeckPoints(1,:),projNeckPoints(2,:));
@@ -106,6 +102,9 @@ newControls(1,:)=newControls(1,:)+HeightAdjust*normalizeVector3d(newControls(2,:
 neckLengthAdjust=neckLength-distancePoints3d(newControls(1,:),newControls(2,:));
 newControls(1,:)=newControls(1,:)+neckLengthAdjust*...
     normalizeVector3d(newControls(1,:)-newControls(2,:));
+% Femoral Length
+% !!! Move newControls(3,:) in proximal direction, along the straight femur 
+%     axis to adapt the length !!!
 
 % Check if femoral version is correct
 projNeckPoints = projPointOnPlane(newControls(1:2,:),transversePlane);
@@ -117,6 +116,8 @@ assert(ismembertol(CCD,...
     rad2deg(vectorAngle3d(newControls(3,:)-newControls(2,:), newControls(1,:)-newControls(2,:)))))
 % Check if neck length is correct
 assert(ismembertol(neckLength, distancePoints3d(newControls(1,:),newControls(2,:))))
+% Check if femoral length is correct
+% !!! Missing
 
 % Calculate skinning transformations
 [T,AX,AN,Sm,O] = skinning_transformations(Controls,P,[],newControls);
@@ -131,20 +132,22 @@ TR(1:dim,1:dim,:) = Sm;
 Sm = reshape(Sm,[dim dim*m])';
 TR(1:dim,dim+1,:) = permute(O-stacktimes(Sm,O),[2 3 1]);
 % Perform scale as linear blend skinning, before translations and rotations
-[new_V] = lbs(V,TR,Weights);
+skinnedMesh=LE(2).Mesh;
+[scaledVertices] = lbs(skinnedMesh.vertices,TR,Weights);
 Q = axisangle2quat(AX,AN);
 % quattrans2udq expect 3D translations, so pad with zeros
 T = [T zeros(size(T,1),1)];
 % Convert quaternions and translations into dualquaternions
 DQ = quattrans2udq(Q,T);
 % Dual quaternions linear blend skinning deformation
-skinnedMesh.vertices = dualquatlbs(new_V,DQ,Weights);
+skinnedMesh.vertices = dualquatlbs(scaledVertices,DQ,Weights);
 
 %% Update femur
 % Mesh
 LE(2).Mesh = skinnedMesh;
 % Joints
 LE(2).Joints.Hip.Pos = newControls(1,:);
+% !!! Position of the knee joint and axis has to be updated, too !!!
 % Muscles
 Fascicles = fieldnames(LE(2).Muscle);
 for f = 1:length(Fascicles)
