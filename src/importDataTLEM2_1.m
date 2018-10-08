@@ -1,5 +1,5 @@
-function importDataTLEM2_1(LE, muscleList) %#ok<INUSD>
-% !!! Nodes are missing at the moment !!!
+function importDataTLEM2_1(LE, muscleList)
+% !!! Update of muscleList needed? !!!
 
 % Update TLEM 2.0 to TLEM 2.1
 % Hardcoding of changes made in the AnyBody model due to the reviewed TLEM
@@ -8,9 +8,8 @@ function importDataTLEM2_1(LE, muscleList) %#ok<INUSD>
 
 ScaleFactor = 1000; % [m] in [mm]
 
-% Update Calculation of HRC in scaleTLEM2
-% Joint Centers
-AnyBodyHipJointTLEM2_0   = [-0.0338      -0.0807      0.0843    ] .* ScaleFactor;
+% Joint centers
+AnyBodyHipJointTLEM2_0 = [-0.0338      -0.0807      0.0843    ] .* ScaleFactor;
 AnyBodyHipJointTLEM2_1 = [-0.03697295  -0.07767031  0.08159202] .* ScaleFactor;
 % In AnyBody instead of the HJC a different origin is used: 
 %   0.5*(ASIS_R + ASIS_L)
@@ -101,15 +100,15 @@ LE(2).Muscle.GluteusMediusPosterior4.Pos = [-0.01664,0.36185,0.05178] * ScaleFac
 LE(2).Muscle.GluteusMediusPosterior5.Pos = [-0.01579,0.35539,0.05894] * ScaleFactor;
 LE(2).Muscle.GluteusMediusPosterior6.Pos = [-0.01977,0.35915,0.05206] * ScaleFactor;
 LE(2).Muscle.GluteusMinimusAnterior1.Pos = [0.01523, 0.34569,0.05730] * ScaleFactor;
-LE(2).Muscle.GluteusMinimusAnterior1.Type(2) = {'Via'}; % via point added
+LE(2).Muscle.GluteusMinimusAnterior1.Type(2,1) = {'Via'}; % via point added % !!! Check if order of Type is important !!!
 LE(2).Muscle.GluteusMinimusAnterior1.Pos(2,1:3) = [0.01523,0.34569,0.05730] * ScaleFactor;
 % LE(2).Muscle.GluteusMinimusAnterior2.Pos = [] * ScaleFactor; % missing
 LE(2).Muscle.GluteusMinimusMid1.Pos = [0.01635,0.33517,0.05715] * ScaleFactor;
-LE(2).Muscle.GluteusMinimusMid1.Type(2) = {'Via'}; % via point added
+LE(2).Muscle.GluteusMinimusMid1.Type(2,1) = {'Via'}; % via point added
 LE(2).Muscle.GluteusMinimusMid1.Pos(2,1:3) = [0.01635,0.33517,0.05715] * ScaleFactor;
 % LE(2).Muscle.GluteusMinimusMid2.Pos = [] * ScaleFactor; % missing
 LE(2).Muscle.GluteusMinimusPosterior1.Pos = [0.01656,0.32615,0.05660] * ScaleFactor;
-LE(2).Muscle.GluteusMinimusPosterior1.Type = {'Via'}; % via point added
+LE(2).Muscle.GluteusMinimusPosterior1.Type(2,1) = {'Via'}; % via point added
 LE(2).Muscle.GluteusMinimusPosterior1.Pos(2,1:3) = [0.01656,0.32615,0.05660] * ScaleFactor;
 % LE(2).Muscle.GluteusMinimusPosterior2.Pos = [] * ScaleFactor; % missing
 LE(2).Muscle.Piriformis1.Pos = [0.00153,0.36326,0.05249] * ScaleFactor;
@@ -123,6 +122,18 @@ LE(3).Muscle.TensorFasciaeLatae1.Pos = [0.01568,0.32738,0.03194] * ScaleFactor;
 % Patellar muscle elements
 LE(4).Muscle.RectusFemoris1.Pos = [0.00290,0.01391,- 0.00732] * ScaleFactor;
 LE(4).Muscle.RectusFemoris2.Pos = [0.00397,0.01249, 0.00462] * ScaleFactor;
+
+%% Update closest node to femoral muscle origins, insertions and via points
+
+femurNS = createns(LE(2).Mesh.vertices);
+Fascicles = fieldnames(LE(2).Muscle);
+% [IDX,D] = deal([]);
+for m = 1:length(Fascicles)
+    LE(2).Muscle.(Fascicles{m}).Node = knnsearch(femurNS, LE(2).Muscle.(Fascicles{m}).Pos);
+%     [idx, d] = knnsearch(femurNS, LE(2).Muscle.(Fascicles{m}).Pos);
+%     IDX = [IDX; idx];
+%     D = [D; d];
+end
 
 %% Save data
 save('data\TLEM2_1.mat', 'LE', 'muscleList')

@@ -7,25 +7,25 @@ gui.Window = figure(...
     'MenuBar', 'figure',...
     'Toolbar', 'figure');
 
-monitorsPosition = get(0,'MonitorPositions');
-if size(monitorsPosition,1) == 1
-    set(gui.Window,'OuterPosition',monitorsPosition(1,:));
-elseif size(monitorsPosition,1) == 2
-    set(gui.Window,'OuterPosition',monitorsPosition(2,:));
+monitorsPosition = get(0, 'MonitorPositions');
+if size(monitorsPosition, 1) == 1
+    set(gui.Window, 'OuterPosition' ,monitorsPosition(1,:));
+elseif size(monitorsPosition, 1) == 2
+    set(gui.Window, 'OuterPosition', monitorsPosition(2,:));
 end
 
 gui.Tabs = uiextras.TabPanel('Parent', gui.Window, 'TabSize', 100);
 
-% Create Home Tab
-gui.Layout_Home_Main_H       = uix.HBox('Parent', gui.Tabs,               'Spacing', 3);
-gui.Layout_Home_Main_V_Left  = uix.VBox('Parent', gui.Layout_Home_Main_H, 'Spacing', 3);
-gui.Layout_Home_Main_V_Mid   = uix.VBox('Parent', gui.Layout_Home_Main_H, 'Spacing', 3);
-gui.Layout_Home_Main_V_Right = uix.VBox('Parent', gui.Layout_Home_Main_H, 'Spacing', 3);
+% Create home tab
+gui.Home.Layout_H       = uix.HBox('Parent', gui.Tabs,          'Spacing', 3);
+gui.Home.Layout_V_Left  = uix.VBox('Parent', gui.Home.Layout_H, 'Spacing', 3);
+gui.Home.Layout_V_Mid   = uix.VBox('Parent', gui.Home.Layout_H, 'Spacing', 3);
+gui.Home.Layout_V_Right = uix.VBox('Parent', gui.Home.Layout_H, 'Spacing', 3);
 
-% Create Validation Tab
-gui.Layout_Validation_Main_H       = uix.HBox('Parent', gui.Tabs,                     'Spacing', 3);
-gui.Layout_Validation_Main_V_Left  = uix.VBox('Parent', gui.Layout_Validation_Main_H, 'Spacing', 3);
-gui.Layout_Validation_Main_V_Right = uix.VBox('Parent', gui.Layout_Validation_Main_H, 'Spacing', 3);
+% Create validation tab
+gui.Validation.Layout_H       = uix.HBox('Parent', gui.Tabs,                'Spacing', 3);
+gui.Validation.Layout_V_Left  = uix.VBox('Parent', gui.Validation.Layout_H, 'Spacing', 3);
+gui.Validation.Layout_V_Right = uix.VBox('Parent', gui.Validation.Layout_H, 'Spacing', 3);
 
 gui.Tabs.TabNames = {'Home', 'Validation'};
 gui.Tabs.SelectedChild = 1;
@@ -38,198 +38,238 @@ gui.Tabs.SelectedChild = 1;
 %                                  PANELS                                 %
 %_________________________________________________________________________%
 
-%% Patient Specific Parameters Panel
-gui.Panel_PSP = uix.BoxPanel('Parent', gui.Layout_Home_Main_V_Left,...
-    'Title', 'Patient Specific Parameters',...
+%% Box panel settings
+gui.Home.Settings.BoxPanel = uix.BoxPanel('Parent', gui.Home.Layout_V_Left,...
+    'Title', 'Settings',...
     'FontWeight', 'bold');
 
-gui.Layout_PSP = uix.VBox('Parent', gui.Panel_PSP,...
+gui.Home.Settings.Layout_V = uix.VBox('Parent', gui.Home.Settings.BoxPanel,...
     'Spacing', 3);
 
-% Panel HJF Selection
-gui.Panel_Dataset = uix.Panel('Parent', gui.Layout_PSP,...
-    'Title', 'Used dataset');
+% Panel TLEMversion
+gui.Home.Settings.Panel_TLEMversion = uix.Panel('Parent', gui.Home.Settings.Layout_V,...
+    'Title', 'Used TLEM Version');
 
-gui.RadioButtonBox_Dataset = uix.VButtonBox('Parent', gui.Panel_Dataset,...
+gui.Home.Settings.RadioButtonBox_TLEMversion = uix.VButtonBox('Parent', gui.Home.Settings.Panel_TLEMversion,...
     'Spacing', 3,...
     'HorizontalAlignment', 'left',...
     'ButtonSize', [80 20]);
 
-gui.RadioButton_TLEM2_0 = uicontrol('Parent', gui.RadioButtonBox_Dataset,...
+gui.Home.Settings.RadioButton_TLEM2_0 = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_TLEMversion,...
     'Style', 'radiobutton',...
-    'String', 'TLEM 2',...
-    'Value', 1,...
+    'String', 'TLEM 2.0',...
     'Callback', @onTLEM2_0);
 
-gui.RadioButton_TLEM2_1 = uicontrol('Parent', gui.RadioButtonBox_Dataset,...
+gui.Home.Settings.RadioButton_TLEM2_1 = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_TLEMversion,...
     'Style', 'radiobutton',...
     'String', 'TLEM 2.1',...
     'Callback', @onTLEM2_1);
 
-% Panel HJF Selection
-gui.Panel_HJF = uix.Panel('Parent', gui.Layout_PSP,...
-    'Title', 'Show HJF for');
+set(gui.Home.Settings.(['RadioButton_' data.TLEMversion]), 'Value', 1)
 
-gui.RadioButtonBox_HJF = uix.VButtonBox('Parent', gui.Panel_HJF,...
+% Panel view
+gui.Home.Settings.Panel_View = uix.Panel('Parent', gui.Home.Settings.Layout_V,...
+    'Title', 'Show Hip Joint Force for');
+
+gui.Home.Settings.RadioButtonBox_View = uix.VButtonBox('Parent', gui.Home.Settings.Panel_View,...
     'Spacing', 3,...
     'HorizontalAlignment', 'left',...
     'ButtonSize', [80 20]);
 
-gui.RadioButton_Pelvis = uicontrol('Parent', gui.RadioButtonBox_HJF,...
+gui.Home.Settings.RadioButton_Pelvis = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_View,...
     'Style', 'radiobutton',...
     'String', 'Pelvis',...
-    'Value', 1,...
     'Callback', @onPelvis);
 
-gui.RadioButton_Femur = uicontrol('Parent', gui.RadioButtonBox_HJF,...
+gui.Home.Settings.RadioButton_Femur = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_View,...
     'Style', 'radiobutton',...
     'String', 'Femur',...
     'Callback', @onFemur);
 
-% Panel Side Selection
-gui.Panel_Side = uix.Panel('Parent', gui.Layout_PSP,...
+set(gui.Home.Settings.(['RadioButton_' data.View]), 'Value', 1)
+
+% Panel femoral transformation
+gui.Home.Settings.Panel_FemoralTransformation = uix.Panel('Parent', gui.Home.Settings.Layout_V,...
+    'Title', 'Execute Femoral Transformation by');
+
+gui.Home.Settings.RadioButtonBox_FemoralTransformation = uix.VButtonBox('Parent', gui.Home.Settings.Panel_FemoralTransformation,...
+    'Spacing', 3,...
+    'HorizontalAlignment', 'left',...
+    'ButtonSize', [200 20]);
+
+gui.Home.Settings.RadioButton_Scaling = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_FemoralTransformation,...
+    'Style', 'radiobutton',...
+    'String', 'Scaling',...
+    'Callback', @onScaling);
+
+gui.Home.Settings.RadioButton_Skinning = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_FemoralTransformation,...
+    'Style', 'radiobutton',...
+    'String', 'Linear Blend Skinning',...
+    'Callback', @onSkinning);
+
+set(gui.Home.Settings.(['RadioButton_' data.FemoralTransformation]), 'Value', 1)
+
+% % Adjust layout
+% set(gui.Home.Settings.Layout_V, 'Height', [-1, -1, -1])
+
+%% Box panel patient specific parameters
+gui.Home.Parameters.BoxPanel = uix.BoxPanel('Parent', gui.Home.Layout_V_Left,...
+    'Title', 'Patient Specific Parameters',...
+    'FontWeight', 'bold');
+
+gui.Home.Parameters.Layout_V = uix.VBox('Parent', gui.Home.Parameters.BoxPanel,...
+    'Spacing', 3);
+
+% Panel side
+gui.Home.Parameters.Panel_Side = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
     'Title', 'Side');
 
-gui.RadioButtonBox_Side = uix.VButtonBox('Parent', gui.Panel_Side,...
+gui.Home.Parameters.RadioButtonBox_Side = uix.VButtonBox('Parent', gui.Home.Parameters.Panel_Side,...
     'Spacing', 3,...
     'HorizontalAlignment', 'left',...
     'ButtonSize', [80 20]);
 
-gui.RadioButton_Left = uicontrol('Parent', gui.RadioButtonBox_Side,...
+gui.Home.Parameters.RadioButton_L = uicontrol('Parent', gui.Home.Parameters.RadioButtonBox_Side,...
     'Style', 'radiobutton',...
     'String', 'Left',...
     'Callback', @onLeftSide);
 
-gui.RadioButton_Right = uicontrol('Parent', gui.RadioButtonBox_Side,...
+gui.Home.Parameters.RadioButton_R = uicontrol('Parent', gui.Home.Parameters.RadioButtonBox_Side,...
     'Style', 'radiobutton',...
     'String', 'Right',...
-    'Value', 1,...
     'Callback', @onRightSide);
 
-% Panel Bodyweight
-gui.Panel_BW = uix.Panel('Parent', gui.Layout_PSP,...
-    'Title', 'Bodyweight [kg]');
+set(gui.Home.Parameters.(['RadioButton_' data.T.Side]), 'Value', 1)
 
-gui.EditText_BW = uicontrol('Parent', gui.Panel_BW,...
+% Panel body weight
+gui.Home.Parameters.Panel_BodyWeight = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
+    'Title', 'Body Weight [kg]');
+
+gui.Home.Parameters.EditText_BodyWeight = uicontrol('Parent', gui.Home.Parameters.Panel_BodyWeight,...
     'Style', 'edit',...
-    'String', data.S.BodyWeight,...
-    'Callback', @onEditText_BW);
+    'String', data.T.BodyWeight,...
+    'Callback', @onEditText_BodyWeight);
 
-% Panel Pelvic Bend
-gui.Panel_PB = uix.Panel('Parent', gui.Layout_PSP,...
-    'Title', 'Pelvic Bend [°]');
-
-gui.EditText_PB = uicontrol('Parent', gui.Panel_PB,...
-    'Style', 'edit',...
-    'String', data.S.PelvicBend,...
-    'Callback', @onEditText_PB);
-
-% Panel Hip Joint Width
-gui.Panel_HJW = uix.Panel('Parent', gui.Layout_PSP,...
+% Panel hip joint width
+gui.Home.Parameters.Panel_HipJointWidth = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
     'Title', 'Hip Joint Width [mm]');
 
-gui.EditText_HJW = uicontrol('Parent', gui.Panel_HJW,...
+gui.Home.Parameters.EditText_HipJointWidth = uicontrol('Parent', gui.Home.Parameters.Panel_HipJointWidth,...
     'Style', 'edit',...
-    'Callback', @onEditText_HJW);
+    'String', data.T.Scale(1).HipJointWidth,...
+    'Callback', @onEditText_HipJointWidth);
 
-% Scaling Parameters
-gui.Layout_SP = uix.HBox('Parent', gui.Layout_PSP,...
-    'Spacing', 3);
+% Panel pelvic bend
+gui.Home.Parameters.Panel_PelvicBend = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
+    'Title', 'Pelvic Bend [°]');
 
-gui.Layout_P = uix.VBox('Parent', gui.Layout_SP,...
-    'Spacing', 3);
+gui.Home.Parameters.EditText_PelvicBend = uicontrol('Parent', gui.Home.Parameters.Panel_PelvicBend,...
+    'Style', 'edit',...
+    'String', data.T.PelvicBend,...
+    'Callback', @onEditText_PelvicBend);
 
-gui.Layout_S = uix.VBox('Parent', gui.Layout_SP,...
-    'Spacing', 3);
-
-% Panel Pelvic Width
-gui.Panel_PW = uix.Panel('Parent', gui.Layout_P,...
+% Panel pelvic width
+gui.Home.Parameters.Panel_PelvicWidth = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
     'Title', 'Pelvic Width [mm]');
-gui.EditText_PW = uicontrol('Parent', gui.Panel_PW,...
-    'Style', 'edit',...
-    'Callback', @onEditText_PW);
 
-% Panel Pelvic Height
-gui.Panel_PH = uix.Panel('Parent', gui.Layout_P,...
+gui.Home.Parameters.EditText_PelvicWidth = uicontrol('Parent', gui.Home.Parameters.Panel_PelvicWidth,...
+    'Style', 'edit',...
+    'String', data.T.Scale(1).PelvicWidth,...
+    'Callback', @onEditText_PelvicWidth);
+
+% Panel pelvic height
+gui.Home.Parameters.Panel_PelvicHeight = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
     'Title', 'Pelvic Height [mm]');
-gui.EditText_PH = uicontrol('Parent', gui.Panel_PH,...
-    'Style', 'edit',...
-    'Callback', @onEditText_PH);
 
-% Panel Pelvic Depth
-gui.Panel_PD = uix.Panel('Parent', gui.Layout_P,...
+gui.Home.Parameters.EditText_PelvicHeight = uicontrol('Parent', gui.Home.Parameters.Panel_PelvicHeight,...
+    'Style', 'edit',...
+    'String', data.T.Scale(1).PelvicHeight,...
+    'Callback', @onEditText_PelvicHeight);
+
+% Panel pelvic depth
+gui.Home.Parameters.Panel_PelvicDepth = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
     'Title', 'Pelvic Depth [mm]');
-gui.EditText_PD = uicontrol('Parent', gui.Panel_PD,...
-    'Style', 'edit',...
-    'Callback', @onEditText_PD);
 
-% Panel Femoral Length
-gui.Panel_FL = uix.Panel('Parent', gui.Layout_P,...
+gui.Home.Parameters.EditText_PelvicDepth = uicontrol('Parent', gui.Home.Parameters.Panel_PelvicDepth,...
+    'Style', 'edit',...
+    'String', data.T.Scale(1).PelvicDepth,...
+    'Callback', @onEditText_PelvicDepth);
+
+% Panel femoral length
+gui.Home.Parameters.Panel_FemoralLength = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
     'Title', 'Femoral Length [mm]');
-gui.EditText_FL = uicontrol('Parent', gui.Panel_FL,...
+
+gui.Home.Parameters.EditText_FemoralLength = uicontrol('Parent', gui.Home.Parameters.Panel_FemoralLength,...
     'Style', 'edit',...
-    'Callback', @onEditText_FL);
+    'String', data.T.Scale(2).FemoralLength,...
+    'Callback', @onEditText_FemoralLength);
 
-% Scale Panels
-gui.Panel_SPW = uix.Panel('Parent', gui.Layout_S,...
-    'Title', 'Scale');
-gui.Label_SPW = uicontrol('Parent', gui.Panel_SPW,...
-    'Style', 'text');
+% Panel femoral version
+gui.Home.Parameters.Panel_FemoralVersion = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
+    'Title', 'Femoral Version [°]');
 
-gui.Panel_SPH = uix.Panel('Parent', gui.Layout_S,...
-    'Title', 'Scale');
-gui.Label_SPH = uicontrol('Parent', gui.Panel_SPH,...
-    'Style', 'text');
+gui.Home.Parameters.EditText_FemoralVersion = uicontrol('Parent', gui.Home.Parameters.Panel_FemoralVersion,...
+    'Style', 'edit',...
+    'String', data.T.Scale(2).FemoralVersion,...
+    'Callback', @onEditText_FemoralVersion);
 
-gui.Panel_SPD = uix.Panel('Parent', gui.Layout_S,...
-    'Title', 'Scale');
-gui.Label_SPD = uicontrol('Parent', gui.Panel_SPD,...
-    'Style', 'text');
+% Panel CCD
+gui.Home.Parameters.Panel_CCD = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
+    'Title', 'CCD Angle [°]');
 
-gui.Panel_SFL = uix.Panel('Parent', gui.Layout_S,...
-    'Title', 'Scale');
-gui.Label_SFL = uicontrol('Parent', gui.Panel_SFL,...
-    'Style', 'text');
+gui.Home.Parameters.EditText_CCD = uicontrol('Parent', gui.Home.Parameters.Panel_CCD,...
+    'Style', 'edit',...
+    'String', data.T.Scale(2).CCD,...
+    'Callback', @onEditText_CCD);
 
-gui.PushButton_ResetScaling = uicontrol('Parent', gui.Layout_PSP,...
+% Panel neck length
+gui.Home.Parameters.Panel_NeckLength = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
+    'Title', 'Neck Length [mm]');
+
+gui.Home.Parameters.EditText_NeckLength = uicontrol('Parent', gui.Home.Parameters.Panel_NeckLength,...
+    'Style', 'edit',...
+    'String', data.T.Scale(2).NeckLength,...
+    'Callback', @onEditText_NeckLength);
+
+% Reset button
+gui.Home.Parameters.PushButton_ResetParameters = uicontrol('Parent', gui.Home.Parameters.Layout_V,...
     'Style', 'PushButton',...
     'String', 'Reset',...
-    'Callback', @onPushButton_ResetScaling);
-gui.ResetScaling = false;
+    'Callback', @onPushButton_ResetParameters);
 
-set(gui.Layout_PSP, 'Height', [-1, -1, -1, -1, -1, -1, -4, -0.5])
-set(gui.Layout_SP,  'Width',  [-2.5, -1])
+% Adjust layout
+set(gui.Home.Parameters.Layout_V, 'Height', [-2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -0.6])
 
-%% Model Panel
-gui.Panel_Model = uix.BoxPanel('Parent', gui.Layout_Home_Main_V_Right,...
+%% Box panel model
+gui.Home.Model.BoxPanel = uix.BoxPanel('Parent', gui.Home.Layout_V_Right,...
     'Title', 'Model',...
     'FontWeight', 'bold');
 
-gui.Layout_Muscle = uix.HBox('Parent', gui.Panel_Model,...
+gui.Home.Model.Layout_H = uix.HBox('Parent', gui.Home.Model.BoxPanel,...
     'Spacing', 3);
 
-% Panel Posture
-gui.Panel_Posture = uix.Panel('Parent', gui.Layout_Muscle,...
+% Panel posture
+gui.Home.Model.Panel_Posture = uix.Panel('Parent', gui.Home.Model.Layout_H,...
     'Title', 'Posture');
 
-% Get Models
+% Get models
 models = dir('src\models\*.m');
 [~, models] = arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
 data.Model = models{2};
 updatePosture()
-gui.ListBox_Posture = uicontrol( 'Style', 'list', ...
-    'BackgroundColor', 'w', ...
-    'Parent', gui.Panel_Posture, ...
+gui.Home.Model.ListBox_Posture = uicontrol( 'Parent', gui.Home.Model.Panel_Posture,...
+    'BackgroundColor', 'w',...
+    'Style', 'list',...
     'String', models,...
     'Value', 2,...
     'Callback', @onListSelection_Posture);
 
-% Panel Muscle List
-gui.Panel_Muscle = uix.Panel('Parent', gui.Layout_Muscle,...
+% Panel muscle list
+gui.Home.Model.Panel_Muscle = uix.Panel('Parent', gui.Home.Model.Layout_H,...
     'Title', 'Muscle List');
-gui.Panel_Muscle_V = uix.VBox('Parent', gui.Panel_Muscle, 'Spacing', 3);
+gui.Home.Model.Layout_V_Muscle = uix.VBox('Parent', gui.Home.Model.Panel_Muscle, 'Spacing', 3);
 
-gui.ListBox_MuscleList = uicontrol('Parent', gui.Panel_Muscle_V, 'Style', 'list', ...
+gui.Home.Model.ListBox_MuscleList = uicontrol('Parent', gui.Home.Model.Layout_V_Muscle, 'Style', 'list', ...
     'BackgroundColor', 'w',...
     'String', data.MuscleList(:,1),...
     'Min', 1,...
@@ -237,164 +277,171 @@ gui.ListBox_MuscleList = uicontrol('Parent', gui.Panel_Muscle_V, 'Style', 'list'
     'Callback', @onListSelection_Muscles);
 updateMuscleList()
 
-gui.ListBox_MuscleReset = uicontrol('Parent', gui.Panel_Muscle_V,...
+% Reset button
+gui.Home.Model.PushButton_ResetMuscle = uicontrol('Parent', gui.Home.Model.Layout_V_Muscle,...
     'Style', 'PushButton',...
     'String', 'Reset',...
-    'Callback', @onPushButton_MuscleReset);
+    'Callback', @onPushButton_ResetMuscle);
 
-set(gui.Panel_Muscle_V, 'Height', [-10, -1])
+% Adjust layout
+set(gui.Home.Model.Layout_V_Muscle, 'Height', [-10, -1])
 
-%% Visualization Panel
-gui.Panel_Vis = uix.BoxPanel('Parent', gui.Layout_Home_Main_V_Mid,...
+%% Box panel visualization
+gui.Home.Visualization.BoxPanel = uix.BoxPanel('Parent', gui.Home.Layout_V_Mid,...
     'Title', 'Visualization',...
     'FontWeight', 'bold');
 
-gui.Layout_Vis_V = uix.VBox('Parent', gui.Panel_Vis, 'Spacing', 3);
+gui.Home.Visualization.Layout_V = uix.VBox('Parent', gui.Home.Visualization.BoxPanel, 'Spacing', 3);
 
-% Panel Visualization
-gui.Panel_Vis = uix.Panel('Parent', gui.Layout_Vis_V);
+% Panel visualization
+gui.Home.Visualization.Panel_Visualization = uix.Panel('Parent', gui.Home.Visualization.Layout_V);
 
-gui.Axis_Vis = axes('Parent', gui.Panel_Vis);
+gui.Home.Visualization.Axis_Visualization = axes('Parent', gui.Home.Visualization.Panel_Visualization);
 
-data = scaleTLEM2(data);
-set(gui.EditText_HJW, 'String', data.S.Scale(1).HipJointWidth);
-set(gui.EditText_PW,  'String', data.S.Scale(1).PelvicWidth);
-set(gui.EditText_PH,  'String', data.S.Scale(1).PelvicHeight);
-set(gui.EditText_PD,  'String', data.S.Scale(1).PelvicDepth);
-set(gui.EditText_FL,  'String', data.S.Scale(2).FemoralLength);
-set(gui.Label_SPW, 'String', data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth);
-set(gui.Label_SPH, 'String', data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight);
-set(gui.Label_SPD, 'String', data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth);
-set(gui.Label_SFL, 'String', data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength);
 data = globalizeTLEM2(data);
-visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis, 'Muscles', data.activeMuscles);
+visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Visualization.Axis_Visualization, 'Muscles', data.activeMuscles);
 
-gui.Axis_Vis.View = [90, 0];
-gui.Axis_Vis.CameraUpVector = [0, 1, 0];
+gui.Home.Visualization.Axis_Visualization.View = [90, 0];
+gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
 
-% Push Buttons
-gui.Layout_Vis_G = uix.Grid('Parent', gui.Layout_Vis_V, 'Spacing', 3);
+% Push buttons
+gui.Home.Visualization.Layout_Grid = uix.Grid('Parent', gui.Home.Visualization.Layout_V, 'Spacing', 3);
 
-uicontrol('Parent', gui.Layout_Vis_G, 'Style', 'PushButton',...
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid, 'Style', 'PushButton',...
     'String', 'Front',  'Callback', @onPushButton_Front);
-uicontrol('Parent', gui.Layout_Vis_G, 'Style', 'PushButton',...
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid, 'Style', 'PushButton',...
     'String', 'Back',   'Callback', @onPushButton_Back);
-uicontrol('Parent', gui.Layout_Vis_G, 'Style', 'PushButton',...
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid, 'Style', 'PushButton',...
     'String', 'Top',    'Callback', @onPushButton_Top);
-uicontrol('Parent', gui.Layout_Vis_G, 'Style', 'PushButton',...
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid, 'Style', 'PushButton',...
     'String', 'Bottom', 'Callback', @onPushButton_Bottom);
-uicontrol('Parent', gui.Layout_Vis_G, 'Style', 'PushButton',...
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid, 'Style', 'PushButton',...
     'String', 'Right',  'Callback', @onPushButton_Right);
-uicontrol('Parent', gui.Layout_Vis_G, 'Style', 'PushButton',...
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid, 'Style', 'PushButton',...
     'String', 'Left',   'Callback', @onPushButton_Left);
 
-set(gui.Layout_Vis_V, 'Height', [-18, -1])
-set(gui.Layout_Vis_G, 'Widths', [-1, -1, -1], 'Heights', [-1, -1]);
+% Adjust layout
+set(gui.Home.Visualization.Layout_V,    'Height', [-18, -1])
+set(gui.Home.Visualization.Layout_Grid, 'Widths', [-1, -1, -1], 'Heights', [-1, -1])
 
-%% Results Panel
-gui.Panel_Res = uix.BoxPanel('Parent', gui.Layout_Home_Main_V_Right,...
+%% Box panel results
+gui.Home.Results.BoxPanel = uix.BoxPanel('Parent', gui.Home.Layout_V_Right,...
     'Title', 'Results',...
     'FontWeight', 'bold');
 
-gui.Layout_Res_V  = uix.VBox('Parent', gui.Panel_Res,    'Spacing', 3);
-gui.Layout_Res_HT = uix.HBox('Parent', gui.Layout_Res_V, 'Spacing', 3);
-gui.Layout_Res_HB = uix.HBox('Parent', gui.Layout_Res_V, 'Spacing', 3);
+gui.Home.Results.Layout_V        = uix.VBox('Parent', gui.Home.Results.BoxPanel, 'Spacing', 3);
+gui.Home.Results.Layout_H_Top    = uix.HBox('Parent', gui.Home.Results.Layout_V, 'Spacing', 3);
+gui.Home.Results.Layout_H_Bottom = uix.HBox('Parent', gui.Home.Results.Layout_V, 'Spacing', 3);
 
-% Panel Frontal View
-gui.Panel_FV = uix.Panel('Parent', gui.Layout_Res_HT, 'Title', 'Frontal View');
-gui.FV_Axis = axes(gui.Panel_FV);
-visualizeTLEM2(data.LE, data.MuscleList, gui.FV_Axis,...
-    'Bones', 1, 'Joints', false, 'Muscles', {});
-gui.FV_Axis.View = [90, 0];
-gui.FV_Axis.CameraUpVector = [0, 1, 0];
+% Panel frontal view
+gui.Home.Results.Panel_FrontalView = uix.Panel('Parent', gui.Home.Results.Layout_H_Top, 'Title', 'Frontal View');
+gui.Home.Results.Axis_FrontalView = axes(gui.Home.Results.Panel_FrontalView);
+visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_FrontalView,...
+    'Bones', find(strcmp({data.S.LE.Name}, data.View)), 'Joints', false, 'Muscles', {});
+gui.Home.Results.Axis_FrontalView.View = [90, 0];
+gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
 
-% Panel Sagittal View
-gui.Panel_SV = uix.Panel('Parent', gui.Layout_Res_HT, 'Title', 'Sagittal View');
-gui.SV_Axis = axes(gui.Panel_SV);
-visualizeTLEM2(data.LE, data.MuscleList, gui.SV_Axis,...
-    'Bones', 1, 'Joints', false, 'Muscles', {});
+% Panel sagittal view
+gui.Home.Results.Panel_SagittalView = uix.Panel('Parent', gui.Home.Results.Layout_H_Top, 'Title', 'Sagittal View');
+gui.Home.Results.Axis_SagittalView = axes(gui.Home.Results.Panel_SagittalView);
+visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_SagittalView,...
+    'Bones', find(strcmp({data.S.LE.Name}, data.View)), 'Joints', false, 'Muscles', {});
 switch data.S.Side
     case 'R'
-        gui.SV_Axis.View = [0, 90];
+        gui.Home.Results.Axis_SagittalView.View = [0, 90];
     case 'L'
-        gui.SV_Axis.View = [0, -90];
+        gui.Home.Results.Axis_SagittalView.View = [0, -90];
 end
-gui.SV_Axis.CameraUpVector = [0, 1, 0];
+gui.Home.Results.Axis_SagittalView.CameraUpVector = [0, 1, 0];
 
-% Panel Horizontal View
-gui.Panel_HV = uix.Panel('Parent', gui.Layout_Res_HT, 'Title', 'Horizontal View');
-gui.HV_Axis = axes(gui.Panel_HV);
+% Panel transverse view
+gui.Home.Results.Panel_TransverseView = uix.Panel('Parent', gui.Home.Results.Layout_H_Top, 'Title', 'Transverse View');
+gui.Home.Results.Axis_TransverseView = axes(gui.Home.Results.Panel_TransverseView);
 
-visualizeTLEM2(data.LE, data.MuscleList, gui.HV_Axis,...
-    'Bones', 1, 'Joints', false, 'Muscles', {});
-gui.HV_Axis.View = [0, 0];
-gui.HV_Axis.CameraUpVector = [1, 0, 0];
+visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_TransverseView,...
+    'Bones', find(strcmp({data.S.LE.Name}, data.View)), 'Joints', false, 'Muscles', {});
+            
+switch data.View
+    case 'Pelvis'
+        DefaultTransverseViewAngle = 0;                    
+    case 'Femur'
+        DefaultTransverseViewAngle = 180;
+end
 
-% Panel Magnitude of Force [N]
-gui.Panel_FM = uix.Panel(...
-    'Parent', gui.Layout_Res_HB,...
+gui.Home.Results.Axis_TransverseView.View = [0, DefaultTransverseViewAngle];
+gui.Home.Results.Axis_TransverseView.CameraUpVector = [1, 0, 0];
+
+% Panel magnitude of force in [N]
+gui.Home.Results.Panel_MagnitudeNewton = uix.Panel(...
+    'Parent', gui.Home.Results.Layout_H_Bottom,...
     'Title', 'Magnitude of Force [N]');
 
-gui.Label_FM = uicontrol('Parent', gui.Panel_FM,...
+gui.Home.Results.Label_MagnitudeNewton = uicontrol('Parent', gui.Home.Results.Panel_MagnitudeNewton,...
     'Style', 'text',....
     'String', '-',...
     'FontWeight', 'bold');
 
-% Panel Magnitude of Force [BW%]
-gui.Panel_FMP = uix.Panel(...
-    'Parent', gui.Layout_Res_HB,...
-    'Title', 'Magnitude of Force [BW%]');
+% Panel magnitude of force in [%BW]
+gui.Home.Results.Panel_MagnitudePercentageBodyWeight = uix.Panel(...
+    'Parent', gui.Home.Results.Layout_H_Bottom,...
+    'Title', 'Magnitude of Force [%BW]');
 
-gui.Label_FMP = uicontrol('Parent', gui.Panel_FMP,...
+gui.Home.Results.Label_MagnitudePercentageBodyWeight = uicontrol('Parent', gui.Home.Results.Panel_MagnitudePercentageBodyWeight,...
     'Style', 'text',....
     'String', '-',...
     'FontWeight', 'bold');
 
-% Panel Frontal Angle
-gui.Panel_FA = uix.Panel(...
-    'Parent', gui.Layout_Res_HB,...
+% Panel frontal angle
+gui.Home.Results.Panel_FrontalAngle = uix.Panel(...
+    'Parent', gui.Home.Results.Layout_H_Bottom,...
     'Title', 'Frontal Angle [°]');
 
-gui.Label_FA = uicontrol('Parent', gui.Panel_FA,...
+gui.Home.Results.Label_FrontalAngle = uicontrol('Parent', gui.Home.Results.Panel_FrontalAngle,...
     'Style', 'text',....
     'String', '-',...
     'FontWeight', 'bold');
 
-% Panel Sagittal Angle
-gui.Panel_SA = uix.Panel(...
-    'Parent', gui.Layout_Res_HB,...
+% Panel sagittal angle
+gui.Home.Results.Panel_SagittalAngle = uix.Panel(...
+    'Parent', gui.Home.Results.Layout_H_Bottom,...
     'Title', 'Sagittal Angle [°]');
 
-gui.Label_SA = uicontrol('Parent', gui.Panel_SA,...
+gui.Home.Results.Label_SagittalAngle = uicontrol('Parent', gui.Home.Results.Panel_SagittalAngle,...
     'Style', 'text',....
     'String', '-',...
     'FontWeight', 'bold');
 
-% Panel Horizontal Angle
-gui.Panel_HA = uix.Panel(...
-    'Parent', gui.Layout_Res_HB,...
-    'Title', 'Horizontal Angle [°]');
+% Panel transverse angle
+gui.Home.Results.Panel_TransverseAngle = uix.Panel(...
+    'Parent', gui.Home.Results.Layout_H_Bottom,...
+    'Title', 'Transverse Angle [°]');
 
-gui.Label_HA = uicontrol('Parent', gui.Panel_HA,...
+gui.Home.Results.Label_TransverseAngle = uicontrol('Parent', gui.Home.Results.Panel_TransverseAngle,...
     'Style', 'text',....
     'String', '-',...
     'FontWeight', 'bold');
 
-% Push Button Calculation
+% Push button for calculation
 gui.IsUpdated = false;
 
-gui.PushButton_RC = uicontrol('Parent', gui.Layout_Res_HB,...
+gui.Home.Results.PushButton_RunCalculation = uicontrol('Parent', gui.Home.Results.Layout_H_Bottom,...
     'Style', 'PushButton',...
     'String', 'Run Calculation',...
     'BackgroundColor', 'y',...
-    'Callback',@onPushButton_RC);
+    'Callback',@onPushButton_RunCalculation);
 
-gui.Checkbox_VAL = uicontrol('Parent', gui.Layout_Res_HB,...
+gui.Home.Results.Checkbox_Validation = uicontrol('Parent', gui.Home.Results.Layout_H_Bottom,...
     'Style', 'Checkbox',...
     'String', 'and Validation');
 
-set(gui.Layout_Res_V,  'Height', [-9, -1])
-set(gui.Layout_Res_HB, 'Width',  [-2, -2, -2, -2, -2, -1.5, -1.5])
+% Adjust layout
+set(gui.Home.Results.Layout_V,        'Height', [-9, -1])
+set(gui.Home.Results.Layout_H_Bottom, 'Width',  [-2, -2, -2, -2, -2, -1.5, -1.5])
+
+%% Adjust home layout
+set(gui.Home.Layout_H,       'Width',  [-1, -2, -4])
+set(gui.Home.Layout_V_Left,  'Height', [-6, -12])
+set(gui.Home.Layout_V_Right, 'Height', [-1, -2])
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
 %                              VALIDATION TAB                             %
@@ -404,176 +451,190 @@ set(gui.Layout_Res_HB, 'Width',  [-2, -2, -2, -2, -2, -1.5, -1.5])
 %                                  PANELS                                 %
 %_________________________________________________________________________%
 
-gui.Panel_HJF_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Left,...
-    'Title', 'Magnitude of Force [BW%]',...
-    'FontWeight', 'bold','BackgroundColor','w');
-gui.HJF_VAL_Axis = axes(gui.Panel_HJF_VAL);
+gui.Validation.MagnitudePercentageBodyWeight.BoxPanel = uix.BoxPanel('Parent', gui.Validation.Layout_V_Left,...
+    'Title', 'Magnitude of Force [%BW]',...
+    'FontWeight', 'bold', 'BackgroundColor', 'w');
+gui.Validation.MagnitudePercentageBodyWeight.Axis = axes(gui.Validation.MagnitudePercentageBodyWeight.BoxPanel);
 
-gui.Panel_FA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Right,...
+gui.Validation.FrontalAngle.BoxPanel = uix.BoxPanel('Parent', gui.Validation.Layout_V_Right,...
     'Title', 'Frontal Angle',...
-    'FontWeight', 'bold','BackgroundColor','w');
-gui.FA_VAL_Axis = axes(gui.Panel_FA_VAL);
+    'FontWeight', 'bold', 'BackgroundColor', 'w');
+gui.Validation.FrontalAngle.Axis = axes(gui.Validation.FrontalAngle.BoxPanel);
 
-gui.Panel_SA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Left,...
+gui.Validation.SagittalAngle.BoxPanel = uix.BoxPanel('Parent', gui.Validation.Layout_V_Left,...
     'Title', 'Sagittal Angle',...
-    'FontWeight', 'bold','BackgroundColor','w');
-gui.SA_VAL_Axis = axes(gui.Panel_SA_VAL);
+    'FontWeight', 'bold', 'BackgroundColor', 'w');
+gui.Validation.SagittalAngle.Axis = axes(gui.Validation.SagittalAngle.BoxPanel);
 
-gui.Panel_HA_VAL = uix.BoxPanel('Parent', gui.Layout_Validation_Main_V_Right,...
-    'Title', 'Horizontal Angle',...
-    'FontWeight', 'bold','BackgroundColor','w');
-gui.HA_VAL_Axis = axes(gui.Panel_HA_VAL);
-
-%% Adjust main Layout
-set(gui.Layout_Home_Main_H,          'Width',    [-1, -2, -4])
-set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
+gui.Validation.TransverseAngle.BoxPanel = uix.BoxPanel('Parent', gui.Validation.Layout_V_Right,...
+    'Title', 'Transverse Angle',...
+    'FontWeight', 'bold', 'BackgroundColor', 'w');
+gui.Validation.TransverseAngle.Axis = axes(gui.Validation.TransverseAngle.BoxPanel);
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
 %                           CALLBACK FUNCTIONS                            %
 %_________________________________________________________________________%
 
-%% Patient Specific Parameters Panel
+%% Box panel settings
 
     function onTLEM2_0(~, ~)
-        % User has chosen TLEM 2.0 dataset
+        % User has chosen TLEM 2.0 version
         data = createDataTLEM2(data, 'TLEM2_0');
         data = scaleTLEM2(data);
+        updateParameters();
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onTLEM2_1(~, ~)
-        % User has chosen TLEM 2.1 dataset
+        % User has chosen TLEM 2.1 version
         data = createDataTLEM2(data, 'TLEM2_1');
         data = scaleTLEM2(data);
+        updateParameters();
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onPelvis(~, ~)
-        % User has set HJF for Pelvis
-        data.View = 1;
+        % User has set view to pelvis
+        data.View = 'Pelvis';
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onFemur(~, ~)
-        % User has set HJF for Femur
-        data.View = 2;
+        % User has set view to femur
+        data.View = 'Femur';
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onRightSide(~, ~)
-        % User has set the hip Side to Right
-        data.S.Side = 'R';
+    function onScaling(~, ~)
+        % User has set femoral transformation to scaling
+        data.FemoralTransformation = 'Scaling';
         gui.IsUpdated = false;
         updateHomeTab();
     end
+
+    function onSkinning(~, ~)
+        % User has set femoral transformation to skinning
+        data.FemoralTransformation = 'Skinning';
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+%% Box panel patient specific parameters
 
     function onLeftSide(~, ~)
-        % User has set the hip Side to Left
+        % User has set side to left
         data.S.Side = 'L';
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onEditText_BW(scr, ~)
-        % User is editing the Bodyweight
+    function onRightSide(~, ~)
+        % User has set side to right
+        data.S.Side = 'R';
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onEditText_BodyWeight(scr, ~)
+        % User has edited the body weight
         data.S.BodyWeight = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onEditText_PB(scr, ~)
-        % User is editing the Pelvic Bend
-        data.S.PelvicBend = str2double(get(scr, 'String'));
-        gui.IsUpdated = false;
-        updateHomeTab();
-    end
-
-    function onEditText_HJW(scr, ~)
-        % User is editing the distance between Hip Rotation Centers
+    function onEditText_HipJointWidth(scr, ~)
+        % User has edited the hip joint width
         data.S.Scale(1).HipJointWidth = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onEditText_PW(scr, ~)
-        % User is editing the Pelvic Width
+    function onEditText_PelvicBend(scr, ~)
+        % User has edited the pelvic bend
+        data.S.PelvicBend = str2double(get(scr, 'String'));
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onEditText_PelvicWidth(scr, ~)
+        % User has edited the pelvic width
         data.S.Scale(1).PelvicWidth = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onEditText_PH(scr, ~)
-        % User is editing the Pelvic Height
+    function onEditText_PelvicHeight(scr, ~)
+        % User has edited the pelvic height
         data.S.Scale(1).PelvicHeight = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onEditText_PD(scr, ~)
-        % User is editing the Pelvic Depth
+    function onEditText_PelvicDepth(scr, ~)
+        % User has edited the pelvic depth
         data.S.Scale(1).PelvicDepth = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onEditText_FL(scr, ~)
-        % User is editing Femoral Length
+    function onEditText_FemoralLength(scr, ~)
+        % User has edited the femoral length
         data.S.Scale(2).FemoralLength = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-    function onPushButton_ResetScaling(~, ~)
-        gui.ResetScaling = true;
+    function onEditText_FemoralVersion(scr, ~)
+        % User has edited the femoral version
+        data.S.Scale(2).FemoralVersion = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-%% Visualization Panel
-    function onPushButton_Front(~, ~)
-        gui.Axis_Vis.View = [90 ,0];
-        gui.Axis_Vis.CameraUpVector = [0, 1, 0];
-    end
-    function onPushButton_Back(~, ~)
-        gui.Axis_Vis.View = [-90, 0];
-        gui.Axis_Vis.CameraUpVector = [0, 1, 0];
-    end
-    function onPushButton_Top(~, ~)
-        gui.Axis_Vis.View = [0, 180];
-        gui.Axis_Vis.CameraUpVector = [1, 0, 0];
-    end
-    function onPushButton_Left(~, ~)
-        gui.Axis_Vis.View = [0, -90];
-        gui.Axis_Vis.CameraUpVector = [0, 1, 0];
-    end
-    function onPushButton_Right(~, ~)
-        gui.Axis_Vis.View = [0, 90];
-        gui.Axis_Vis.CameraUpVector = [0, 1, 0];
-    end
-    function onPushButton_Bottom(~, ~)
-        gui.Axis_Vis.View = [0, 0];
-        gui.Axis_Vis.CameraUpVector = [1, 0, 0];
+    function onEditText_CCD(scr, ~)
+        % User has edited the CCD angle
+        data.S.Scale(2).CCD = str2double(get(scr, 'String'));
+        gui.IsUpdated = false;
+        updateHomeTab();
     end
 
-%% Model Panel
+    function onEditText_NeckLength(scr, ~)
+        % User has edited the neck length
+        data.S.Scale(2).NeckLength = str2double(get(scr, 'String'));
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onPushButton_ResetParameters(~, ~)
+        data.S.Side = data.T.Side;
+        data.S.BodyWeight = data.T.BodyWeight;
+        data.S.PelvicBend = data.T.PelvicBend;
+        data.S.Scale = data.T.Scale;
+        updateParameters();
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+%% Box panel model
+
     function onListSelection_Posture(src, ~)
-        % User selected a Posture from the list
+        % User has selected a posture from the list
         data.Model = models{get(src, 'Value')};
         gui.IsUpdated = false;
-        updatePosture()
+        updatePosture();
         updateHomeTab();
     end
 
     function onListSelection_Muscles(src, ~)
-        % User selects muscles from the list
+        % User has selected muscles from the list
         tempMuscleIdx = get(src, 'Value');
         tempMuscles = data.MuscleList(tempMuscleIdx,[1,4]);
         tempFascicles = {};
-        for m=1:size(tempMuscles,1)
+        for m = 1:size(tempMuscles,1)
             tempFascicles = [tempFascicles;...
                 cellstr(num2str((1:tempMuscles{m,2})', [tempMuscles{m,1} '%d']))];
         end
@@ -582,28 +643,61 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
         updateHomeTab();
     end
 
-    function onPushButton_MuscleReset(~, ~)
-        [data.activeMuscles, gui.MuscleListEnable] = gui.modelHandle.Muscles();
+    function onPushButton_ResetMuscle(~, ~)
+        [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles();
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
-%% Results Panel
-    function onPushButton_RC(~, ~)
-        % User has pressed the Run Calculation button
-        set(gui.PushButton_RC, 'BackgroundColor', 'r', 'Enable', 'off');
+%% Box panel visualization
+
+    function onPushButton_Front(~, ~)
+        gui.Home.Visualization.Axis_Visualization.View = [90 ,0];
+        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
+    end
+
+    function onPushButton_Back(~, ~)
+        gui.Home.Visualization.Axis_Visualization.View = [-90, 0];
+        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
+    end
+
+    function onPushButton_Top(~, ~)
+        gui.Home.Visualization.Axis_Visualization.View = [0, 180];
+        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [1, 0, 0];
+    end
+
+    function onPushButton_Left(~, ~)
+        gui.Home.Visualization.Axis_Visualization.View = [0, -90];
+        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
+    end
+
+    function onPushButton_Right(~, ~)
+        gui.Home.Visualization.Axis_Visualization.View = [0, 90];
+        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
+    end
+
+    function onPushButton_Bottom(~, ~)
+        gui.Home.Visualization.Axis_Visualization.View = [0, 0];
+        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [1, 0, 0];
+    end
+
+%% Box panel results
+
+    function onPushButton_RunCalculation(~, ~)
+        % User has pressed the run calculation button
+        set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'r', 'Enable', 'off');
         
         % Validtion with OrthoLoad data
-        if gui.Checkbox_VAL.Value == 1
+        if gui.Home.Results.Checkbox_Validation.Value == 1
+            data.View = 'Femur';
+            updateHipJointForceView();
             data.Results = validateTLEM2(data, gui);
             writetable(struct2table(data.Results), 'Results.xlsx')
             updateValidationTab();
         end
 
         % Calculation with inserted data
-        [data.rMag, data.rMagP, data.rPhi, data.rTheta, data.rAlpha,...
-            data.rDir, data.rX, data.rY, data.rZ] =...
-            gui.modelHandle.Calculation(data);
+        data = gui.Home.Model.modelHandle.Calculation(data); % !!! Review: If validation was run this is not the inserted data anymore
         
         gui.IsUpdated = true;
         updateResults();
@@ -614,208 +708,229 @@ set(gui.Layout_Home_Main_V_Right,    'Height',   [-1, -2])
 %                             UPDATE FUNCTIONS                            %
 %_________________________________________________________________________%
 
-%% Update Home Tab
+%% Home tab
+
     function updateHomeTab()
-        updateDataset();
-        updateHJFView();
-        updateSideSelection();
-        updateMuscleList()
+        updateTLEMversion();
+        updateHipJointForceView();
+        updateFemoralTransformation();
+        updateSide();
+        updateMuscleList();
         updateVisualization();
         updateResults();
     end
 
-%% Patient Specific Parameters Panel
-    function updateDataset()
-        set(gui.RadioButton_TLEM2_0,  'Value', 0);
-        set(gui.RadioButton_TLEM2_1, 'Value', 0);
-        switch data.Dataset
+%% Box panel settings
+
+    function updateTLEMversion()
+        set(gui.Home.Settings.RadioButton_TLEM2_0, 'Value', 0);
+        set(gui.Home.Settings.RadioButton_TLEM2_1, 'Value', 0);
+        switch data.TLEMversion
             case 'TLEM2_0'
-                set(gui.RadioButton_TLEM2_0, 'Value', 1);
+                set(gui.Home.Settings.RadioButton_TLEM2_0, 'Value', 1);
             case 'TLEM2_1'
-                set(gui.RadioButton_TLEM2_1, 'Value', 1);
-                otherwise
-                    error('No valid TLEM version')
+                set(gui.Home.Settings.RadioButton_TLEM2_1, 'Value', 1);
         end
     end
 
-    function updateHJFView()
-        set(gui.RadioButton_Pelvis,  'Value', 0);
-        set(gui.RadioButton_Femur, 'Value', 0);
+    function updateHipJointForceView()
+        set(gui.Home.Settings.RadioButton_Pelvis, 'Value', 0);
+        set(gui.Home.Settings.RadioButton_Femur,  'Value', 0);
         switch data.View
-            case 1 % Pelvis
-                set(gui.RadioButton_Pelvis, 'Value', 1);
-            case 2 % Femur
-                set(gui.RadioButton_Femur, 'Value', 1);
+            case 'Pelvis'
+                set(gui.Home.Settings.RadioButton_Pelvis, 'Value', 1);
+            case 'Femur'
+                set(gui.Home.Settings.RadioButton_Femur,  'Value', 1);
         end
     end
 
-    function updateSideSelection()
-        set(gui.RadioButton_Left,  'Value', 0);
-        set(gui.RadioButton_Right, 'Value', 0);
+    function updateFemoralTransformation()
+        set(gui.Home.Settings.RadioButton_Scaling,  'Value', 0);
+        set(gui.Home.Settings.RadioButton_Skinning, 'Value', 0);
+        switch data.FemoralTransformation
+            case 'Scaling'
+                set(gui.Home.Settings.RadioButton_Scaling,  'Value', 1);
+                set([gui.Home.Parameters.EditText_FemoralVersion,...
+                     gui.Home.Parameters.EditText_CCD,...
+                     gui.Home.Parameters.EditText_NeckLength], 'Enable', 'off');
+            case 'Skinning'
+                set(gui.Home.Settings.RadioButton_Skinning, 'Value', 1);
+                set([gui.Home.Parameters.EditText_FemoralVersion,...
+                     gui.Home.Parameters.EditText_CCD,...
+                     gui.Home.Parameters.EditText_NeckLength], 'Enable', 'on');
+        end
+    end
+
+%% Box panel patient specific parameters
+
+    function updateSide()
+        set(gui.Home.Parameters.RadioButton_L, 'Value', 0);
+        set(gui.Home.Parameters.RadioButton_R, 'Value', 0);
         switch data.S.Side
             case 'L'
-                set(gui.RadioButton_Left,  'Value', 1);
+                set(gui.Home.Parameters.RadioButton_L, 'Value', 1);
             case 'R'
-                set(gui.RadioButton_Right, 'Value', 1);
+                set(gui.Home.Parameters.RadioButton_R, 'Value', 1);
         end
     end
 
-%% Model Panel
+    function updateParameters()
+        set(gui.Home.Parameters.EditText_BodyWeight,     'String', data.S.BodyWeight);
+        set(gui.Home.Parameters.EditText_HipJointWidth,  'String', data.S.Scale(1).HipJointWidth);
+        set(gui.Home.Parameters.EditText_PelvicBend,     'String', data.S.PelvicBend);
+        set(gui.Home.Parameters.EditText_PelvicWidth,    'String', data.S.Scale(1).PelvicWidth);
+        set(gui.Home.Parameters.EditText_PelvicHeight,   'String', data.S.Scale(1).PelvicHeight);
+        set(gui.Home.Parameters.EditText_PelvicDepth,    'String', data.S.Scale(1).PelvicDepth);
+        set(gui.Home.Parameters.EditText_FemoralLength,  'String', data.S.Scale(2).FemoralLength);        
+        set(gui.Home.Parameters.EditText_FemoralVersion, 'String', data.S.Scale(2).FemoralVersion);        
+        set(gui.Home.Parameters.EditText_CCD,            'String', data.S.Scale(2).CCD);        
+        set(gui.Home.Parameters.EditText_NeckLength,     'String', data.S.Scale(2).NeckLength);
+    end
+
+%% Box panel model
+
     function updatePosture()
         calculateTLEM2 = str2func(data.Model);
-        gui.modelHandle = calculateTLEM2();
-        [data.activeMuscles, gui.MuscleListEnable] = gui.modelHandle.Muscles();
+        gui.Home.Model.modelHandle = calculateTLEM2();
+        [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles();
     end
 
     function updateMuscleList()
         % Get the indices of the muscles used in the current model
-        mListValues = find(ismember(data.MuscleList(:,1), unique(cellfun(@(x) ...
+        mListValues = find(ismember(data.MuscleList(:,1), unique(cellfun(@(x)...
             regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
-        gui.ListBox_MuscleList.Value = mListValues;
-        gui.ListBox_MuscleList.Enable = gui.MuscleListEnable;
+        gui.Home.Model.ListBox_MuscleList.Value = mListValues;
+        gui.Home.Model.ListBox_MuscleList.Enable = gui.Home.Model.MuscleListEnable;
     end
 
-%% Visualization Panel
+%% Box panel visualization
+
     function updateVisualization()
-        % Reset LE
-        data.LE = data.T.LE;
-        
-        if gui.ResetScaling
-            data.S.Scale(1).PelvicWidth = data.T.Scale(1).PelvicWidth;
-            data.S.Scale(1).PelvicHeight = data.T.Scale(1).PelvicHeight;
-            data.S.Scale(1).PelvicDepth = data.T.Scale(1).PelvicDepth;
-            data.S.Scale(2).FemoralLength = data.T.Scale(2).FemoralLength;
-            data = scaleTLEM2(data);
-            gui.ResetScaling = false;
-        else
-            data = scaleTLEM2(data);
-        end
-        set(gui.EditText_HJW, 'String', data.S.Scale(1).HipJointWidth);
-        set(gui.EditText_PW,  'String', data.S.Scale(1).PelvicWidth);
-        set(gui.EditText_PH,  'String', data.S.Scale(1).PelvicHeight);
-        set(gui.EditText_PD,  'String', data.S.Scale(1).PelvicDepth);
-        set(gui.EditText_FL,  'String', data.S.Scale(2).FemoralLength);
-        set(gui.Label_SPW, 'String', data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth);
-        set(gui.Label_SPH, 'String', data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight);
-        set(gui.Label_SPD, 'String', data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth);
-        set(gui.Label_SFL, 'String', data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength);
+        data = scaleTLEM2(data);
         data = globalizeTLEM2(data);
-        delete(gui.Axis_Vis.Children);
-        visualizeTLEM2(data.LE, data.MuscleList, gui.Axis_Vis, 'Muscles', data.activeMuscles);
+        delete(gui.Home.Visualization.Axis_Visualization.Children);
+        visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Visualization.Axis_Visualization, 'Muscles', data.activeMuscles);
     end
 
-%% Results Panel
+%% Box panel results
+
     function updateResults
-        % Plot HJF vector
+        % Plot hip joint force vector
         if gui.IsUpdated
             
-            delete([gui.FV_Axis.Children, gui.SV_Axis.Children, gui.HV_Axis.Children]);
-
-            visualizeTLEM2(data.LE, data.MuscleList, gui.FV_Axis,...
-                'Bones', data.View, 'Joints', false, 'Muscles', {});
-            visualizeTLEM2(data.LE, data.MuscleList, gui.SV_Axis,...
-                'Bones', data.View, 'Joints', false, 'Muscles', {});
-            visualizeTLEM2(data.LE, data.MuscleList, gui.HV_Axis,...
-                'Bones', data.View, 'Joints', false, 'Muscles', {});
-                     
-            switch data.View
-                case 1 % Pelvis
-                    HVAngle = 0;                    
-                case 2 % Femur
-                    HVAngle = 180;
-            end
+            delete([gui.Home.Results.Axis_FrontalView   .Children,...
+                    gui.Home.Results.Axis_SagittalView  .Children,...
+                    gui.Home.Results.Axis_TransverseView.Children])
             
-            gui.FV_Axis.View = [90 ,0];
-            gui.FV_Axis.CameraUpVector = [0, 1, 0];
+            visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_FrontalView,...
+                'Bones', find(strcmp({data.S.LE.Name}, data.View)), 'Joints', false, 'Muscles', {});
+            visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_SagittalView,...
+                'Bones', find(strcmp({data.S.LE.Name}, data.View)), 'Joints', false, 'Muscles', {});
+            visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_TransverseView,...
+                'Bones', find(strcmp({data.S.LE.Name}, data.View)), 'Joints', false, 'Muscles', {});
+            
+            gui.Home.Results.Axis_FrontalView.View = [90 ,0];
+            gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
                     
             switch data.S.Side
                 case 'R'
-                    gui.SV_Axis.View = [0, 90];
+                    gui.Home.Results.Axis_SagittalView.View = [0, 90];
                 case 'L'
-                    gui.SV_Axis.View = [0, -90];
+                    gui.Home.Results.Axis_SagittalView.View = [0, -90];
             end
-            gui.SV_Axis.CameraUpVector = [0, 1, 0];
+            gui.Home.Results.Axis_SagittalView.CameraUpVector = [0, 1, 0];
             
-            gui.HV_Axis.View = [0, HVAngle];
-            gui.HV_Axis.CameraUpVector = [1, 0, 0];
+            switch data.View
+                case 'Pelvis'
+                    TransverseViewAngle = 0;                    
+                case 'Femur'
+                    TransverseViewAngle = 180;
+            end
+            gui.Home.Results.Axis_TransverseView.View = [0, TransverseViewAngle];
+            gui.Home.Results.Axis_TransverseView.CameraUpVector = [1, 0, 0];
             
-            quiver3D(gui.FV_Axis, -data.rDir*75, data.rDir*55, 'r')
-            quiver3D(gui.SV_Axis, -data.rDir*75, data.rDir*55, 'r')
-            quiver3D(gui.HV_Axis, -data.rDir*75, data.rDir*55, 'r')
+            quiver3D(gui.Home.Results.Axis_FrontalView,    -data.rDir*75, data.rDir*55, 'r')
+            quiver3D(gui.Home.Results.Axis_SagittalView,   -data.rDir*75, data.rDir*55, 'r')
+            quiver3D(gui.Home.Results.Axis_TransverseView, -data.rDir*75, data.rDir*55, 'r')
         
-            set(gui.Label_FM,  'String', data.rMag);
-            set(gui.Label_FMP, 'String', data.rMagP);
-            set(gui.Label_FA,  'String', abs(data.rPhi));
-            set(gui.Label_SA,  'String', abs(data.rTheta));
-            set(gui.Label_HA,  'String', abs(data.rAlpha));     
+            set(gui.Home.Results.Label_MagnitudeNewton,               'String',     data.rMag);
+            set(gui.Home.Results.Label_MagnitudePercentageBodyWeight, 'String',     data.rMagP);
+            set(gui.Home.Results.Label_FrontalAngle,                  'String', abs(data.rPhi));
+            set(gui.Home.Results.Label_SagittalAngle,                 'String', abs(data.rTheta));
+            set(gui.Home.Results.Label_TransverseAngle,               'String', abs(data.rAlpha));     
         
             % Disable push button
-            set(gui.PushButton_RC, 'BackgroundColor', 'g', 'Enable', 'off');
+            set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'g', 'Enable', 'off');
         else
-            set(gui.PushButton_RC, 'BackgroundColor', 'y', 'Enable', 'on');
+            set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'y', 'Enable', 'on');
         end
     end
 
-%% Update Validation Tab
+%% Update validation tab
+
     function updateValidationTab
         NoS = length(data.Results);
-        delete([gui.HJF_VAL_Axis.Children, gui.FA_VAL_Axis.Children, ...
-            gui.SA_VAL_Axis.Children, gui.HA_VAL_Axis.Children]);
-        [gui.HJF_VAL_Axis.XTick, gui.FA_VAL_Axis.XTick, ...
-            gui.SA_VAL_Axis.XTick, gui.HA_VAL_Axis.XTick] = deal(1:length(data.Results));
-        [gui.HJF_VAL_Axis.XTickLabel, gui.FA_VAL_Axis.XTickLabel, ...
-            gui.SA_VAL_Axis.XTickLabel, gui.HA_VAL_Axis.XTickLabel] = deal({data.Results.Subject});
-        [gui.HJF_VAL_Axis.XLim, gui.FA_VAL_Axis.XLim, ...
-            gui.SA_VAL_Axis.XLim, gui.HA_VAL_Axis.XLim] = deal([0.5,length(data.Results)+0.5]);
+        delete([gui.Validation.MagnitudePercentageBodyWeight.Axis.Children, gui.Validation.FrontalAngle.Axis.Children,...
+            gui.Validation.SagittalAngle.Axis.Children, gui.Validation.TransverseAngle.Axis.Children]);   
+        [gui.Validation.MagnitudePercentageBodyWeight.Axis.XTick, gui.Validation.FrontalAngle.Axis.XTick,...
+            gui.Validation.SagittalAngle.Axis.XTick, gui.Validation.TransverseAngle.Axis.XTick] = deal(1:length(data.Results));   
+        [gui.Validation.MagnitudePercentageBodyWeight.Axis.XTickLabel, gui.Validation.FrontalAngle.Axis.XTickLabel,...
+            gui.Validation.SagittalAngle.Axis.XTickLabel, gui.Validation.TransverseAngle.Axis.XTickLabel] = deal({data.Results.Subject}); 
+        [gui.Validation.MagnitudePercentageBodyWeight.Axis.XLim, gui.Validation.FrontalAngle.Axis.XLim,...
+            gui.Validation.SagittalAngle.Axis.XLim, gui.Validation.TransverseAngle.Axis.XLim] = deal([0.5, length(data.Results) + 0.5]);
 
-        markerProps.Marker='x';
-        markerProps.Markersize=7;
-        % Magnitude Panel
-        hold (gui.HJF_VAL_Axis,'on')
-        drawPoint(gui.HJF_VAL_Axis, 1:NoS, [data.Results(:).rMagP], 'color', 'b', markerProps);
-        drawPoint(gui.HJF_VAL_Axis, 1:NoS, [data.Results(:).OrrMagP], 'color', 'g', markerProps)
-        S.rMagP.mean=mean([data.Results(:).rMagP]);
-        O.rMagP.mean=mean([data.Results(:).OrrMagP]);
-        plot(gui.HJF_VAL_Axis, [1,NoS], [S.rMagP.mean,S.rMagP.mean], 'color', 'b')
-        plot(gui.HJF_VAL_Axis, [1,NoS], [O.rMagP.mean,O.rMagP.mean], 'color', 'g')
-        % Frontal Angle Panel
-        hold (gui.FA_VAL_Axis,'on')
-        drawPoint(gui.FA_VAL_Axis, 1:NoS, [data.Results(:).rPhi], 'color', 'b', markerProps);
-        drawPoint(gui.FA_VAL_Axis, 1:NoS, [data.Results(:).OrPhi], 'color', 'g', markerProps);
-        S.rPhi.mean=mean([data.Results(:).rPhi]);
-        O.rPhi.mean=mean([data.Results(:).OrPhi]);
-        plot(gui.FA_VAL_Axis, [1,NoS], [S.rPhi.mean,S.rPhi.mean], 'color', 'b')
-        plot(gui.FA_VAL_Axis, [1,NoS], [O.rPhi.mean,O.rPhi.mean], 'color', 'g')
-        % Sagittal Angle Panel
-        hold (gui.SA_VAL_Axis,'on')
-        drawPoint(gui.SA_VAL_Axis, 1:NoS, [data.Results(:).rTheta], 'color', 'b', markerProps);
-        drawPoint(gui.SA_VAL_Axis, 1:NoS, [data.Results(:).OrTheta], 'color', 'g', markerProps);
-        S.rTheta.mean=mean([data.Results(:).rTheta]);
-        O.rTheta.mean=mean([data.Results(:).OrTheta]);
-        plot(gui.SA_VAL_Axis, [1,NoS], [S.rTheta.mean,S.rTheta.mean], 'color', 'b')
-        plot(gui.SA_VAL_Axis, [1,NoS], [O.rTheta.mean,O.rTheta.mean], 'color', 'g')
-        % Horizontal Angle Panel
-        hold (gui.HA_VAL_Axis,'on')
-        drawPoint(gui.HA_VAL_Axis, 1:NoS, [data.Results(:).rAlpha], 'color', 'b', markerProps);
-        drawPoint(gui.HA_VAL_Axis, 1:NoS, [data.Results(:).OrAlpha], 'color', 'g', markerProps);
-        S.rAlpha.mean=mean([data.Results(:).rAlpha]);
-        O.rAlpha.mean=mean([data.Results(:).OrAlpha]);
-        plot(gui.HA_VAL_Axis, [1,NoS], [S.rAlpha.mean,S.rAlpha.mean], 'color', 'b')
-        plot(gui.HA_VAL_Axis, [1,NoS], [O.rAlpha.mean,O.rAlpha.mean], 'color', 'g')
+        markerProps.Marker = 'x';
+        markerProps.Markersize = 7;
         
-%         legend(gui.HJF_VAL_Axis, [calc(2) orig(2)], 'Calculated Value', 'Measured Value')
-        figure('Color','w')
+        % Box panel magnitude of force in [%BW]
+        hold (gui.Validation.MagnitudePercentageBodyWeight.Axis, 'on')
+        drawPoint(gui.Validation.MagnitudePercentageBodyWeight.Axis, 1:NoS, [data.Results(:).rMagP],   'color', 'b', markerProps)
+        drawPoint(gui.Validation.MagnitudePercentageBodyWeight.Axis, 1:NoS, [data.Results(:).OrrMagP], 'color', 'g', markerProps)
+        S.rMagP.mean = mean([data.Results(:).rMagP]);
+        O.rMagP.mean = mean([data.Results(:).OrrMagP]);
+        plot(gui.Validation.MagnitudePercentageBodyWeight.Axis, [1,NoS], [S.rMagP.mean,S.rMagP.mean], 'color', 'b')
+        plot(gui.Validation.MagnitudePercentageBodyWeight.Axis, [1,NoS], [O.rMagP.mean,O.rMagP.mean], 'color', 'g')
+        
+        % Box panel frontal angle
+        hold (gui.Validation.FrontalAngle.Axis, 'on')
+        drawPoint(gui.Validation.FrontalAngle.Axis, 1:NoS, [data.Results(:).rPhi],  'color', 'b', markerProps)
+        drawPoint(gui.Validation.FrontalAngle.Axis, 1:NoS, [data.Results(:).OrPhi], 'color', 'g', markerProps)
+        S.rPhi.mean = mean([data.Results(:).rPhi]);
+        O.rPhi.mean = mean([data.Results(:).OrPhi]);
+        plot(gui.Validation.FrontalAngle.Axis, [1,NoS], [S.rPhi.mean,S.rPhi.mean], 'color', 'b')
+        plot(gui.Validation.FrontalAngle.Axis, [1,NoS], [O.rPhi.mean,O.rPhi.mean], 'color', 'g')
+        
+        % Box panel sagittal angle
+        hold (gui.Validation.SagittalAngle.Axis, 'on')
+        drawPoint(gui.Validation.SagittalAngle.Axis, 1:NoS, [data.Results(:).rTheta],  'color', 'b', markerProps)
+        drawPoint(gui.Validation.SagittalAngle.Axis, 1:NoS, [data.Results(:).OrTheta], 'color', 'g', markerProps)
+        S.rTheta.mean = mean([data.Results(:).rTheta]);
+        O.rTheta.mean = mean([data.Results(:).OrTheta]);
+        plot(gui.Validation.SagittalAngle.Axis, [1,NoS], [S.rTheta.mean,S.rTheta.mean], 'color', 'b')
+        plot(gui.Validation.SagittalAngle.Axis, [1,NoS], [O.rTheta.mean,O.rTheta.mean], 'color', 'g')
+        
+        % Box panel transverse angle
+        hold (gui.Validation.TransverseAngle.Axis, 'on')
+        drawPoint(gui.Validation.TransverseAngle.Axis, 1:NoS, [data.Results(:).rAlpha],  'color', 'b', markerProps)
+        drawPoint(gui.Validation.TransverseAngle.Axis, 1:NoS, [data.Results(:).OrAlpha], 'color', 'g', markerProps)
+        S.rAlpha.mean = mean([data.Results(:).rAlpha]);
+        O.rAlpha.mean = mean([data.Results(:).OrAlpha]);
+        plot(gui.Validation.TransverseAngle.Axis, [1,NoS], [S.rAlpha.mean,S.rAlpha.mean], 'color', 'b')
+        plot(gui.Validation.TransverseAngle.Axis, [1,NoS], [O.rAlpha.mean,O.rAlpha.mean], 'color', 'g')
+        
+        figure('Color', 'w')
         subplot(2,2,1)
-        boxplot([[data.Results(:).OrrMagP]',[data.Results(:).rMagP]'],{'In-vivio','Simulated'})
+        boxplot([[data.Results(:).OrrMagP]',[data.Results(:).rMagP]'],{'In-vivo','Simulated'})
         title('R [%BW]')
         subplot(2,2,2)
-        boxplot([[data.Results(:).OrPhi]',[data.Results(:).rPhi]'],{'In-vivio','Simulated'})
+        boxplot([[data.Results(:).OrPhi]',[data.Results(:).rPhi]'],{'In-vivo','Simulated'})
         title('Frontal Angle [°]')
         subplot(2,2,3)
-        boxplot([[data.Results(:).OrTheta]',[data.Results(:).rTheta]'],{'In-vivio','Simulated'})
+        boxplot([[data.Results(:).OrTheta]',[data.Results(:).rTheta]'],{'In-vivo','Simulated'})
         title('Sagittal Angle [°]')
         subplot(2,2,4)
-        boxplot([[data.Results(:).OrAlpha]',[data.Results(:).rAlpha]'],{'In-vivio','Simulated'})
+        boxplot([[data.Results(:).OrAlpha]',[data.Results(:).rAlpha]'],{'In-vivo','Simulated'})
         title('Transverse Angle [°]')
     end
+
 end

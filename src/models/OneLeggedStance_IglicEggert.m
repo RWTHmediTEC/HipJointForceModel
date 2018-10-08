@@ -10,19 +10,20 @@ end
 function jointAngles = Position(data)
 
 % Inputs
-HRC = data.S.Scale(1).HipJointWidth; % ??? From the template or the subject ???
-FL  = data.S.Scale(2).FemoralLength; % ??? From the template or the subject ???
-PB  = data.S.PelvicBend;
+l = data.S.Scale(1).HipJointWidth/2;
+x0 = data.S.Scale(2).FemoralLength;
+phi = 0.5;
 
 % Calculate the joint angles
-b = 0.48 * HRC/2;
-ny = asind(b/FL);
-jointAngles = {[0.5 0 PB], [ny 0 0], 0, 0, -ny, 0};
+b = 0.48 * l;
+ny = asind(b/x0);
+jointAngles = {[phi 0 data.S.PelvicBend], [ny 0 0], 0, 0, -ny, 0};
+
 end
 
-%% Active Muscles
+%% Active muscles
 function [activeMuscles, enable] = Muscles()
-% Is the user allowed to edit the default values
+% User is allowed to edit the default values
 enable = 'on';
 
 % Default fascicles of the model
@@ -53,13 +54,13 @@ activeMuscles = {...
 end
 
 %% Calculation of the HJF
-function [rMag, rMagP, rPhi, rTheta, rAlpha, rDir, rX, rY, rZ] = Calculation(data)
+function data = Calculation(data)
 
 % Inputs
-LE            = data.LE;
+LE            = data.S.LE;
 muscleList    = data.MuscleList;
 BW            = data.S.BodyWeight;
-PB            = data.S.PelvicBend;
+PelvicBend    = data.S.PelvicBend;
 HRC           = data.S.Scale(1).HipJointWidth;
 activeMuscles = data.activeMuscles;
 Side          = data.S.Side;
@@ -67,13 +68,13 @@ rView         = data.View;
 
 %% Define Parameters
 G = -9.81;                              % Weight force
-wb = BW * G;                            % Resultant force of total bodyweight
-wl = 0.161 * wb;                        % Resultant force of the supporting limb
-w = [0, wb - wl, 0];                    % Resultant bodyweight force
+Wb = BW * G;                            % Resultant force of total bodyweight
+Wl = 0.161 * Wb;                        % Resultant force of the supporting limb
+W = [0, Wb - Wl, 0];                    % Resultant bodyweight force
 HRChalf = HRC/2;                        % Half the distance between the two hip rotation centers
-ba = 0.48 * HRChalf;                    % Lever arm of the force wl
-ca = 1.01 * HRChalf;                    % Lever arm of the ground reaction force wb's attachment point
-a = (wb * ca - wl * ba) / (wb - wl);    % Lever arm of the force w's attachment point
+ba = 0.48 * HRChalf;                    % Lever arm of the force Wl
+ca = 1.01 * HRChalf;                    % Lever arm of the ground reaction force Wb's attachment point
+a = (Wb * ca - Wl * ba) / (Wb - Wl);    % Lever arm of the force W's attachment point
 
 % Implement matrices for Muscle Origin Points (MOP) and Muscle Insertion
 % Points (MIP) which are equal to r and r' in Iglic 1990
@@ -124,16 +125,16 @@ end
 momentF = cross(MOP, muscleForce);
 
 if Side == 'L'
-    momentW = cross([0 0 a], w);  % Moment of bodyweight force around HRC
+    momentW = cross([0 0 a], W);  % Moment of bodyweight force around HRC
 else
-    momentW = cross([0 0 -a], w); % Moment of bodyweight force around HRC
+    momentW = cross([0 0 -a], W); % Moment of bodyweight force around HRC
 end
 
 syms rXsym rYsym rZsym % Hip joint forces
 
-eq1 =  sum(muscleForce(:,1)) + rXsym + w(1); % Iglic 1990 equation 4 for X-component
-eq2 =  sum(muscleForce(:,2)) + rYsym + w(2); % Iglic 1990 equation 4 for Y-component
-eq3 =  sum(muscleForce(:,3)) + rZsym + w(3); % Iglic 1990 equation 4 for Z-component
+eq1 =  sum(muscleForce(:,1)) + rXsym + W(1); % Iglic 1990 equation 4 for X-component
+eq2 =  sum(muscleForce(:,2)) + rYsym + W(2); % Iglic 1990 equation 4 for Y-component
+eq3 =  sum(muscleForce(:,3)) + rZsym + W(3); % Iglic 1990 equation 4 for Z-component
 
 eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
 
@@ -145,7 +146,7 @@ rZ = double(hipJointForce.rZsym);
 %f = double(hipJointForce.f);
 
 rMag = norm([rX rY rZ]);
-rMagP = rMag / abs(wb) * 100;
+rMagP = rMag / abs(Wb) * 100;
 rDir = normalizeVector3d([rX rY rZ]);
 
 if Side == 'L'
@@ -155,9 +156,9 @@ end
 % Rotation matrices for local pelvic COS
 TFMx = createRotationOx(degtorad(0.5));
 TFMy = createRotationOy(0);
-TFMz = createRotationOz(degtorad(PB));
+TFMz = createRotationOz(degtorad(PelvicBend));
 
-if rView == 2
+if strcmp(rView, 'Femur') == 1
     rDir = -1 * rDir;
     
     ny = asin(ba/data.S.Scale(2).FemoralLength);
@@ -174,11 +175,21 @@ rPhi   = atand(rZ / rY);                               % Angle in frontal plane
 rTheta = atand(rX / rY);                               % Angle in sagittal plane
 rAlpha = atand(rX / rZ);                               % Angle in horizontal plane
 
+data.rMag = rMag;
+data.rMagP = rMagP;
+data.rPhi = rPhi;
+data.rTheta = rTheta;
+data.rAlpha = rAlpha;
+data.rDir = rDir;
+data.rX = rX;
+data.rY = rY;
+data.rZ = rZ;
+
 % ny = asind(ba/data.FL);
 % rYfemur = cosd(ny)*rY + sind(ny)*rZ;
 % rZfemur = -sind(ny)*rY + cosd(ny)*rZ;
 % rMag = norm([rX rYfemur rZfemur]);                          % Magnitude of hip joint reaction force in [N]
-% rMagP = rMag / abs(wb) * 100;                               % Magnitude of hip joint reaction force in [BW%]
+% rMagP = rMag / abs(Wb) * 100;                               % Magnitude of hip joint reaction force in [BW%]
 % rPhi = atand(rZfemur / rYfemur);                            % Angle in frontal plane
 % rTheta = atand(rX / rYfemur);                               % Angle in sagittal plane
 % rAlpha = atand(rX / rZfemur);                               % Angle in horizontal plane

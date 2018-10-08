@@ -1,4 +1,4 @@
-% Import TLEM 2.0 data and save as TLEM2.mat in data
+% Import TLEM 2.0 data and save as TLEM2_0.mat in data
 % including structure LE (Lower Extremity) and muscleList 
 
 %% Import .stl files
@@ -12,7 +12,7 @@ NoB = size(Bones,2);
 
 for b = 1:NoB
     % Lower Extremity (LE)
-    LE(b).Name=Bones{b};
+    LE(b).Name = Bones{b};
     % Load the bone surfaces described in the local (bone) coordinate system
     [LE(b).Mesh.vertices, LE(b).Mesh.faces] = ...
         stlRead([tempFileName Bones{b} BoneSuffix{b} '.stl']);
@@ -137,7 +137,7 @@ for b = 1:NoB
     end
 end
 
-%% Save node closest to femoral muscle insertion
+%% Save node closest to femoral muscle origins, insertions and via points
 
 femurNS = createns(LE(2).Mesh.vertices);
 Fascicles = fieldnames(LE(2).Muscle);
@@ -157,8 +157,9 @@ for b = 1:NoB
 end
 
 % Indices of required landmarks (line1) and indices of related bones (line2)
-REQ = [5, 6, 7, 14, 17; ...
-       1, 1, 1, 2,  2]; % more landmarks can be added here
+REQ = [5:11, 14:17];
+REQ(2,1:7)  = deal(1);
+REQ(2,8:11) = deal(2); % More landmarks can be added here
 
 % Erase spaces
 lRaw(REQ(1,1:length(REQ))) = erase(lRaw(REQ(1,1:length(REQ))),' ');
@@ -169,4 +170,4 @@ for r = 1:length(REQ)
 end
 
 %% Save data
-save('data\TLEM2.mat', 'LE', 'muscleList')
+save('data\TLEM2_0.mat', 'LE', 'muscleList')

@@ -1,6 +1,6 @@
 function data = globalizeTLEM2(data)
 % Transformation of TLEM2 data into a global coordinate system
-LE = data.LE;
+LE = data.S.LE;
 
 %% Transformations from Local to Global Coordinate System
 NoB = length(LE);
@@ -37,6 +37,6 @@ switch data.S.Side
         LE = transformTLEM2(LE, mirrorTFM);
 end
 
-data.LE = LE;
+data.S.LE = LE;
 
 end
