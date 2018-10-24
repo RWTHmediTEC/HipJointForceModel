@@ -23,9 +23,7 @@ gui.Home.Layout_V_Mid   = uix.VBox('Parent', gui.Home.Layout_H, 'Spacing', 3);
 gui.Home.Layout_V_Right = uix.VBox('Parent', gui.Home.Layout_H, 'Spacing', 3);
 
 % Create validation tab
-gui.Validation.Layout_H       = uix.HBox('Parent', gui.Tabs,                'Spacing', 3);
-gui.Validation.Layout_V_Left  = uix.VBox('Parent', gui.Validation.Layout_H, 'Spacing', 3);
-gui.Validation.Layout_V_Right = uix.VBox('Parent', gui.Validation.Layout_H, 'Spacing', 3);
+gui.Validation.Layout_Grid = uix.Grid('Parent', gui.Tabs, 'Spacing', 3);
 
 gui.Tabs.TabNames = {'Home', 'Validation'};
 gui.Tabs.SelectedChild = 1;
@@ -451,25 +449,41 @@ set(gui.Home.Layout_V_Right, 'Height', [-1, -2])
 %                                  PANELS                                 %
 %_________________________________________________________________________%
 
-gui.Validation.MagnitudePercentageBodyWeight.BoxPanel = uix.BoxPanel('Parent', gui.Validation.Layout_V_Left,...
+gui.Validation.Panel_MagnitudePercentageBodyWeightSingle = uix.Panel('Parent', gui.Validation.Layout_Grid,...
     'Title', 'Magnitude of Force [%BW]',...
-    'FontWeight', 'bold', 'BackgroundColor', 'w');
-gui.Validation.MagnitudePercentageBodyWeight.Axis = axes(gui.Validation.MagnitudePercentageBodyWeight.BoxPanel);
+    'FontWeight', 'bold');
+gui.Validation.Panel_SagittalAngleSingle = uix.Panel('Parent', gui.Validation.Layout_Grid,...
+    'Title', 'Sagittal Angle [°]',...
+    'FontWeight', 'bold');
+gui.Validation.Panel_MagnitudePercentageBodyWeightBoxPlot = uix.Panel('Parent', gui.Validation.Layout_Grid,...
+    'Title', 'Boxplot',...
+    'FontWeight', 'bold');
+gui.Validation.Panel_SagittalAngleBoxPlot = uix.Panel('Parent', gui.Validation.Layout_Grid,...
+    'Title', 'Boxplot',...
+    'FontWeight', 'bold');
+gui.Validation.Panel_FrontalAngleSingle = uix.Panel('Parent', gui.Validation.Layout_Grid,...
+    'Title', 'Frontal Angle [°]',...
+    'FontWeight', 'bold');
+gui.Validation.Panel_TransverseAngleSingle = uix.Panel('Parent', gui.Validation.Layout_Grid,...
+    'Title', 'Transverse Angle [°]',...
+    'FontWeight', 'bold');
+gui.Validation.Panel_FrontalAngleBoxPlot = uix.Panel('Parent', gui.Validation.Layout_Grid,...
+    'Title', 'Boxplot',...
+    'FontWeight', 'bold');
+gui.Validation.Panel_TransverseAngleBoxPlot = uix.Panel('Parent', gui.Validation.Layout_Grid,...
+    'Title', 'Boxplot',...
+    'FontWeight', 'bold');
 
-gui.Validation.FrontalAngle.BoxPanel = uix.BoxPanel('Parent', gui.Validation.Layout_V_Right,...
-    'Title', 'Frontal Angle',...
-    'FontWeight', 'bold', 'BackgroundColor', 'w');
-gui.Validation.FrontalAngle.Axis = axes(gui.Validation.FrontalAngle.BoxPanel);
+gui.Validation.Axis_MagnitudePercentageBodyWeightSingle = axes(gui.Validation.Panel_MagnitudePercentageBodyWeightSingle);
+gui.Validation.Axis_SagittalAngleSingle = axes(gui.Validation.Panel_SagittalAngleSingle);
+gui.Validation.Axis_MagnitudePercentageBodyWeightBoxPlot = axes(gui.Validation.Panel_MagnitudePercentageBodyWeightBoxPlot);
+gui.Validation.Axis_SagittalAngleBoxPlot = axes(gui.Validation.Panel_SagittalAngleBoxPlot);
+gui.Validation.Axis_FrontalAngleSingle = axes(gui.Validation.Panel_FrontalAngleSingle);
+gui.Validation.Axis_TransverseAngleSingle = axes(gui.Validation.Panel_TransverseAngleSingle);
+gui.Validation.Axis_FrontalAngleBoxPlot = axes(gui.Validation.Panel_FrontalAngleBoxPlot);
+gui.Validation.Axis_TransverseAngleBoxPlot = axes(gui.Validation.Panel_TransverseAngleBoxPlot);
 
-gui.Validation.SagittalAngle.BoxPanel = uix.BoxPanel('Parent', gui.Validation.Layout_V_Left,...
-    'Title', 'Sagittal Angle',...
-    'FontWeight', 'bold', 'BackgroundColor', 'w');
-gui.Validation.SagittalAngle.Axis = axes(gui.Validation.SagittalAngle.BoxPanel);
-
-gui.Validation.TransverseAngle.BoxPanel = uix.BoxPanel('Parent', gui.Validation.Layout_V_Right,...
-    'Title', 'Transverse Angle',...
-    'FontWeight', 'bold', 'BackgroundColor', 'w');
-gui.Validation.TransverseAngle.Axis = axes(gui.Validation.TransverseAngle.BoxPanel);
+set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
 %                           CALLBACK FUNCTIONS                            %
@@ -870,67 +884,59 @@ gui.Validation.TransverseAngle.Axis = axes(gui.Validation.TransverseAngle.BoxPan
 
     function updateValidationTab
         NoS = length(data.Results);
-        delete([gui.Validation.MagnitudePercentageBodyWeight.Axis.Children, gui.Validation.FrontalAngle.Axis.Children,...
-            gui.Validation.SagittalAngle.Axis.Children, gui.Validation.TransverseAngle.Axis.Children]);   
-        [gui.Validation.MagnitudePercentageBodyWeight.Axis.XTick, gui.Validation.FrontalAngle.Axis.XTick,...
-            gui.Validation.SagittalAngle.Axis.XTick, gui.Validation.TransverseAngle.Axis.XTick] = deal(1:length(data.Results));   
-        [gui.Validation.MagnitudePercentageBodyWeight.Axis.XTickLabel, gui.Validation.FrontalAngle.Axis.XTickLabel,...
-            gui.Validation.SagittalAngle.Axis.XTickLabel, gui.Validation.TransverseAngle.Axis.XTickLabel] = deal({data.Results.Subject}); 
-        [gui.Validation.MagnitudePercentageBodyWeight.Axis.XLim, gui.Validation.FrontalAngle.Axis.XLim,...
-            gui.Validation.SagittalAngle.Axis.XLim, gui.Validation.TransverseAngle.Axis.XLim] = deal([0.5, length(data.Results) + 0.5]);
+%         delete([gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.Children, gui.Validation.Axis_FrontalAngleSingle.Children,...
+%             gui.Validation.Axis_SagittalAngleSingle.Children, gui.Validation.Axis_TransverseAngleSingle.Children]);   
+        [gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.XTick, gui.Validation.Axis_FrontalAngleSingle.XTick,...
+            gui.Validation.Axis_SagittalAngleSingle.XTick, gui.Validation.Axis_TransverseAngleSingle.XTick] = deal(1:length(data.Results));   
+        [gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.XTickLabel, gui.Validation.Axis_FrontalAngleSingle.XTickLabel,...
+            gui.Validation.Axis_SagittalAngleSingle.XTickLabel, gui.Validation.Axis_TransverseAngleSingle.XTickLabel] = deal({data.Results.Subject}); 
+        [gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.XLim, gui.Validation.Axis_FrontalAngleSingle.XLim,...
+            gui.Validation.Axis_SagittalAngleSingle.XLim, gui.Validation.Axis_TransverseAngleSingle.XLim] = deal([0.5, length(data.Results) + 0.5]);
 
         markerProps.Marker = 'x';
         markerProps.Markersize = 7;
         
-        % Box panel magnitude of force in [%BW]
-        hold (gui.Validation.MagnitudePercentageBodyWeight.Axis, 'on')
-        drawPoint(gui.Validation.MagnitudePercentageBodyWeight.Axis, 1:NoS, [data.Results(:).rMagP],   'color', 'b', markerProps)
-        drawPoint(gui.Validation.MagnitudePercentageBodyWeight.Axis, 1:NoS, [data.Results(:).OrrMagP], 'color', 'g', markerProps)
+        % Panel magnitude of force in [%BW]
+        hold (gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, 'on')
+        drawPoint(gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, 1:NoS, [data.Results(:).rMagP],   'color', 'b', markerProps)
+        drawPoint(gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, 1:NoS, [data.Results(:).OrrMagP], 'color', 'g', markerProps)
         S.rMagP.mean = mean([data.Results(:).rMagP]);
         O.rMagP.mean = mean([data.Results(:).OrrMagP]);
-        plot(gui.Validation.MagnitudePercentageBodyWeight.Axis, [1,NoS], [S.rMagP.mean,S.rMagP.mean], 'color', 'b')
-        plot(gui.Validation.MagnitudePercentageBodyWeight.Axis, [1,NoS], [O.rMagP.mean,O.rMagP.mean], 'color', 'g')
+        plot(gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, [1,NoS], [S.rMagP.mean,S.rMagP.mean], 'color', 'b')
+        plot(gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, [1,NoS], [O.rMagP.mean,O.rMagP.mean], 'color', 'g')
         
-        % Box panel frontal angle
-        hold (gui.Validation.FrontalAngle.Axis, 'on')
-        drawPoint(gui.Validation.FrontalAngle.Axis, 1:NoS, [data.Results(:).rPhi],  'color', 'b', markerProps)
-        drawPoint(gui.Validation.FrontalAngle.Axis, 1:NoS, [data.Results(:).OrPhi], 'color', 'g', markerProps)
+        % Panel frontal angle
+        hold (gui.Validation.Axis_FrontalAngleSingle, 'on')
+        drawPoint(gui.Validation.Axis_FrontalAngleSingle, 1:NoS, [data.Results(:).rPhi],  'color', 'b', markerProps)
+        drawPoint(gui.Validation.Axis_FrontalAngleSingle, 1:NoS, [data.Results(:).OrPhi], 'color', 'g', markerProps)
         S.rPhi.mean = mean([data.Results(:).rPhi]);
         O.rPhi.mean = mean([data.Results(:).OrPhi]);
-        plot(gui.Validation.FrontalAngle.Axis, [1,NoS], [S.rPhi.mean,S.rPhi.mean], 'color', 'b')
-        plot(gui.Validation.FrontalAngle.Axis, [1,NoS], [O.rPhi.mean,O.rPhi.mean], 'color', 'g')
+        plot(gui.Validation.Axis_FrontalAngleSingle, [1,NoS], [S.rPhi.mean,S.rPhi.mean], 'color', 'b')
+        plot(gui.Validation.Axis_FrontalAngleSingle, [1,NoS], [O.rPhi.mean,O.rPhi.mean], 'color', 'g')
         
-        % Box panel sagittal angle
-        hold (gui.Validation.SagittalAngle.Axis, 'on')
-        drawPoint(gui.Validation.SagittalAngle.Axis, 1:NoS, [data.Results(:).rTheta],  'color', 'b', markerProps)
-        drawPoint(gui.Validation.SagittalAngle.Axis, 1:NoS, [data.Results(:).OrTheta], 'color', 'g', markerProps)
+        % Panel sagittal angle
+        hold (gui.Validation.Axis_SagittalAngleSingle, 'on')
+        drawPoint(gui.Validation.Axis_SagittalAngleSingle, 1:NoS, [data.Results(:).rTheta],  'color', 'b', markerProps)
+        drawPoint(gui.Validation.Axis_SagittalAngleSingle, 1:NoS, [data.Results(:).OrTheta], 'color', 'g', markerProps)
         S.rTheta.mean = mean([data.Results(:).rTheta]);
         O.rTheta.mean = mean([data.Results(:).OrTheta]);
-        plot(gui.Validation.SagittalAngle.Axis, [1,NoS], [S.rTheta.mean,S.rTheta.mean], 'color', 'b')
-        plot(gui.Validation.SagittalAngle.Axis, [1,NoS], [O.rTheta.mean,O.rTheta.mean], 'color', 'g')
+        plot(gui.Validation.Axis_SagittalAngleSingle, [1,NoS], [S.rTheta.mean,S.rTheta.mean], 'color', 'b')
+        plot(gui.Validation.Axis_SagittalAngleSingle, [1,NoS], [O.rTheta.mean,O.rTheta.mean], 'color', 'g')
         
-        % Box panel transverse angle
-        hold (gui.Validation.TransverseAngle.Axis, 'on')
-        drawPoint(gui.Validation.TransverseAngle.Axis, 1:NoS, [data.Results(:).rAlpha],  'color', 'b', markerProps)
-        drawPoint(gui.Validation.TransverseAngle.Axis, 1:NoS, [data.Results(:).OrAlpha], 'color', 'g', markerProps)
+        % Panel transverse angle
+        hold (gui.Validation.Axis_TransverseAngleSingle, 'on')
+        drawPoint(gui.Validation.Axis_TransverseAngleSingle, 1:NoS, [data.Results(:).rAlpha],  'color', 'b', markerProps)
+        drawPoint(gui.Validation.Axis_TransverseAngleSingle, 1:NoS, [data.Results(:).OrAlpha], 'color', 'g', markerProps)
         S.rAlpha.mean = mean([data.Results(:).rAlpha]);
         O.rAlpha.mean = mean([data.Results(:).OrAlpha]);
-        plot(gui.Validation.TransverseAngle.Axis, [1,NoS], [S.rAlpha.mean,S.rAlpha.mean], 'color', 'b')
-        plot(gui.Validation.TransverseAngle.Axis, [1,NoS], [O.rAlpha.mean,O.rAlpha.mean], 'color', 'g')
+        plot(gui.Validation.Axis_TransverseAngleSingle, [1,NoS], [S.rAlpha.mean,S.rAlpha.mean], 'color', 'b')
+        plot(gui.Validation.Axis_TransverseAngleSingle, [1,NoS], [O.rAlpha.mean,O.rAlpha.mean], 'color', 'g')
         
-        figure('Color', 'w')
-        subplot(2,2,1)
-        boxplot([[data.Results(:).OrrMagP]',[data.Results(:).rMagP]'],{'In-vivo','Simulated'})
-        title('R [%BW]')
-        subplot(2,2,2)
-        boxplot([[data.Results(:).OrPhi]',[data.Results(:).rPhi]'],{'In-vivo','Simulated'})
-        title('Frontal Angle [°]')
-        subplot(2,2,3)
-        boxplot([[data.Results(:).OrTheta]',[data.Results(:).rTheta]'],{'In-vivo','Simulated'})
-        title('Sagittal Angle [°]')
-        subplot(2,2,4)
-        boxplot([[data.Results(:).OrAlpha]',[data.Results(:).rAlpha]'],{'In-vivo','Simulated'})
-        title('Transverse Angle [°]')
+        % Boxplots
+        boxplot(gui.Validation.Axis_MagnitudePercentageBodyWeightBoxPlot,[[data.Results(:).OrrMagP]',[data.Results(:).rMagP]'],{'In-vivo','Simulated'})
+        boxplot(gui.Validation.Axis_FrontalAngleBoxPlot,[[data.Results(:).OrPhi]',[data.Results(:).rPhi]'],{'In-vivo','Simulated'})
+        boxplot(gui.Validation.Axis_SagittalAngleBoxPlot,[[data.Results(:).OrTheta]',[data.Results(:).rTheta]'],{'In-vivo','Simulated'})
+        boxplot(gui.Validation.Axis_TransverseAngleBoxPlot,[[data.Results(:).OrAlpha]',[data.Results(:).rAlpha]'],{'In-vivo','Simulated'})
     end
 
 end
