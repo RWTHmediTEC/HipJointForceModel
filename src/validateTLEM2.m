@@ -8,8 +8,21 @@ else
 end
         
 Results = repmat(struct('Subject', []), length(OL),1);
-        
+
 for s = 1:length(OL)
+    
+% Load body weight and forces
+load([OL(s).Subject '_' char(data.Posture) '.mat'])
+OL(s).BodyWeight = meanPFP.Weight_N / 9.81;
+
+OL(s).rMagP = norm(meanPFP.HJF_pBW);
+
+load(['femur' data.TLEMversion 'Controls.mat'], 'fwTFM2AFCS')
+HJFtrans = transpose(fwTFM2AFCS(1:3,1:3)) * transpose(meanPFP.HJF_pBW);
+
+OL(s).rPhi   = atand(HJFtrans(3) / HJFtrans(2));
+OL(s).rTheta = atand(HJFtrans(1) / HJFtrans(2));
+OL(s).rAlpha = atand(HJFtrans(1) / HJFtrans(3));
             
 data.S.Side                    = OL(s).Subject(end);
 data.S.BodyWeight              = OL(s).BodyWeight;

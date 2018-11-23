@@ -1,13 +1,13 @@
 TODO:
 - Revision der PCSAs
-	- Vergleich mit AnyBody. AnyBody passt die PCSAs anhand eines "Scaling Laws" an.
+	- Vergleich mit AnyBody; AnyBody passt die PCSAs anhand eines "Scaling Laws" an
 	- PCSA = MuscleVolume/OptimalFiberLength
-	- Sowohl MuscleVolume als auch OptimalFiberLength können patienten-spezifisch 
-	  über ein Skalierungsgesetz angepasst werden.
+	- Sowohl MuscleVolume als auch OptimalFiberLength können patienten-spezifisch über ein Skalierungsgesetz angepasst werden
 	- Hier werden die Daten vom TLEM1 (Klein Horsman) verwendet:
 		- MuscleVolume = Mass/1.056 (MuscleDensity) 
 		- OptimalFiberLength (Lopt)
 
+- Auswahl der zu betrachtenden ADL für Validierung
 - Weitere Modelle für One-Leg-Stance importieren (Pauwels, Debrunner, ...)
 - Parameterstudie für Iglic (Modell-Konstanten variieren)
 - Skalierung der Via points und Wrapping surfaces
@@ -17,7 +17,7 @@ TODO:
 - Modelle für weitere ADLs implementieren
 
 TODO GUI:
-- Add box-plots to validation tab
+- Add legends in Validation Tab
 
 TOTEST:
 - Zeitaufwand der einzelnen Funktionen (tictoc)

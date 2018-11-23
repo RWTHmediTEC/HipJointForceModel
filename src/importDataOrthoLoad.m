@@ -66,21 +66,6 @@ OL(s).NeckLength = NeckLength(s);
 OL(s).FemoralVersion = alphaZ(s);
 OL(s).CCD = CCD;
 
-%% Load body weight and forces
-load([Subject{s} '_OLS' '.mat']) % OLS: One-legged stance % !!! Add Level Walking here???
-OL(s).BodyWeight = meanPFP.Weight_N / 9.81;
-
-OL(s).rMagP = norm(meanPFP.HJF_pBW);
-
-load('femurTLEM2Controls', 'fwTFM2AFCS') % !!! ['femur' data.TLEMversion 'Controls.mat']
-% !!! OL different for TLEM 2.0 and TLEM 2.1, transformation need to be
-% executed in validateTLEM2
-HJFtrans = transpose(fwTFM2AFCS(1:3,1:3)) * transpose(meanPFP.HJF_pBW);
-
-OL(s).rPhi   = atand(HJFtrans(3) / HJFtrans(2));
-OL(s).rTheta = atand(HJFtrans(1) / HJFtrans(2));
-OL(s).rAlpha = atand(HJFtrans(1) / HJFtrans(3));
-
 end
 
 %% Save data

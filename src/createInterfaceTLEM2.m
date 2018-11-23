@@ -246,20 +246,35 @@ gui.Home.Model.BoxPanel = uix.BoxPanel('Parent', gui.Home.Layout_V_Right,...
 gui.Home.Model.Layout_H = uix.HBox('Parent', gui.Home.Model.BoxPanel,...
     'Spacing', 3);
 
-% Panel posture
-gui.Home.Model.Panel_Posture = uix.Panel('Parent', gui.Home.Model.Layout_H,...
-    'Title', 'Posture');
+gui.Home.Model.Layout_V = uix.VBox('Parent', gui.Home.Model.Layout_H,...
+    'Spacing', 3);
+
+% Panel model
+gui.Home.Model.Panel_Model = uix.Panel('Parent', gui.Home.Model.Layout_V,...
+    'Title', 'Model');
 
 % Get models
 models = dir('src\models\*.m');
 [~, models] = arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
 data.Model = models{2};
-updatePosture()
-gui.Home.Model.ListBox_Posture = uicontrol( 'Parent', gui.Home.Model.Panel_Posture,...
+updateModel()
+gui.Home.Model.ListBox_Model = uicontrol( 'Parent', gui.Home.Model.Panel_Model,...
     'BackgroundColor', 'w',...
     'Style', 'list',...
     'String', models,...
     'Value', 2,...
+    'Callback', @onListSelection_Model);
+
+% Panel posture
+gui.Home.Model.Panel_Posture = uix.Panel('Parent', gui.Home.Model.Layout_V,...
+    'Title', 'Posture');
+
+% Get postures
+gui.Home.Model.ListBox_Posture = uicontrol( 'Parent', gui.Home.Model.Panel_Posture,...
+    'BackgroundColor', 'w',...
+    'Style', 'list',...
+    'String', postures(:,1),...
+    'Value', default,...
     'Callback', @onListSelection_Posture);
 
 % Panel muscle list
@@ -635,11 +650,18 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
 
 %% Box panel model
 
-    function onListSelection_Posture(src, ~)
-        % User has selected a posture from the list
+    function onListSelection_Model(src, ~)
+        % User has selected a model from the list
         data.Model = models{get(src, 'Value')};
         gui.IsUpdated = false;
-        updatePosture();
+        updateModel();
+        updateHomeTab();
+    end
+
+    function onListSelection_Posture(src, ~)
+        % User has selected a posture from the list
+        data.Posture = postures{get(src, 'Value'), 2};
+        gui.IsUpdated = false;
         updateHomeTab();
     end
 
@@ -803,10 +825,15 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
 
 %% Box panel model
 
-    function updatePosture()
+    function updateModel()
         calculateTLEM2 = str2func(data.Model);
         gui.Home.Model.modelHandle = calculateTLEM2();
         [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles();
+        [postures, default] = gui.Home.Model.modelHandle.Posture();
+        data.Posture = postures(default, 2);
+        if isfield(gui.Home.Model, 'ListBox_Posture') == 1
+        set(gui.Home.Model.ListBox_Posture, 'String', postures(:,1), 'Value', default);
+        end
     end
 
     function updateMuscleList()
@@ -884,8 +911,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
 
     function updateValidationTab
         NoS = length(data.Results);
-%         delete([gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.Children, gui.Validation.Axis_FrontalAngleSingle.Children,...
-%             gui.Validation.Axis_SagittalAngleSingle.Children, gui.Validation.Axis_TransverseAngleSingle.Children]);   
+        delete([gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.Children, gui.Validation.Axis_FrontalAngleSingle.Children,...
+            gui.Validation.Axis_SagittalAngleSingle.Children, gui.Validation.Axis_TransverseAngleSingle.Children]);   
         [gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.XTick, gui.Validation.Axis_FrontalAngleSingle.XTick,...
             gui.Validation.Axis_SagittalAngleSingle.XTick, gui.Validation.Axis_TransverseAngleSingle.XTick] = deal(1:length(data.Results));   
         [gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.XTickLabel, gui.Validation.Axis_FrontalAngleSingle.XTickLabel,...
