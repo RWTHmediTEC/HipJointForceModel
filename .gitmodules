@@ -4,3 +4,6 @@
 [submodule "src/external/matGeom"]
 	path = src/external/matGeom
 	url = https://github.com/mattools/matGeom/
+[submodule "src/internal/ManualLandmarkSelection"]
+	path = src/internal/ManualLandmarkSelection
+	url = //sagnix/Programmierung/public/Matlab/ManualLandmarkSelection
