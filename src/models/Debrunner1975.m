@@ -1,0 +1,167 @@
+function funcHandles = Debrunner1975
+
+funcHandles.Posture     = @Posture;
+funcHandles.Position    = @Position;
+funcHandles.Muscles     = @Muscles;
+funcHandles.Calculation = @Calculation;
+
+end
+
+%% Postures for validation
+
+function [postures, default] = Posture()
+
+default = 1;
+postures = {'OneLeggedStance' 'OLS';
+            'LevelWalking' 'LW'};
+
+end
+
+%% Calculate the joint angles for positioning of the TLEM2
+function jointAngles = Position(data)
+
+% Inputs
+
+% Calculate the joint angles
+jointAngles = {[0 0 data.S.PelvicBend], [0 0 0], 0, 0, 0, 0};
+
+end
+
+%% Active muscles
+function [activeMuscles, enable] = Muscles()
+% User is allowed to edit the default values
+enable = 'off';
+
+% Default fascicles of the model
+activeMuscles = {...
+    'GluteusMediusAnterior1';
+    'GluteusMediusAnterior2';
+    'GluteusMediusAnterior3';
+    'GluteusMediusAnterior4';
+    'GluteusMediusAnterior5';
+    'GluteusMediusAnterior6';
+    'GluteusMediusPosterior1';
+    'GluteusMediusPosterior2';
+    'GluteusMediusPosterior3';
+    'GluteusMediusPosterior4';
+    'GluteusMediusPosterior5';
+    'GluteusMediusPosterior6';
+    'GluteusMinimusAnterior1';
+    'GluteusMinimusAnterior2';
+    'GluteusMinimusMid1';
+    'GluteusMinimusMid2';
+    'GluteusMinimusPosterior1';
+    'GluteusMinimusPosterior2';};
+end
+
+%% Calculation of the hip joint force
+function data = Calculation(data)
+
+% Inputs
+LE                = data.S.LE;
+activeMuscles     = data.activeMuscles;
+BodyWeight        = data.S.BodyWeight;
+PelvicBend        = data.S.PelvicBend;
+HipJointWidth     = data.S.Scale(1).HipJointWidth;
+Side              = data.S.Side;
+View              = data.View;
+GreaterTrochanter = data.S.LE(2).Mesh.vertices(data.S.LE(2).Landmarks.GreaterTrochanter.Node,:);
+HipJointCenter    = data.S.LE(1).Joints.Hip.Pos;
+AcetabularRoof    = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.DebrunnerAcetabularRoof.Node,:);
+MostCranial       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.DebrunnerMostCranial   .Node,:);
+MostMedial        = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.DebrunnerMostMedial    .Node,:);
+MostLateral       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.DebrunnerMostLateral   .Node,:);
+
+%% Define Parameters
+
+d6 = HipJointWidth/2; % Half the distance between the two hip joint centers
+d5 = 1.28 * d6; % Lever arm of G5 around the hip joint center
+G5 = 5/6 * BodyWeight; % Partial body weight weighing on the hip joint
+Z = [0, HipJointCenter(2:3)]; % Coordinates of the hip joint center in frontal plane
+T = [0, GreaterTrochanter(2:3)]; % Coordinates of the greater trochanter in frontal plane
+bD = MostLateral(3) - MostMedial(3); % Width of the iliac bone along the Z-axis
+hD = MostCranial(2) - AcetabularRoof(2); % Height of the iliac bone along the Y-axis
+A = [0, AcetabularRoof(2) + 2/3 * hD, MostLateral(3) - 2/5 * bD]; % Coordinates of the muscle origin in frontal plane
+% h = norm(cross(A-T, Z-T)) / norm(A-T); % Lever arm of the muscle force around the hip joint center
+
+% Get the coordinates of the active muscles
+for m = 1:length(activeMuscles)
+    origin(m,:)    = LE(1).Muscle.(activeMuscles{m}).Pos;
+    insertion(m,:) = LE(2).Muscle.(activeMuscles{m}).Pos;
+end
+A_TLEM = [0,...
+          sum(origin(:,2)) / length(activeMuscles),...
+          sum(origin(:,3)) / length(activeMuscles)];
+T_TLEM = [0,...
+          sum(insertion(:,2)) / length(activeMuscles),...
+          sum(insertion(:,3)) / length(activeMuscles)];
+h_TLEM = norm(cross(A_TLEM-T_TLEM, Z-T_TLEM)) / norm(A_TLEM-T_TLEM);
+
+disp(['Difference between A and A_TLEM: ' num2str(A-A_TLEM)])
+disp(['Difference between T and T_TLEM: ' num2str(T-T_TLEM)])
+
+M_TLEM_direction = (T_TLEM - A_TLEM)/norm(T_TLEM - A_TLEM);
+syms M_TLEM_magnitude % Magnitude of the muscle force M
+M = M_TLEM_direction * M_TLEM_magnitude;
+G5_Force = [0, -9.81 * G5, 0];
+
+if Side == 'L'
+    momentG5 = cross([0 0 d5], G5_Force);  % Moment of bodyweight force around hip rotation center
+else
+    momentG5 = cross([0 0 -d5], G5_Force); % Moment of bodyweight force around hip rotation center
+end
+
+eq1 = momentG5 + [h_TLEM * M_TLEM_magnitude, 0, 0]; % Moment equilibrium around hip joint center
+syms RxSym RySym RzSym
+% Calculate the hip joint force
+check = G5_Force(1) + M(1) + RxSym; % Force equilibrium in the direction of X
+eq2 = G5_Force(2) + M(2) + RySym; % Force equilibrium in the direction of Y
+eq3 = G5_Force(3) + M(3) + RzSym; % Force equilibrium in the direction of Z
+
+Results = solve(check, eq1, eq2, eq3);
+
+MuscleForce = double(Results.M_TLEM_magnitude);
+rX = double(Results.RxSym);
+rY = double(Results.RySym);
+rZ = double(Results.RzSym);
+
+rMag = norm([rX rY rZ]);              % Magnitude of R
+rMagP = rMag / norm(G5_Force) * 100;  % Magnitude of R in percentage body weight
+rDir = normalizeVector3d([rX rY rZ]); % Direction of R
+
+if Side == 'L'
+    rZ = -1 * rZ;
+end
+
+% Rotation matrices for local pelvic COS
+TFMx = createRotationOx(0);
+TFMy = createRotationOy(0);
+TFMz = createRotationOz(degtorad(PelvicBend));
+
+if strcmp(View, 'Femur') == 1
+    rDir = -1 * rDir;
+    
+    % Rotation matrices for local femur COS
+    TFMx = createRotationOx();
+    TFMy = createRotationOy();
+    TFMz = createRotationOz();
+end
+
+[rX, rY, rZ] = transformPoint3d(rX, rY, rZ, TFMx*TFMy*TFMz);
+
+rPhi   = atand(rZ / rY); % Angle in frontal plane
+rTheta = atand(rX / rY); % Angle in sagittal plane
+rAlpha = atand(rX / rZ); % Angle in horizontal plane
+
+% Save results in data
+data.rX     = rX;
+data.rY     = rY;
+data.rZ     = rZ;
+data.rDir   = rDir;
+data.rMag   = rMag;
+data.rMagP  = rMagP;
+data.rPhi   = rPhi;
+data.rTheta = rTheta;
+data.rAlpha = rAlpha;
+
+end

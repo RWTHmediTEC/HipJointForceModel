@@ -18,7 +18,7 @@ for b = 1:NoB
         stlRead([tempFileName Bones{b} BoneSuffix{b} '.stl']);
 end
 
-%% Import Joint Centers for Transformation Matrices
+%% Import Joint Centers
 [~,~,jRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A6 - Joint Center and Axes.xlsx');
 % Delete the first 3 lines
 jRaw(1:3,:) = [];
@@ -137,8 +137,7 @@ for b = 1:NoB
     end
 end
 
-%% Save node closest to femoral muscle origins, insertions and via points
-
+% Save node closest to femoral muscle origins, insertions and via points
 femurNS = createns(LE(2).Mesh.vertices);
 Fascicles = fieldnames(LE(2).Muscle);
 % [IDX,D] = deal([]);
@@ -149,7 +148,7 @@ for m = 1:length(Fascicles)
 %     D = [D; d];
 end
 
-%% Import Bony Landmarks required for Scaling
+%% Import bony landmarks
 [~,~,lRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A2 - Bony landmarks.xlsx');
 
 for b = 1:NoB
@@ -167,6 +166,38 @@ lRaw(REQ(1,1:length(REQ))) = erase(lRaw(REQ(1,1:length(REQ))),' ');
 % Create landmark fields including coordinates
 for r = 1:length(REQ)
     LE(REQ(2,r)).Landmarks.(lRaw{REQ(1,r)}).Pos = cell2mat(lRaw(REQ(1,r),2:4))*1000; % [m] to [mm]
+end
+
+% Save node closest to landmark
+pelvisNS = createns(LE(1).Mesh.vertices);
+landmarksPelvis = fieldnames(LE(1).Landmarks);
+[IDX,D] = deal([]);
+for l = 1:length(landmarksPelvis)
+    LE(1).Landmarks.(landmarksPelvis{l}).Node = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{l}).Pos);
+    [idx, d] = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{l}).Pos);
+    IDX = [IDX; idx];
+    D = [D; d];
+end
+
+landmarksFemur = fieldnames(LE(2).Landmarks);
+[IDX,D] = deal([]);
+for l = 1:length(landmarksFemur)
+    LE(2).Landmarks.(landmarksFemur{l}).Node = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{l}).Pos);
+    [idx, d] = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{l}).Pos);
+    IDX = [IDX; idx];
+    D = [D; d];
+end
+
+% Add additional user selected landmarks
+landmarks = {'DebrunnerAcetabularRoof';
+             'DebrunnerMostCranial';
+             'DebrunnerMostMedial';
+             'DebrunnerMostLateral'};
+landmarksOut = selectLandmarks(LE(1).Mesh,landmarks);
+
+for l = 1:length(landmarks)
+LE(1).Landmarks.(landmarksOut{l,1}).Pos  = cell2mat(landmarksOut(l,2));
+LE(1).Landmarks.(landmarksOut{l,1}).Node = cell2mat(landmarksOut(l,3));
 end
 
 %% Save data
