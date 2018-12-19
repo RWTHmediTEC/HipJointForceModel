@@ -8,7 +8,6 @@ funcHandles.Calculation = @Calculation;
 end
 
 %% Postures for validation
-
 function [postures, default] = Posture()
 
 default = 1;

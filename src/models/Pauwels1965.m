@@ -1,4 +1,4 @@
-function funcHandles = Debrunner1975
+function funcHandles = Pauwels1965
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;
@@ -47,10 +47,15 @@ activeMuscles = {...
     'GluteusMediusPosterior6';
     'GluteusMinimusAnterior1';
     'GluteusMinimusAnterior2';
+    'TensorFasciaeLatae1';
+    'TensorFasciaeLatae2';
+    'RectusFemoris1';
+    'RectusFemoris2';
     'GluteusMinimusMid1';
     'GluteusMinimusMid2';
     'GluteusMinimusPosterior1';
-    'GluteusMinimusPosterior2';};
+    'GluteusMinimusPosterior2';
+    'Piriformis1'};
 end
 
 %% Calculation of the hip joint force
