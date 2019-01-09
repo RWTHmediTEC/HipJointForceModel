@@ -17,12 +17,12 @@ postures = {'OneLeggedStance' 'OLS';
 end
 
 %% Calculate the joint angles for positioning of the TLEM2
-function jointAngles = Position(data)
+function jointAngles = Position(~)
 
 % Inputs
 
 % Calculate the joint angles
-jointAngles = {[0 0 data.S.PelvicBend], [0 0 0], 0, 0, 0, 0};
+jointAngles = {[0 0 0], [0 0 0], 0, 0, 0, 0};
 
 end
 
@@ -66,10 +66,10 @@ Side              = data.S.Side;
 View              = data.View;
 GreaterTrochanter = data.S.LE(2).Mesh.vertices(data.S.LE(2).Landmarks.GreaterTrochanter.Node,:);
 HipJointCenter    = data.S.LE(1).Joints.Hip.Pos;
-AcetabularRoof    = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.DebrunnerAcetabularRoof.Node,:);
-MostCranial       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.DebrunnerMostCranial   .Node,:);
-MostMedial        = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.DebrunnerMostMedial    .Node,:);
-MostLateral       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.DebrunnerMostLateral   .Node,:);
+AcetabularRoof    = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.AcetabularRoof  .Node,:);
+MostCranial       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MostCranialIlium.Node,:);
+MostMedial        = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MostMedialIlium .Node,:);
+MostLateral       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MostLateralIlium.Node,:);
 
 %% Define Parameters
 
@@ -140,9 +140,9 @@ rX = double(Results.RxSym);
 rY = double(Results.RySym);
 rZ = double(Results.RzSym);
 
-rMag = norm([rX rY rZ]);              % Magnitude of R
-rMagP = rMag / norm(G5_Force) * 100;  % Magnitude of R in percentage body weight
-rDir = normalizeVector3d([rX rY rZ]); % Direction of R
+rMag = norm([rX rY rZ]);                % Magnitude of R
+rMagP = rMag / (BodyWeight*9.81) * 100; % Magnitude of R in percentage body weight
+rDir = normalizeVector3d([rX rY rZ]);   % Direction of R
 
 if Side == 'L'
     rZ = -1 * rZ;

@@ -27,7 +27,7 @@ phi = 0.5;
 % Calculate the joint angles
 b = 0.48 * l;
 ny = asind(b/x0);
-jointAngles = {[phi 0 data.S.PelvicBend], [ny 0 0], 0, 0, -ny, 0};
+jointAngles = {[phi 0 0], [ny 0 0], 0, 0, -ny, 0};
 
 end
 

@@ -189,10 +189,10 @@ for l = 1:length(landmarksFemur)
 end
 
 % Add additional user selected landmarks
-landmarks = {'DebrunnerAcetabularRoof';
-             'DebrunnerMostCranial';
-             'DebrunnerMostMedial';
-             'DebrunnerMostLateral'};
+landmarks = {'AcetabularRoof';
+             'MostCranialIlium';
+             'MostMedialIlium';
+             'MostLateralIlium'};
 landmarksOut = selectLandmarks(LE(1).Mesh,landmarks);
 
 for l = 1:length(landmarks)
