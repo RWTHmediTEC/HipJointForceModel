@@ -27,7 +27,7 @@ jointAngles = {[0 0 0], [0 0 0], 0, 0, 0, 0};
 end
 
 %% Active muscles
-function [activeMuscles, enable] = Muscles()
+function [activeMuscles, enable] = Muscles(gui)
 % User is allowed to edit the default values
 enable = 'off';
 
@@ -57,6 +57,10 @@ activeMuscles = {...
     'GluteusMinimusPosterior2';
     'Piriformis1'
     'Sartorius1'};
+
+% Disable muscle path models which are not supported
+set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'off');
+set(gui.Home.Settings.RadioButton_ObstacleSet, 'enable', 'off');
 end
 
 %% Calculation of the hip joint force

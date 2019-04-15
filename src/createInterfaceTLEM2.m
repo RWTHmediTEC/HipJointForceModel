@@ -107,6 +107,32 @@ gui.Home.Settings.RadioButton_Skinning = uicontrol('Parent', gui.Home.Settings.R
 
 set(gui.Home.Settings.(['RadioButton_' data.FemoralTransformation]), 'Value', 1)
 
+% Panel muscle path design
+gui.Home.Settings.Panel_MusclePath = uix.Panel('Parent', gui.Home.Settings.Layout_V,...
+    'Title', 'Design Muscle Paths per');
+
+gui.Home.Settings.RadioButtonBox_MusclePath = uix.VButtonBox('Parent', gui.Home.Settings.Panel_MusclePath,...
+    'Spacing', 3,...
+    'HorizontalAlignment', 'left',...
+    'ButtonSize', [200 20]);
+
+gui.Home.Settings.RadioButton_StraightLine = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_MusclePath,...
+    'Style', 'radiobutton',...
+    'String', 'Straight Line Model',...
+    'Callback', @onStraightLine);
+
+gui.Home.Settings.RadioButton_ViaPoint = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_MusclePath,...
+    'Style', 'radiobutton',...
+    'String', 'Via Point Model',...
+    'Callback', @onViaPoint);
+
+gui.Home.Settings.RadioButton_ObstacleSet = uicontrol('Parent', gui.Home.Settings.RadioButtonBox_MusclePath,...
+    'Style', 'radiobutton',...
+    'String', 'Obstacle Set Method',...
+    'Callback', @onObstacleSet);
+
+set(gui.Home.Settings.(['RadioButton_' data.MusclePath]), 'Value', 1)
+
 % % Adjust layout
 % set(gui.Home.Settings.Layout_V, 'Height', [-1, -1, -1])
 
@@ -453,7 +479,7 @@ set(gui.Home.Results.Layout_H_Bottom, 'Width',  [-2, -2, -2, -2, -2, -1.5, -1.5]
 
 %% Adjust home layout
 set(gui.Home.Layout_H,       'Width',  [-1, -2, -4])
-set(gui.Home.Layout_V_Left,  'Height', [-6, -12])
+set(gui.Home.Layout_V_Left,  'Height', [-8, -12])
 set(gui.Home.Layout_V_Right, 'Height', [-1, -2])
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
@@ -551,6 +577,28 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         gui.IsUpdated = false;
         updateHomeTab();
     end
+
+    function onStraightLine(~, ~)
+        % User has set the muscle path model to straight line
+        data.MusclePath = 'StraightLine';
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onViaPoint(~, ~)
+        % User has set the muscle path model to via point
+        data.MusclePath = 'ViaPoint';
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onObstacleSet(~, ~)
+        % User has set the muscle path model to obstacle set
+        data.MusclePath = 'ObstacleSet';
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
 
 %% Box panel patient specific parameters
 
@@ -680,7 +728,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
     end
 
     function onPushButton_ResetMuscle(~, ~)
-        [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles();
+        [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -750,6 +798,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         updateTLEMversion();
         updateHipJointForceView();
         updateFemoralTransformation();
+        updateMusclePath();
         updateSide();
         updateMuscleList();
         updateVisualization();
@@ -797,6 +846,20 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         end
     end
 
+    function updateMusclePath()
+        set(gui.Home.Settings.RadioButton_StraightLine, 'Value', 0);
+        set(gui.Home.Settings.RadioButton_ViaPoint, 'Value', 0);
+        set(gui.Home.Settings.RadioButton_ObstacleSet, 'Value', 0);
+        switch data.MusclePath
+            case 'StraightLine'
+                set(gui.Home.Settings.RadioButton_StraightLine, 'Value', 1);
+            case 'ViaPoint'
+                set(gui.Home.Settings.RadioButton_ViaPoint, 'Value', 1);
+            case 'ObstacleSet'
+                set(gui.Home.Settings.RadioButton_ObstacleSet, 'Value', 1);
+        end
+    end
+
 %% Box panel patient specific parameters
 
     function updateSide()
@@ -828,7 +891,10 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
     function updateModel()
         calculateTLEM2 = str2func(data.Model);
         gui.Home.Model.modelHandle = calculateTLEM2();
-        [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles();
+        [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
+        % Set muscle path model to straight line
+        data.MusclePath = 'StraightLine';
+        updateMusclePath();
         [postures, default] = gui.Home.Model.modelHandle.Posture();
         data.Posture = postures(default, 2);
         if isfield(gui.Home.Model, 'ListBox_Posture') == 1

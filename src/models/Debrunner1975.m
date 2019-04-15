@@ -27,7 +27,7 @@ jointAngles = {[0 0 0], [0 0 0], 0, 0, 0, 0};
 end
 
 %% Active muscles
-function [activeMuscles, enable] = Muscles()
+function [activeMuscles, enable] = Muscles(gui)
 % User is allowed to edit the default values
 enable = 'off';
 
@@ -51,6 +51,10 @@ activeMuscles = {...
     'GluteusMinimusMid2';
     'GluteusMinimusPosterior1';
     'GluteusMinimusPosterior2';};
+
+% Disable muscle path models which are not supported
+set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'off');
+set(gui.Home.Settings.RadioButton_ObstacleSet, 'enable', 'off');
 end
 
 %% Calculation of the hip joint force
@@ -83,7 +87,8 @@ hD = MostCranial(2) - AcetabularRoof(2); % Height of the iliac bone along the Y-
 A = [0, AcetabularRoof(2) + 2/3 * hD, MostLateral(3) - 2/5 * bD]; % Coordinates of the muscle origin in frontal plane
 % h = norm(cross(A-T, Z-T)) / norm(A-T); % Lever arm of the muscle force around the hip joint center
 
-% Get the coordinates of the active muscles
+% Get muscle origin points and muscle insertion points
+[origin, insertion] = deal(zeros(Noam,3));
 for m = 1:length(activeMuscles)
     for n = 1:length(LE)
         if ~isempty(LE(n).Muscle)
@@ -93,7 +98,7 @@ for m = 1:length(activeMuscles)
                     if strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Origin')
                         origin(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
                     elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Via')
-                        continue
+                        continue;
                     elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Insertion')
                         insertion(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
                     end

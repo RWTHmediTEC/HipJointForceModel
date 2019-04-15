@@ -5,6 +5,7 @@ if nargin == 0
     % Build structure which contains default data
     data.View = 'Femur';                     % View of the HJF: Pelvis; Femur
     data.FemoralTransformation = 'Skinning'; % Femoral transformation method: Scaling; Skinning
+    data.MusclePath = 'StraightLine';        % Muscle Path Model: StraightLine; ViaPoint; ObstacleSet
     data.T.Side = 'R';                       % Side of the hip joint: R:Right; L:Left
     data.T.BodyWeight = 45;                  % Patient's body weight [kg]
     data.T.PelvicBend = 0;                   % Pelvic Bend [°] % !!! Add pelvic bend to scale???

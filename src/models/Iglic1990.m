@@ -32,7 +32,7 @@ jointAngles = {[phi 0 0], [ny 0 0], 0, 0, -ny, 0};
 end
 
 %% Active Muscles
-function [activeMuscles, enable] = Muscles()
+function [activeMuscles, enable] = Muscles(gui)
 % User is allowed to edit the default values
 enable = 'off';
 
@@ -63,6 +63,10 @@ activeMuscles = {...
     'GluteusMinimusPosterior1', 'fp';
     'GluteusMinimusPosterior2', 'fp';
     'Piriformis1',              'fp'};
+
+% Disable muscle path models which are not supported
+set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'on');
+set(gui.Home.Settings.RadioButton_ObstacleSet, 'enable', 'off');
 end
 
 %% Calculation of the hip joint force
@@ -98,6 +102,7 @@ phi = 0.5;                         % Rotation of the pelvis around the Y axis
 Noam = size(activeMuscles,1);
 
 % Get muscle origin points and muscle insertion points
+via(Noam,1) = false;
 [r, rApostrophe] = deal(zeros(Noam,3));
 for m = 1:Noam
     for n = 1:length(LE)
@@ -108,7 +113,11 @@ for m = 1:Noam
                     if strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Origin')
                         r(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
                     elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Via')
-                        continue
+                        if strcmp(data.MusclePath, 'ViaPoint')
+                            via(m) = true;
+                        else
+                            continue;
+                        end
                     elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Insertion')
                         rApostrophe(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
                     end
@@ -127,7 +136,18 @@ for m = 1:Noam
 end
 
 % Unit vectors s in the direction of the muscles
+for m = 1:Noam
+    if via(m) == true
+        % Find most distal via point of pelvis
+        [~, idxPelvis] = min(LE(1).Muscle.(activeMuscles{m,1}).Pos(:,2));
+        r(m,:) = LE(1).Muscle.(activeMuscles{m,1}).Pos(idxPelvis,:);
+        % Find most proximal via point of femur
+        [~, idxFemur] = max(LE(2).Muscle.(activeMuscles{m,1}).Pos(:,2));
+        rApostrophe(m,:) = LE(2).Muscle.(activeMuscles{m,1}).Pos(idxFemur,:);
+    end
+end
 s = normalizeVector3d(rApostrophe - r);
+
 % Iglic 1990 equation 2
 for m = 1:Noam % loop not needed for latest Matlab version
     F(m,:) = A(m) * cell2sym(activeMuscles(m,2)) * s(m,:);
