@@ -8,7 +8,7 @@ if nargin == 0
     data.MusclePath = 'StraightLine';        % Muscle Path Model: StraightLine; ViaPoint; ObstacleSet
     data.T.Side = 'R';                       % Side of the hip joint: R:Right; L:Left
     data.T.BodyWeight = 45;                  % Patient's body weight [kg]
-    data.T.PelvicBend = 0;                   % Pelvic Bend [°] % !!! Add pelvic bend to scale???
+    data.T.PelvicBend = 0;                   % Pelvic Bend [°]
 end
 
 data.TLEMversion = TLEMversion;
@@ -85,11 +85,11 @@ data.T.Scale(2).CCD = rad2deg(vectorAngle3d(Controls(3,:) - Controls(2,:), Contr
 
 %% Save initally as (T)emplate and (S)ubject
               
-data.S.Side = data.T.Side;
+data.S.Side       = data.T.Side;
 data.S.BodyWeight = data.T.BodyWeight;
 data.S.PelvicBend = data.T.PelvicBend;
 
-data.S.LE = data.T.LE;
+data.S.LE    = data.T.LE;
 data.S.Scale = data.T.Scale;
 
 end

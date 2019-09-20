@@ -21,7 +21,6 @@ patchProps.EdgeLighting = 'gouraud';
 patchProps.FaceLighting = 'gouraud';
 
 % Visualize bones
-
 if NoB == 1 || NoB == 2
     meshHandle = patch(axH, LE(NoB).Mesh, patchProps);
 else

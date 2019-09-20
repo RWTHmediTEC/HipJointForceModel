@@ -142,6 +142,7 @@ for m = 1:Noam
         % Find most proximal via point of femur
         [~, idxFemur] = max(LE(2).Muscle.(activeMuscles{m,1}).Pos(:,2));
         rApostrophe(m,:) = LE(2).Muscle.(activeMuscles{m,1}).Pos(idxFemur,:);
+        % !!! Has to be adapted if extreme joint positions are considered
     end
 end
 s = normalizeVector3d(rApostrophe - r);

@@ -18,7 +18,7 @@ for b = 1:NoB
         stlRead([tempFileName Bones{b} BoneSuffix{b} '.stl']);
 end
 
-%% Import Joint Centers
+%% Import joint centers
 [~,~,jRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A6 - Joint Center and Axes.xlsx');
 % Delete the first 3 lines
 jRaw(1:3,:) = [];
@@ -58,7 +58,7 @@ for j = 1:size(jRaw,1)/2
     LE(childIdx).Parent = find(ismember({LE.Name},jRaw(j*2-1,2)));
 end
 
-%% Import Muscle Elements including PCSA (Physiological Cross-Sectional Areas)
+%% Import muscle elements including PCSA (Physiological Cross-Sectional Areas)
 [~,~,mRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A3 - Muscle-tendon lines-of-action.xlsx');
 [~,~,aRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A7 - Muscle-tendon architecture.xlsx');
 % Change RectusFemoris for consistency
@@ -76,7 +76,7 @@ mRaw(:,1:2) = erase(mRaw(:,1:2),' ');
 muscleList = mRaw(:,1);
 % Fill missing names
 mRaw(:,1:2) = fillmissing(mRaw(:,1:2),'previous');
-% Special Case: PsoasMajor starts with a Via point and not with Origin
+% Special case: PsoasMajor starts with a Via point and not with Origin
 emptyIdx = find(cellfun('isclass', mRaw(:,5), 'char'));
 % Replace 'Via' by 'Origin'
 mRaw(emptyIdx+1,3) = {'Origin'};
@@ -171,21 +171,21 @@ end
 % Save node closest to landmark
 pelvisNS = createns(LE(1).Mesh.vertices);
 landmarksPelvis = fieldnames(LE(1).Landmarks);
-[IDX,D] = deal([]);
+% [IDX,D] = deal([]);
 for l = 1:length(landmarksPelvis)
     LE(1).Landmarks.(landmarksPelvis{l}).Node = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{l}).Pos);
-    [idx, d] = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{l}).Pos);
-    IDX = [IDX; idx];
-    D = [D; d];
+% %     [idx, d] = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{l}).Pos);
+% %     IDX = [IDX; idx];
+% %     D = [D; d];
 end
 
 landmarksFemur = fieldnames(LE(2).Landmarks);
-[IDX,D] = deal([]);
+% [IDX,D] = deal([]);
 for l = 1:length(landmarksFemur)
     LE(2).Landmarks.(landmarksFemur{l}).Node = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{l}).Pos);
-    [idx, d] = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{l}).Pos);
-    IDX = [IDX; idx];
-    D = [D; d];
+%     [idx, d] = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{l}).Pos);
+%     IDX = [IDX; idx];
+%     D = [D; d];
 end
 
 % Add additional user selected landmarks

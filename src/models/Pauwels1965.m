@@ -70,7 +70,7 @@ function data = Calculation(data)
 Side              = data.S.Side;
 View              = data.View;
 
-%% Define Parameters
+%% Define parameters
 
 S = 58.7; % Total body weight
 S5 = 47.76; % % Partial body weight weighing on the hip joint

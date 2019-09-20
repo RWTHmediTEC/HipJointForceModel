@@ -1,6 +1,6 @@
 function data = scaleTLEM2(data)
-% Patient specific scaling of TLEM2 by pelvic width, pelvic height, pelvic
-% depth and femoral length
+% Patient specific scaling of TLEM2 by pelvic width, pelvic height,
+% pelvic depth and femoral length
 
 %% Scaling parameters
 PW  = data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth;

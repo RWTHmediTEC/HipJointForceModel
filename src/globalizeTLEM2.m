@@ -2,7 +2,7 @@ function data = globalizeTLEM2(data)
 % Transformation of TLEM2 data into a global coordinate system
 LE = data.S.LE;
 
-%% Transformations from Local to Global Coordinate System
+%% Transformations from local to global coordinate system
 NoB = length(LE);
 transTFM = repmat(eye(4), 1, 1, NoB);
 for b = 2:NoB

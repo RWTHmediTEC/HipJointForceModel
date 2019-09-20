@@ -283,6 +283,7 @@ gui.Home.Model.Panel_Model = uix.Panel('Parent', gui.Home.Model.Layout_V,...
 models = dir('src\models\*.m');
 [~, models] = arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
 data.Model = models{3};
+postures ={}; default=nan;
 updateModel()
 gui.Home.Model.ListBox_Model = uicontrol( 'Parent', gui.Home.Model.Panel_Model,...
     'BackgroundColor', 'w',...
@@ -781,7 +782,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         end
 
         % Calculation with inserted data
-        data = gui.Home.Model.modelHandle.Calculation(data); % !!! Review: If validation was run this is not the inserted data anymore
+        data = gui.Home.Model.modelHandle.Calculation(data);
         
         gui.IsUpdated = true;
         updateResults();
@@ -898,7 +899,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         [postures, default] = gui.Home.Model.modelHandle.Posture();
         data.Posture = postures(default, 2);
         if isfield(gui.Home.Model, 'ListBox_Posture') == 1
-        set(gui.Home.Model.ListBox_Posture, 'String', postures(:,1), 'Value', default);
+            set(gui.Home.Model.ListBox_Posture, 'String', postures(:,1), 'Value', default);
         end
     end
 

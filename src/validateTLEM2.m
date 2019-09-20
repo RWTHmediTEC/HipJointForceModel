@@ -26,7 +26,7 @@ OL(s).rAlpha = atand(HJFtrans(1) / HJFtrans(3));
             
 data.S.Side                    = OL(s).Subject(end);
 data.S.BodyWeight              = OL(s).BodyWeight;
-data.S.PelvicBend              = 0; % !!! No data yet
+data.S.PelvicBend              = 0; % !!! No data available
 data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
 data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
 data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
@@ -62,7 +62,7 @@ Results(s).rZ         = data.rZ;
 Results(s).rMag       = data.rMag;
 Results(s).rMagP      = data.rMagP;
 Results(s).OrrMagP    = OL(s).rMagP;
-Results(s).errP       = abs((data.rMagP - OL(s).rMagP) / OL(s).rMagP * 100); % !!! Review abs
+Results(s).errP       = abs((data.rMagP - OL(s).rMagP) / OL(s).rMagP * 100);
 Results(s).rPhi       = data.rPhi;          
 Results(s).OrPhi      = OL(s).rPhi;
 Results(s).errPhi     = abs(abs(data.rPhi) - abs(OL(s).rPhi));

@@ -8,12 +8,10 @@ TODO:
 		- OptimalFiberLength (Lopt)
 
 - Auswahl der zu betrachtenden ADL für Validierung
-- Weitere Modelle für One-Leg-Stance importieren (Pauwels, Debrunner, ...)
-- Parameterstudie für Iglic (Modell-Konstanten variieren)
-- Skalierung der Via points und Wrapping surfaces
+- Weitere Modelle für One-Leg-Stance importieren- Parameterstudie für Iglic (Modell-Konstanten variieren)
+- Implementierung der Via points und Wrapping surfaces
 - Implementierung des Pelvic tilt (bezieht sich im Moment auf Wu2002)
-- Implementierung des LBS für die Hüfte
-- Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
+- Implementierung des LBS für die Hüfte- Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
 - Modelle für weitere ADLs implementieren
 
 TODO GUI:

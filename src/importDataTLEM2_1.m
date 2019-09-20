@@ -4,7 +4,7 @@ function importDataTLEM2_1(LE, muscleList)
 % Update TLEM 2.0 to TLEM 2.1
 % Hardcoding of changes made in the AnyBody model due to the reviewed TLEM
 
-%% Update Joint Centers
+%% Update joint centers
 
 ScaleFactor = 1000; % [m] in [mm]
 
@@ -25,7 +25,7 @@ LE(5).Joints.Talocrural.Pos = [ 0.0003584674  -0.005524157   0           ] .* Sc
 LE(5).Joints.Subtalar.  Pos = [-0.006535063   -0.02434153    0.005824743 ] .* ScaleFactor;
 LE(6).Joints.Subtalar.  Pos = [ 0              0             0           ] .* ScaleFactor;
 
-% Joint Axes
+% Joint axes
 LE(2).Joints.Knee.      Axis = [0.09091897   0.06445389    0.9937703] .* ScaleFactor;
 LE(2).Joints.Patella.   Axis = [0.09663987  -0.009576934   0.9952733] .* ScaleFactor;
 LE(3).Joints.Knee.      Axis = [0.02081402   0.1209213     0.9924439] .* ScaleFactor;
@@ -35,7 +35,7 @@ LE(5).Joints.Talocrural.Axis = [0.362799     0.1304906    -0.9226858] .* ScaleFa
 LE(5).Joints.Subtalar.  Axis = [0.8784254    0.4637787     0.1152306] .* ScaleFactor;
 LE(6).Joints.Subtalar.  Axis = [0.8784254    0.4637787     0.1152306] .* ScaleFactor;
 
-%% Update Muscle Elements
+%% Update muscle elements
 % Pelvic muscle elements
 LE(1).Muscle.GluteusMaximusInferior1.Pos = [-0.08467, 0.04858, -0.04897] * ScaleFactor;
 LE(1).Muscle.GluteusMaximusInferior2.Pos = [-0.08405, 0.03945, -0.05900] * ScaleFactor;
@@ -100,7 +100,7 @@ LE(2).Muscle.GluteusMediusPosterior4.Pos = [-0.01664,0.36185,0.05178] * ScaleFac
 LE(2).Muscle.GluteusMediusPosterior5.Pos = [-0.01579,0.35539,0.05894] * ScaleFactor;
 LE(2).Muscle.GluteusMediusPosterior6.Pos = [-0.01977,0.35915,0.05206] * ScaleFactor;
 LE(2).Muscle.GluteusMinimusAnterior1.Pos = [0.01523, 0.34569,0.05730] * ScaleFactor;
-LE(2).Muscle.GluteusMinimusAnterior1.Type(2,1) = {'Via'}; % via point added % !!! Check if order of Type is important !!!
+LE(2).Muscle.GluteusMinimusAnterior1.Type(2,1) = {'Via'}; % via point added
 LE(2).Muscle.GluteusMinimusAnterior1.Pos(2,1:3) = [0.01523,0.34569,0.05730] * ScaleFactor;
 % LE(2).Muscle.GluteusMinimusAnterior2.Pos = [] * ScaleFactor; % missing
 LE(2).Muscle.GluteusMinimusMid1.Pos = [0.01635,0.33517,0.05715] * ScaleFactor;
@@ -112,12 +112,12 @@ LE(2).Muscle.GluteusMinimusPosterior1.Type(2,1) = {'Via'}; % via point added
 LE(2).Muscle.GluteusMinimusPosterior1.Pos(2,1:3) = [0.01656,0.32615,0.05660] * ScaleFactor;
 % LE(2).Muscle.GluteusMinimusPosterior2.Pos = [] * ScaleFactor; % missing
 LE(2).Muscle.Piriformis1.Pos = [0.00153,0.36326,0.05249] * ScaleFactor;
-% LE(2).Muscle.Sartorius1.Pos = [] * ScaleFactor; % review needed
+% LE(2).Muscle.Sartorius1.Pos = [] * ScaleFactor; % Review needed
 
 % Tibial muscle elements
 LE(3).Muscle.TensorFasciaeLatae1.Pos = [0.01568,0.32738,0.03194] * ScaleFactor;
-% LE(3).Muscle.TensorFasciaeLatae2.Pos = [] * ScaleFactor; % same as node 1
-% LE(3).Muscle.Sartorius1.Pos = [0.01796,0.29020,-0.01085] * ScaleFactor; % review needed
+% LE(3).Muscle.TensorFasciaeLatae2.Pos = [] * ScaleFactor; % Same as node 1
+% LE(3).Muscle.Sartorius1.Pos = [0.01796,0.29020,-0.01085] * ScaleFactor; % Review needed
 
 % Patellar muscle elements
 LE(4).Muscle.RectusFemoris1.Pos = [0.00290,0.01391,- 0.00732] * ScaleFactor;
