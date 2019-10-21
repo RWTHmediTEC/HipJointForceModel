@@ -6,4 +6,4 @@
 	url = https://github.com/mattools/matGeom/
 [submodule "src/internal/ManualLandmarkSelection"]
 	path = src/internal/ManualLandmarkSelection
-	url = //sagnix/Programmierung/public/Matlab/ManualLandmarkSelection
+	url = https://git.rwth-aachen.de/Maximilian.Fischer/ManualLandmarkSelection
