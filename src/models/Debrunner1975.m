@@ -87,6 +87,9 @@ hD = MostCranial(2) - AcetabularRoof(2); % Height of the iliac bone along the Y-
 A = [0, AcetabularRoof(2) + 2/3 * hD, MostLateral(3) - 2/5 * bD]; % Coordinates of the muscle origin in frontal plane
 % h = norm(cross(A-T, Z-T)) / norm(A-T); % Lever arm of the muscle force around the hip joint center
 
+% Number of active muscles
+Noam = size(activeMuscles,1);
+
 % Get muscle origin points and muscle insertion points
 [origin, insertion] = deal(zeros(Noam,3));
 for m = 1:length(activeMuscles)
@@ -129,7 +132,7 @@ if Side == 'L'
     eq1 = momentG5 + [-h_TLEM * M_TLEM_magnitude, 0, 0]; % Moment equilibrium around hip joint center
 else
     momentG5 = cross([0 0 -d5], G5_Force); % Moment of bodyweight force around hip rotation center
-    eq1 = momentG5 + [h_TLEM * M_TLEM_magnitude, 0, 0];  % Moment equilibrium around hip joint center
+    eq1 = momentG5 + [ h_TLEM * M_TLEM_magnitude, 0, 0];  % Moment equilibrium around hip joint center
 end
 
 syms RxSym RySym RzSym
@@ -153,15 +156,15 @@ if Side == 'L'
     rZ = -1 * rZ;
 end
 
-% Rotation matrices for local pelvic COS
+% Rotation matrices for local pelvic CS
 TFMx = createRotationOx(0);
 TFMy = createRotationOy(0);
-TFMz = createRotationOz(degtorad(PelvicBend));
+TFMz = createRotationOz(deg2rad(PelvicBend));
 
 if strcmp(View, 'Femur') == 1
     rDir = -1 * rDir;
     
-    % Rotation matrices for local femur COS
+    % Rotation matrices for local femur CS
     TFMx = createRotationOx();
     TFMy = createRotationOy();
     TFMz = createRotationOz();

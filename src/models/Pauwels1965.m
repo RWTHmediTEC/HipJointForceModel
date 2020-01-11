@@ -71,13 +71,15 @@ Side              = data.S.Side;
 View              = data.View;
 
 %% Define parameters
+% Values from: [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur  
+% funktionellenAnatomie des Bewegungsapparates - Der Schenkelhalsbruch
 
-S = 58.7; % Total body weight
-S5 = 47.76; % % Partial body weight weighing on the hip joint
+S = 58.7; % Total body weight [Pauwels 1965, S.98] 
+S5 = 47.76; % Partial body weight weighing on the hip joint [Pauwels 1965, S.112] 
 G = -9.81; % Weight force
-xS5 = 109.9; % Lever arm of body weight force around the hip joint center
-BO = 40; % Lever arm of the muscle force M
-alphaM = 21; % Angle between the muscle force M and the Y-axis
+xS5 = 109.9; % Lever arm of body weight force around the hip joint center [Pauwels 1965, S.104] 
+BO = 40; % Lever arm of the muscle force M [Pauwels 1965, S.111] 
+alphaM = 21; % Angle between the muscle force M and the vertical [Pauwels 1965, S.111] 
 
 syms M % Magnitude of the muscle force
 % Calculation of the muscle force
@@ -87,10 +89,11 @@ syms RxSym RySym RzSym
 % Calculation of the hip joint force
 eq2 = RxSym;                             % Force equilibrium in the direction of X
 eq3 = RySym + S5 * G - M * cosd(alphaM); % Force equilibrium in the direction of Y
-if Side == 'L'
-eq4 = RzSym - M * sind(alphaM);          % Force equilibrium in the direction of Z
-else
-eq4 = RzSym + M * sind(alphaM);          % Force equilibrium in the direction of Z
+switch Side
+    case 'L'
+        eq4 = RzSym - M * sind(alphaM); % Force equilibrium in the direction of Z
+    case 'R'
+        eq4 = RzSym + M * sind(alphaM); % Force equilibrium in the direction of Z
 end
 
 Results = solve(eq1, eq2, eq3, eq4);
@@ -107,7 +110,7 @@ if Side == 'L'
     rZ = -1 * rZ;
 end
 
-% Rotation matrices for local pelvic COS
+% Rotation matrices for local pelvic CS
 TFMx = createRotationOx(0);
 TFMy = createRotationOy(0);
 TFMz = createRotationOz(0);
@@ -115,7 +118,7 @@ TFMz = createRotationOz(0);
 if strcmp(View, 'Femur') == 1
     rDir = -1 * rDir;
     
-    % Rotation matrices for local femur COS
+    % Rotation matrices for local femur CS
     TFMx = createRotationOx();
     TFMy = createRotationOy();
     TFMz = createRotationOz();
