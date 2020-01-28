@@ -47,8 +47,8 @@ activeMuscles = {...
     'GluteusMediusPosterior6';
     'GluteusMinimusAnterior1';
     'GluteusMinimusAnterior2';
-    'TensorFasciaeLatae1';
-    'TensorFasciaeLatae2';
+    'TensorFasciae1';
+    'TensorFasciae2';
     'RectusFemoris1';
     'RectusFemoris2';
     'GluteusMinimusMid1';
@@ -76,9 +76,9 @@ View              = data.View;
 
 [S, S5, abc] = derivationFromBrauneAndFischer189X; 
 G = -9.81; % Weight force
-derivationFromFick1950;
-BO = 40; % Lever arm of the muscle force M [Pauwels 1965, S.111]
-alphaM = 21; % Angle between the muscle force M and the vertical [Pauwels 1965, S.111] 
+[BO, alphaM] = derivationFromFick1850;
+% BO = 40; % Lever arm of the muscle force M [Pauwels 1965, S.111]
+% alphaM = 21; % Angle between the muscle force M and the vertical [Pauwels 1965, S.111] 
 
 syms M % Magnitude of the muscle force
 % Calculation of the muscle force
@@ -143,6 +143,8 @@ data.rAlpha = rAlpha;
 end
 
 function [S, S5, s5_l] = derivationFromBrauneAndFischer189X()
+% Derivation of the lever arm of the body weight during stance phase.
+% Step 16, Experiment 1, Braune and Fischer
 [S, ~, G1, G2, g1_16, g2_L_16, hjc_R_16] = BrauneAndFischer189X();
 
 % Derivation 
@@ -161,27 +163,81 @@ assert(isequal(round(s5_l,1), round([+10.99 -0.97 11.04],1))); % [cm] Lever arms
 s5_l = s5_l*10; % Conversion to [mm]
 end
 
-function [PT, SC] = derivationFromFick1950
+function [R_FP_LA, R_FP_Angle] = derivationFromFick1850
+% Switch for visualization of Fick's data and Pauwel's derivation of the
+% orientation of the abducturs resulting force
 visu=0;
+
+[Moment, HJC, HM, axH] = Fick1850('visu', visu); %#ok<*UNRCH>
+
+%% P.T. Group [Pauwels 1965, S.110] 
+% Positional data for the origin and insertion of the Piriformis muscle is
+% missing in [Fick 1850]
+GMe1 = createLine3d(HM(1).Muscle.GluteusMedius1.Pos, HM(2).Muscle.GluteusMedius1.Pos);
+GMe3 = createLine3d(HM(1).Muscle.GluteusMedius3.Pos, HM(2).Muscle.GluteusMedius3.Pos);
+GMi1 = createLine3d(HM(1).Muscle.GluteusMinimus1.Pos, HM(2).Muscle.GluteusMinimus1.Pos);
+GMi3 = createLine3d(HM(1).Muscle.GluteusMinimus3.Pos, HM(2).Muscle.GluteusMinimus3.Pos);
+
+% Bisectrix
+GMe_FP = bisector(GMe1([2,3,5,6]),GMe3([2,3,5,6]));
+if GMe_FP(3)<0; GMe_FP(3:4)=-GMe_FP(3:4); end
+GMi_FP = bisector(GMi1([2,3,5,6]),GMi3([2,3,5,6]));
+if GMi_FP(3)<0; GMi_FP(3:4)=-GMi_FP(3:4); end
+
+% Lever arms of the muscles
+GMe_FP_LA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),GMe_FP));
+GMi_FP_LA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),GMi_FP));
+
+% Relative force of the muscle based on its volume
+GMe_rF=Moment.GluteusMedius(2)/GMe_FP_LA;
+GMi_rF=Moment.GluteusMinimus(2)/GMi_FP_LA;
+
+% Calculate the P.T. group's resulting force
+PT_group_Its = intersectLines(GMe_FP,GMi_FP);
+PT_group_FP = [PT_group_Its GMe_FP(3:4)*GMe_rF+GMi_FP(3:4)*GMi_rF];
+
+%% S.C. Group [Pauwels 1965, S.110]
+RF1 = createLine3d(HM(1).Muscle.RectusFemoris1.Pos, HM(2).Muscle.RectusFemoris1.Pos);
+RF2 = createLine3d(HM(1).Muscle.RectusFemoris2.Pos, HM(2).Muscle.RectusFemoris2.Pos);
+TF1 = createLine3d(HM(1).Muscle.TensorFasciae1.Pos, HM(2).Muscle.TensorFasciae1.Pos);
+TF2 = createLine3d(HM(1).Muscle.TensorFasciae2.Pos, HM(2).Muscle.TensorFasciae2.Pos);
+S1 = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
+S2 = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
+
+% Bisectrix
+RF_FP = bisector(RF1([2,3,5,6]),RF2([2,3,5,6]));
+if RF_FP(3)<0; RF_FP(3:4)=-RF_FP(3:4); end
+TF_FP = bisector(TF1([2,3,5,6]),TF2([2,3,5,6]));
+if TF_FP(3)<0; TF_FP(3:4)=-TF_FP(3:4); end
+S_FP = bisector(S1([2,3,5,6]),S2([2,3,5,6]));
+if S_FP(3)<0; S_FP(3:4)=-S_FP(3:4); end
+
+% Lever arms of the muscles
+RF_FP_LA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),RF_FP));
+TF_FP_LA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),TF_FP));
+S_FP_LA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),S_FP));
+
+% Relative force of the muscle based on its volume
+RF_rF=Moment.RectusFemoris(2)/RF_FP_LA;
+TF_rF=Moment.TensorFasciae(2)/TF_FP_LA;
+S_rF =Moment.Sartorius(2)/S_FP_LA;
+
+% Calculate the S.C. group's resulting force
+RF_TF_Its = intersectLines(RF_FP,TF_FP);
+RF_TF_FP = [RF_TF_Its RF_FP(3:4)*RF_rF+TF_FP(3:4)*TF_rF];
+SC_group_Its = intersectLines(RF_TF_FP,S_FP);
+SC_group_FP = [SC_group_Its RF_TF_FP(3:4)+S_FP(3:4)*S_rF];
+
+% R (resulting line of action)
+R_Its = intersectLines(PT_group_FP,SC_group_FP);
+R_FP = [R_Its PT_group_FP(3:4)+SC_group_FP(3:4)];
+R_FP_LA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),R_FP));
+R_FP_Angle = rad2deg(lineAngle(R_FP,[0 0 1 0]));
+
 if visu
-    [~, HM, axH] = Fick1850(visu);
-else
-    [~, HM] = Fick1850();
-end
-
-FrontalPlane = [0 0 0 0 1 0 0 0 1];
-
-RectusFemoris1 = createLine3d(HM(1).Muscle.RectusFemoris1.Pos, HM(2).Muscle.RectusFemoris1.Pos);
-RectusFemoris2 = createLine3d(HM(1).Muscle.RectusFemoris2.Pos, HM(2).Muscle.RectusFemoris2.Pos);
-TensorFasciaeLatae1 = createLine3d(HM(1).Muscle.TensorFasciaeLatae1.Pos, HM(2).Muscle.TensorFasciaeLatae1.Pos);
-TensorFasciaeLatae2 = createLine3d(HM(1).Muscle.TensorFasciaeLatae2.Pos, HM(2).Muscle.TensorFasciaeLatae2.Pos);
-Sartorius1 = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
-Sartorius2 = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
-
-RectusFemoris_FP = bisector(RectusFemoris1([2,3,5,6]),RectusFemoris2([2,3,5,6]));
-
-if visu
-    drawLine3d(axH,[0 RectusFemoris_FP(1:2), 0 RectusFemoris_FP(3:4)]);
+     drawLine3d(axH,[0 PT_group_FP(1:2), 0 PT_group_FP(3:4)],'Color','k','LineStyle','-.');
+     drawLine3d(axH,[0 SC_group_FP(1:2), 0 SC_group_FP(3:4)],'Color','k','LineStyle','-.');
+     drawLine3d(axH,[0 R_FP(1:2), 0 R_FP(3:4)],'Color','k','LineStyle','-');
 end
 
 end
