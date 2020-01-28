@@ -136,6 +136,7 @@ HM(2).Muscle.GluteusMinimus4.Pos = [ 72 70 60];
 varargout{1}=Moment;
 varargout{2}=HJC;
 varargout{3}=HM;
+varargout{4}=NaN;
 
 if visu
     % ColorMap
