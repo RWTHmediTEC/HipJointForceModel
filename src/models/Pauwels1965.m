@@ -55,8 +55,12 @@ activeMuscles = {...
     'GluteusMinimusMid2';
     'GluteusMinimusPosterior1';
     'GluteusMinimusPosterior2';
-    'Piriformis1'
     'Sartorius1'};
+    % 'Piriformis1' % In [Pauwels 1965, S.109] it is claimed that the  
+    % Piriformis is considered as part of the P.T. group. However, 
+    % positional data for the origin and insertion of the Piriformis muscle 
+    % is missing in [Fick 1850, S.105-106] and is not present in 
+    % [Pauwels 1965, S.110, Fig. 169].
 
 % Disable muscle path models which are not supported
 set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'off');
@@ -72,7 +76,7 @@ View              = data.View;
 
 %% Define parameters
 % Values from: [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur  
-% funktionellenAnatomie des Bewegungsapparates - Der Schenkelhalsbruch
+% funktionellen Anatomie des Bewegungsapparates - Der Schenkelhalsbruch
 
 [S, S5, abc] = derivationFromBrauneAndFischer189X; 
 G = -9.81; % Weight force
@@ -168,11 +172,11 @@ function [R_FP_LA, R_FP_Angle] = derivationFromFick1850
 % orientation of the abducturs resulting force
 visu=0;
 
-[Moment, HJC, HM, axH] = Fick1850('visu', visu); %#ok<*UNRCH>
+[Moment, HJC, HM, axH] = Fick1850('visu', visu);  %#ok<ASGLU>
 
 %% P.T. Group [Pauwels 1965, S.110] 
 % Positional data for the origin and insertion of the Piriformis muscle is
-% missing in [Fick 1850]
+% missing in [Fick 1850, S.105-106]
 GMe1 = createLine3d(HM(1).Muscle.GluteusMedius1.Pos, HM(2).Muscle.GluteusMedius1.Pos);
 GMe3 = createLine3d(HM(1).Muscle.GluteusMedius3.Pos, HM(2).Muscle.GluteusMedius3.Pos);
 GMi1 = createLine3d(HM(1).Muscle.GluteusMinimus1.Pos, HM(2).Muscle.GluteusMinimus1.Pos);
@@ -235,9 +239,12 @@ R_FP_LA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),R_FP));
 R_FP_Angle = rad2deg(lineAngle(R_FP,[0 0 1 0]));
 
 if visu
-     drawLine3d(axH,[0 PT_group_FP(1:2), 0 PT_group_FP(3:4)],'Color','k','LineStyle','-.');
-     drawLine3d(axH,[0 SC_group_FP(1:2), 0 SC_group_FP(3:4)],'Color','k','LineStyle','-.');
-     drawLine3d(axH,[0 R_FP(1:2), 0 R_FP(3:4)],'Color','k','LineStyle','-');
+    box = [get(axH, 'xlim') get(axH, 'ylim') get(axH, 'zlim')]; %#ok<UNRCH>
+    edge = clipLine3d([0 PT_group_FP(1:2), 0 PT_group_FP(3:4);...
+                       0 SC_group_FP(1:2), 0 SC_group_FP(3:4)], box);
+    drawEdge3d(axH,edge,'Color','k','LineStyle','-.');
+        edge = clipLine3d([0 R_FP(1:2), 0 R_FP(3:4)], box);
+    drawEdge3d(axH,edge,'Color','k','LineStyle','-');
 end
 
 end

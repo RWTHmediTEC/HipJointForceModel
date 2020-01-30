@@ -95,16 +95,16 @@ c = 1.01 * l;                      % Lever arm of the ground reaction force Wb's
 a = (Wb * c - Wl * b) / (Wb - Wl); % Lever arm of the force W's attachment point
 phi = 0.5;                         % Rotation of the pelvis around the Y axis
 
-% Implement matrices for muscle origin points r, muscle insertion points r'
+% Create matrices for muscle origin points r, muscle insertion points r'
 % and relative physiological cross-sectional areas A
 
 % Number of active muscles
-Noam = size(activeMuscles,1);
+NoAM = size(activeMuscles,1);
 
 % Get muscle origin points and muscle insertion points
-via(Noam,1) = false;
-[r, rApostrophe] = deal(zeros(Noam,3));
-for m = 1:Noam
+via(NoAM,1) = false;
+[r, rApostrophe] = deal(zeros(NoAM,3));
+for m = 1:NoAM
     for n = 1:length(LE)
         if ~isempty(LE(n).Muscle)
             muscles = fieldnames(LE(n).Muscle);
@@ -127,16 +127,16 @@ for m = 1:Noam
     end
 end
 
-A = zeros(Noam,1);
+A = zeros(NoAM,1);
 % Get physiological cross-sectional areas
-for m = 1:Noam
+for m = 1:NoAM
     % Physiological cross-sectional areas of each fascicle
     A_Idx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
     A(m) = muscleList{A_Idx,5} / muscleList{A_Idx,4};
 end
 
 % Unit vectors s in the direction of the muscles
-for m = 1:Noam
+for m = 1:NoAM
     if via(m) == true
         % Find most distal via point of pelvis
         [~, idxPelvis] = min(LE(1).Muscle.(activeMuscles{m,1}).Pos(:,2));
@@ -150,9 +150,7 @@ end
 s = normalizeVector3d(rApostrophe - r);
 
 % Iglic 1990 equation 2
-for m = 1:Noam % loop not needed for latest Matlab version
-    F(m,:) = A(m) * cell2sym(activeMuscles(m,2)) * s(m,:);
-end
+F = A .* cell2sym(activeMuscles(:,2)) .* s;
 
 % Moment of F around hip rotation center
 momentF = cross(r, F);
@@ -192,9 +190,9 @@ if Side == 'L'
 end
 
 % Rotation matrices for local pelvic COS
-TFMx = createRotationOx(degtorad(phi));
+TFMx = createRotationOx(deg2rad(phi));
 TFMy = createRotationOy(0);
-TFMz = createRotationOz(degtorad(PelvicBend));
+TFMz = createRotationOz(deg2rad(PelvicBend));
 
 if strcmp(View, 'Femur') == 1
     rDir = -1 * rDir;

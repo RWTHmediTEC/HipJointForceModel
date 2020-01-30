@@ -7,8 +7,8 @@ addParameter(p,'visualization',true,logParValidFunc);
 parse(p,varargin{:});
 visu = p.Results.visualization;
 
-% Values from:
-% [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des Oberschenkels
+% Values from: [Fick 1850]
+% 1850 - Fick - Statische Betrachtung der Muskulatur des Oberschenkels
 
 % [Fick 1850, S.103-104]
 Moment.TensorFasciae=[12.495  7.605 0.001];
