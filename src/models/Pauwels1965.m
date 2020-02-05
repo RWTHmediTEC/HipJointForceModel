@@ -1,4 +1,16 @@
 function funcHandles = Pauwels1965
+% The original model of Pauwels without patient-specific adaption using  
+% the original data of Fick, Braune and Fischer
+% 
+% References:
+%   [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur 
+%   funktionellen Anatomie des Bewegungsapparates - Der Schenkelhalsbruch
+%   [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des 
+%   Oberschenkels
+%   [Braune 1895] 1985 - Braune - Der Gang des Menschen - I. Theil
+%   [Fischer 1898] 1898 - Fischer - Der Gang des Menschen - II. Theil
+% or
+%   [Braune 1987] 1987 - Braune - The Human Gait
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;
@@ -47,8 +59,8 @@ activeMuscles = {...
     'GluteusMediusPosterior6';
     'GluteusMinimusAnterior1';
     'GluteusMinimusAnterior2';
-    'TensorFasciae1';
-    'TensorFasciae2';
+    'TensorFasciaeLatae1';
+    'TensorFasciaeLatae2';
     'RectusFemoris1';
     'RectusFemoris2';
     'GluteusMinimusMid1';
@@ -75,13 +87,12 @@ Side              = data.S.Side;
 View              = data.View;
 
 %% Define parameters
-% Values from: [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur  
-% funktionellen Anatomie des Bewegungsapparates - Der Schenkelhalsbruch
+G = -9.81; % Weight force
 
 [S, S5, abc] = derivationFromBrauneAndFischer189X; 
-G = -9.81; % Weight force
+
 [BO, alphaM] = derivationFromFick1850;
-% BO = 40; % Lever arm of the muscle force M [Pauwels 1965, S.111]
+% BO = 40; % Moment arm of the muscle force M [Pauwels 1965, S.111]
 % alphaM = 21; % Angle between the muscle force M and the vertical [Pauwels 1965, S.111] 
 
 syms M % Magnitude of the muscle force
@@ -147,7 +158,7 @@ data.rAlpha = rAlpha;
 end
 
 function [S, S5, s5_l] = derivationFromBrauneAndFischer189X()
-% Derivation of the lever arm of the body weight during stance phase.
+% Derivation of the moment arm of the body weight during stance phase.
 % Step 16, Experiment 1, Braune and Fischer
 [S, ~, G1, G2, g1_16, g2_L_16, hjc_R_16] = BrauneAndFischer189X();
 
@@ -157,17 +168,17 @@ assert(isequal(round(S5,2), 47.76)); % [kg] Partial body weight weighing on the 
 s5 = (g1_16*G1+g2_L_16*G2)/(G1+G2); % [Pauwels 1965, S.101]
 assert(isequal(round(s5,2), [129.43 -0.71 102.09])); % [cm] Position of S5 [Pauwels 1965, S.102]
 
-% Lever arms of S5 projected into the anatomical planes
+% Moment arms of S5 projected into the anatomical planes
 a = hjc_R_16(2)-s5(2); % Frontal plane [Pauwels 1965, S.103]
 b = hjc_R_16(1)-s5(1); % Sagittal plane [Pauwels 1965, S.103]
 c = sqrt(a^2+b^2); % Transverse plane [Pauwels 1965, S.103]
 
 s5_l = [a -b c]; % -b: [Pauwels 1965, S.105, Footnote 32]
-assert(isequal(round(s5_l,1), round([+10.99 -0.97 11.04],1))); % [cm] Lever arms of S5 [Pauwels 1965, S.105]
+assert(isequal(round(s5_l,1), round([+10.99 -0.97 11.04],1))); % [cm] Moment arms of S5 [Pauwels 1965, S.105]
 s5_l = s5_l*10; % Conversion to [mm]
 end
 
-function [R_FP_LA, R_FP_Angle] = derivationFromFick1850
+function [R_FP_MA, R_FP_Angle] = derivationFromFick1850
 % Switch for visualization of Fick's data and Pauwel's derivation of the
 % orientation of the abducturs resulting force
 visu=0;
@@ -188,13 +199,13 @@ if GMe_FP(3)<0; GMe_FP(3:4)=-GMe_FP(3:4); end
 GMi_FP = bisector(GMi1([2,3,5,6]),GMi3([2,3,5,6]));
 if GMi_FP(3)<0; GMi_FP(3:4)=-GMi_FP(3:4); end
 
-% Lever arms of the muscles
-GMe_FP_LA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),GMe_FP));
-GMi_FP_LA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),GMi_FP));
+% Moment arms of the muscles
+GMe_FP_MA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),GMe_FP));
+GMi_FP_MA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),GMi_FP));
 
 % Relative force of the muscle based on its volume
-GMe_rF=Moment.GluteusMedius(2)/GMe_FP_LA;
-GMi_rF=Moment.GluteusMinimus(2)/GMi_FP_LA;
+GMe_rF=Moment.GluteusMedius(2)/GMe_FP_MA;
+GMi_rF=Moment.GluteusMinimus(2)/GMi_FP_MA;
 
 % Calculate the P.T. group's resulting force
 PT_group_Its = intersectLines(GMe_FP,GMi_FP);
@@ -216,15 +227,15 @@ if TF_FP(3)<0; TF_FP(3:4)=-TF_FP(3:4); end
 S_FP = bisector(S1([2,3,5,6]),S2([2,3,5,6]));
 if S_FP(3)<0; S_FP(3:4)=-S_FP(3:4); end
 
-% Lever arms of the muscles
-RF_FP_LA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),RF_FP));
-TF_FP_LA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),TF_FP));
-S_FP_LA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),S_FP));
+% Moment arms of the muscles
+RF_FP_MA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),RF_FP));
+TF_FP_MA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),TF_FP));
+S_FP_MA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),S_FP));
 
 % Relative force of the muscle based on its volume
-RF_rF=Moment.RectusFemoris(2)/RF_FP_LA;
-TF_rF=Moment.TensorFasciae(2)/TF_FP_LA;
-S_rF =Moment.Sartorius(2)/S_FP_LA;
+RF_rF=Moment.RectusFemoris(2)/RF_FP_MA;
+TF_rF=Moment.TensorFasciae(2)/TF_FP_MA;
+S_rF =Moment.Sartorius(2)/S_FP_MA;
 
 % Calculate the S.C. group's resulting force
 RF_TF_Its = intersectLines(RF_FP,TF_FP);
@@ -235,7 +246,7 @@ SC_group_FP = [SC_group_Its RF_TF_FP(3:4)+S_FP(3:4)*S_rF];
 % R (resulting line of action)
 R_Its = intersectLines(PT_group_FP,SC_group_FP);
 R_FP = [R_Its PT_group_FP(3:4)+SC_group_FP(3:4)];
-R_FP_LA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),R_FP));
+R_FP_MA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),R_FP));
 R_FP_Angle = rad2deg(lineAngle(R_FP,[0 0 1 0]));
 
 if visu

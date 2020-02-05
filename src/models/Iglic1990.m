@@ -80,6 +80,7 @@ PelvicBend    = data.S.PelvicBend;
 HipJointWidth = data.S.Scale(1).HipJointWidth;
 FemoralLength = data.S.Scale(2).FemoralLength;
 activeMuscles = data.activeMuscles;
+musclePath    = data.MusclePath;
 Side          = data.S.Side;
 View          = data.View;
 
@@ -113,7 +114,7 @@ for m = 1:NoAM
                     if strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Origin')
                         r(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
                     elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Via')
-                        if strcmp(data.MusclePath, 'ViaPoint')
+                        if strcmp(musclePath, 'ViaPoint')
                             via(m) = true;
                         else
                             continue;
