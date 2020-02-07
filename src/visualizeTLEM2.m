@@ -11,6 +11,7 @@ parse(p, varargin{:});
 NoB = p.Results.Bones;
 visJoints = p.Results.Joints;
 visMuscles = p.Results.Muscles;
+if ~isempty(visMuscles); visMuscles=visMuscles(:,1); end
 
 %% Visualization of the model
 hold(axH,'on')
