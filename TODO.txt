@@ -7,7 +7,6 @@ TODO:
 		- MuscleVolume = Mass/1.056 (MuscleDensity) 
 		- OptimalFiberLength (Lopt)
 
-- Auswahl der zu betrachtenden ADL für Validierung
 - Weitere Modelle für One-Leg-Stance importieren- Parameterstudie für Iglic (Modell-Konstanten variieren)
 - Implementierung der Via points und Wrapping surfaces
 - Implementierung des Pelvic tilt (bezieht sich im Moment auf Wu2002)
@@ -15,7 +14,8 @@ TODO:
 - Modelle für weitere ADLs implementieren
 
 TODO GUI:
-- Add legends in Validation Tab
+- Add y unit in Validation Tab
+- Rename Pelvic Bend to Pelvic Tilt in Home Tab: Patient Specific Parameters
 
 TOTEST:
 - Zeitaufwand der einzelnen Funktionen (tictoc)

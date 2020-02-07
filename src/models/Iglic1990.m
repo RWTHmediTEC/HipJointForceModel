@@ -83,13 +83,12 @@ G = -9.81;                         % Weight force
 [x0, l_ref, HM]=Dostal1981_Iglic1990_Table2('visu',0); 
 WB = BW * G;                       % total body weight
 WL = 0.161 * WB;                   % weight of the supporting limb
-d = 0;                             % !QUESTIONABLE! antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
 W = [0, WB - WL, 0];               % 'WB - WL'
 b = 0.48 * l_ref;                  % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
 c = 1.01 * l_ref;                  % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
 a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
-
-phi = 0.5;                         % Pelvic bend [0]: rotation around the posterior-anterior axis
+d = 0;                             % !QUESTIONABLE! antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
+phi = 0.5;                         % Pelvic bend [°]: rotation around the posterior-anterior axis
 ny = asind(b/x0);                  % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
 
 % Rotate muscle attachments [Iglic 1990, S.37]
@@ -142,9 +141,9 @@ F = cell2sym(activeMuscles(:,2)).*A.*s;
 momentF = cross(r, F);
 
 if side == 'L'
-    momentW = cross([d 0  a], W);  % Moment of bodyweight force around hip rotation center
+    momentW = cross([d 0  a], W); % Moment 'WB - WL' around hip rotation center
 else
-    momentW = cross([d 0 -a], W); % Moment of bodyweight force around hip rotation center
+    momentW = cross([d 0 -a], W); % Moment 'WB - WL' around hip rotation center
 end
 
 % Calculate hip joint reaction force R
@@ -182,7 +181,6 @@ TFMz = createRotationOz(0);
 
 if strcmp(View, 'Femur') == 1
     rDir = -1 * rDir;
-    
     % Rotation matrices for local femur COS
     TFMx = createRotationOx(deg2rad(ny));
     TFMy = createRotationOy();
