@@ -1,5 +1,5 @@
 TODO:
-- Revision der PCSAs
+- Revision of PCSAs
 	- Vergleich mit AnyBody; AnyBody passt die PCSAs anhand eines "Scaling Laws" an
 	- PCSA = MuscleVolume/OptimalFiberLength
 	- Sowohl MuscleVolume als auch OptimalFiberLength können patienten-spezifisch über ein Skalierungsgesetz angepasst werden
@@ -7,18 +7,31 @@ TODO:
 		- MuscleVolume = Mass/1.056 (MuscleDensity) 
 		- OptimalFiberLength (Lopt)
 
-- Weitere Modelle für One-Leg-Stance importieren- Parameterstudie für Iglic (Modell-Konstanten variieren)
-- Implementierung der Via points und Wrapping surfaces
-- Implementierung des Pelvic tilt (bezieht sich im Moment auf Wu2002)
-- Implementierung des LBS für die Hüfte- Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
-- Modelle für weitere ADLs implementieren
+HJF models
+- Implement further one-leg stance models
+- Parameter / sensitivity study of the HJF models
+- Implement models for other ADLs
+Muscle path models
+- Implement via point and wrapping surfaces
+- Seperate muscle line model and HJF model
+- Store calculation of muscle vectors / moment arms in single function
+Muscle recruitment
+- Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
+
+- Implement pelvic tilt based on APP instead of SISP [Wu2002]
+Scaling laws
+- Implementierung des LBS für die Hüfte
 
 TODO GUI:
 - Add y unit in Validation Tab
 - Rename Pelvic Bend to Pelvic Tilt in Home Tab: Patient Specific Parameters
+- Verify visualization of HJF in local femur or pelvis CS
+
+DOCUMENTATION
+- Source of the OrthoLoad force data
 
 TOTEST:
-- Zeitaufwand der einzelnen Funktionen (tictoc)
+- Time consumption of single functions (tic toc)
 
 NOTES:
 - Landmarke GT für Subject H4L fehlt

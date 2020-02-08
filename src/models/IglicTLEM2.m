@@ -1,4 +1,8 @@
 function funcHandles = IglicTLEM2
+% The model of [Iglic 1990] using the TLEM2 cadaver data instead of
+% Dostal's cadaver data. Some adaptions were necessary to solve the model
+% that question the validity of the [Iglic 1990] model. See below for 
+% further information.
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;
@@ -40,8 +44,8 @@ enable = 'off';
 % the TLEM2. GluteusMediusMid1 is not available in TLEM2.
 % The classification of the muscles into the groups fa, ft, fp was altered
 % compared to [Iglic 1990, S.37, Table 1]. However, the results for fa, ft 
-% and , fp are still unphysiological / negative. See the warning in the 
-% command window.
+% and , fp are unphysiological / negative. See the warning in the command 
+% window.
 activeMuscles = {...
     'GluteusMediusAnterior1',   'ft';
     'GluteusMediusAnterior2',   'ft';
@@ -87,7 +91,7 @@ femoralLength = data.S.Scale(2).FemoralLength;
 activeMuscles = data.activeMuscles;
 musclePath    = data.MusclePath;
 side          = data.S.Side;
-View          = data.View;
+view          = data.View;
 
 %% Define Parameters
 G = -9.81;                         % weight force
@@ -158,15 +162,15 @@ for m = 1:NoAM
         % !!! Has to be adapted if extreme joint positions are considered
     end
 end
-% Unit vectors s in the direction of the muscles
-% [Iglic 1990, S.37, Equ.3]
+% Unit vectors s in the direction of the muscles [Iglic 1990, S.37, Equ.3]
 s = normalizeVector3d(r_ - r);
 
 % [Iglic 1990, S.37, Equ.2]
-F = cell2sym(activeMuscles(:,2)) .* A .* s;
-% The assumption 'F >= 0' should be included, but then the solver will not find a solution
-assume(F >= 0)
-assume(F,'clear')
+f = cell2sym(activeMuscles(:,2));
+% The assumption 'f >= 0' should be included, but then the solver will not find a solution
+assume(f >= 0)
+assume(f,'clear')
+F = f .* A .* s;
 
 % Moment of F around hip rotation center
 momentF = cross(r, F);
@@ -196,8 +200,8 @@ rZ = double(R.RzSym);
 fa = double(R.fa);
 ft = double(R.ft);
 fp = double(R.fp);
-if fa > 0 || ft > 0 || fp > 0
-    warning(['unphysiolocial / negative value of fa (' num2str(fa,1) '), ' ...
+if fa < 0 || ft < 0 || fp < 0
+    warning(['Unphysiolocial / negative value of fa (' num2str(fa,1) '), ' ...
         'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
 end
 
@@ -214,7 +218,7 @@ TFMx = createRotationOx(deg2rad(phi));
 TFMy = createRotationOy(0);
 TFMz = createRotationOz(deg2rad(pelvicTilt));
 
-if strcmp(View, 'Femur') == 1
+if strcmp(view, 'Femur') == 1
     rDir = -1 * rDir;
     % Rotation matrices for local femur COS
     TFMx = createRotationOx(deg2rad(ny));

@@ -1,4 +1,7 @@
-function funcHandles = IglicEggert
+function funcHandles = Eggert2018
+% Based on the model of [Iglic 1990] but using the TLEM2 cadaver data 
+% instead of Dostal's cadaver data. Grouping of the muscles was removed to
+% avoid unphysiological / negative muscle forces.
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;
@@ -74,24 +77,29 @@ function data = Calculation(data)
 LE            = data.S.LE;
 muscleList    = data.MuscleList;
 BW            = data.S.BodyWeight;
-PelvicBend    = data.S.PelvicBend;
-HipJointWidth = data.S.Scale(1).HipJointWidth;
-FemoralLength = data.S.Scale(2).FemoralLength;
+pelvicTilt    = data.S.PelvicBend;
+hipJointWidth = data.S.Scale(1).HipJointWidth;
+femoralLength = data.S.Scale(2).FemoralLength;
 activeMuscles = data.activeMuscles;
-Side          = data.S.Side;
-View          = data.View;
+side          = data.S.Side;
+view          = data.View;
 
 %% Define Parameters
-G = -9.81;                         % Weight force
-Wb = BW * G;                       % Resultant force of total bodyweight
-Wl = 0.161 * Wb;                   % Resultant force of the supporting limb
-W = [0, Wb - Wl, 0];               % Resultant bodyweight force
-l = HipJointWidth/2;               % Half the distance between the two hip rotation centers
-x0 = FemoralLength;                % Femoral length
-b = 0.48 * l;                      % Lever arm of the force Wl
-c = 1.01 * l;                      % Lever arm of the ground reaction force Wb's attachment point
-a = (Wb * c - Wl * b) / (Wb - Wl); % Lever arm of the force W's attachment point
-phi = 0.5;                         % Rotation of the pelvis around the Y axis
+G = -9.81;                         % weight force
+
+% Subject-specific values
+l = hipJointWidth/2;               % Half the distance between the two hip rotation centers
+x0 = femoralLength;                % Femoral length
+WB = BW * G;                       % total body weight
+% Generic values
+WL = 0.161 * WB;                   % weight of the supporting limb
+W = [0, WB - WL, 0];               % 'WB - WL'
+b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
+c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
+a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
+d = 0;                             % !QUESTIONABLE! antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
+phi = 0.5;                         % Pelvic bend [°]: rotation around the posterior-anterior axis
+ny = asind(b/x0);                  % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
 
 % Implement matrices for muscle origin points r, muscle insertion points r'
 % and relative physiological cross-sectional areas A
@@ -101,7 +109,7 @@ Noam = size(activeMuscles,1);
 
 % Get muscle origin points and muscle insertion points
 via(Noam,1) = false;
-[r, rApostrophe] = deal(zeros(Noam,3));
+[r, r_] = deal(zeros(Noam,3));
 for m = 1:Noam
     for n = 1:length(LE)
         if ~isempty(LE(n).Muscle)
@@ -117,7 +125,7 @@ for m = 1:Noam
                             continue;
                         end
                     elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Insertion')
-                        rApostrophe(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
+                        r_(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
                     end
                 end
             end
@@ -138,67 +146,65 @@ for m = 1:Noam
     if via(m) == true
         % Find most distal via point of pelvis
         [~, idxPelvis] = min(LE(1).Muscle.(activeMuscles{m,1}).Pos(:,2));
-        r(m,:) = LE(1).Muscle.(activeMuscles{m,1}).Pos(idxPelvis,:);
+        r(m,:)  = LE(1).Muscle.(activeMuscles{m,1}).Pos(idxPelvis,:);
         % Find most proximal via point of femur
         [~, idxFemur] = max(LE(2).Muscle.(activeMuscles{m,1}).Pos(:,2));
-        rApostrophe(m,:) = LE(2).Muscle.(activeMuscles{m,1}).Pos(idxFemur,:);
+        r_(m,:) = LE(2).Muscle.(activeMuscles{m,1}).Pos(idxFemur,:);
         % !!! Has to be adapted if extreme joint positions are considered
     end
 end
-s = normalizeVector3d(rApostrophe - r);
+s = normalizeVector3d(r_ - r);
 
-% Iglic 1990 equation 2
-syms f % Symbolic average muscle tension f
-for m = 1:Noam % Loop not needed for latest Matlab version
-    F(m,:) = A(m) * f * s(m,:);
-end
-% F = A .* cell2sym(repmat({'fa'}, Noam,1)) .* s;
+% [Iglic 1990, S.37, Equ.2]
+f = cell2sym(repmat({'f'}, Noam,1));
+assume(f >= 0);
+F = f .* A .* s;
 
 % Moment of F around hip rotation center
 momentF = cross(r, F);
 
-if Side == 'L'
-    momentW = cross([0 0 a], W);  % Moment of bodyweight force around hip rotation center
+if side == 'L'
+    momentW = cross([d 0 a], W);  % Moment of bodyweight force around hip rotation center
 else
-    momentW = cross([0 0 -a], W); % Moment of bodyweight force around hip rotation center
+    momentW = cross([d 0 -a], W); % Moment of bodyweight force around hip rotation center
 end
 
 % Calculate hip joint reaction force R
 syms RxSym RySym RzSym
 
-eq1 =  sum(F(:,1)) + RxSym + W(1); % Iglic 1990 equation 4 for X-component
-eq2 =  sum(F(:,2)) + RySym + W(2); % Iglic 1990 equation 4 for Y-component
-eq3 =  sum(F(:,3)) + RzSym + W(3); % Iglic 1990 equation 4 for Z-component
+eq1 =  sum(F(:,1)) + RxSym + W(1); % [Iglic 1990, S.37, Equ.4]
+eq2 =  sum(F(:,2)) + RySym + W(2); % [Iglic 1990, S.37, Equ.4]
+eq3 =  sum(F(:,3)) + RzSym + W(3); % [Iglic 1990, S.37, Equ.4]
 
-eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
+eq4 = sum(momentF(:,1)) + momentW(1); % [Iglic 1990, S.37, Equ.5]
 
 R = solve(eq1, eq2, eq3, eq4);
 
 rX = double(R.RxSym);
 rY = double(R.RySym);
 rZ = double(R.RzSym);
-% f = double(R.f);
+f = double(R.f);
+if f < 0
+    warning(['Unphysiolocial / negative value of f (' num2str(f,1) ')!'])
+end
 
 rMag = norm([rX rY rZ]);              % Magnitude of R
-rMagP = rMag / abs(Wb) * 100;         % Magnitude of R in percentage body weight
+rMagP = rMag / abs(WB) * 100;         % Magnitude of R in percentage body weight
 rDir = normalizeVector3d([rX rY rZ]); % Direction of R
 
-if Side == 'L'
+if side == 'L'
     rZ = -1 * rZ;
 end
 
 % Rotation matrices for local pelvic COS
-TFMx = createRotationOx(degtorad(phi));
+TFMx = createRotationOx(deg2rad(phi));
 TFMy = createRotationOy(0);
-TFMz = createRotationOz(degtorad(PelvicBend));
+TFMz = createRotationOz(deg2rad(pelvicTilt));
 
-if strcmp(View, 'Femur') == 1
+if strcmp(view, 'Femur') == 1
     rDir = -1 * rDir;
-    
-    ny = asin(b/x0);
-    
     % Rotation matrices for local femur COS
-    TFMx = createRotationOx(ny);
+    TFMx = createRotationOx(deg2rad(ny));
     TFMy = createRotationOy();
     TFMz = createRotationOz();
 end

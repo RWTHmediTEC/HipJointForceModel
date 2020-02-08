@@ -80,7 +80,7 @@ View          = data.View;
 
 %% Define Parameters
 G = -9.81;                         % Weight force
-[x0, l_ref, HM]=Dostal1981_Iglic1990_Table2('visu',0); 
+[x0, l_ref, HM]=Dostal1981_Iglic1990_Table2('visu',0); % Option to visualize Dostal's cadaver data
 WB = BW * G;                       % total body weight
 WL = 0.161 * WB;                   % weight of the supporting limb
 W = [0, WB - WL, 0];               % 'WB - WL'
@@ -100,13 +100,7 @@ switch side
         TFM(:,:,1)=lTFM*TFM(:,:,1);
         TFM(:,:,2)=lTFM*TFM(:,:,2);
 end
-for b=1:length(HM)
-    muscles = fieldnames(HM(b).Muscle);
-    for m = 1:length(muscles)
-        HM(b).Muscle.(muscles{m}).Pos =...
-            transformPoint3d(HM(b).Muscle.(muscles{m}).Pos, TFM(:,:,b));
-    end
-end
+HM = transformTLEM2(HM, TFM);
 
 
 % Get muscle origin points and muscle insertion points
@@ -135,7 +129,9 @@ A = cell2mat(activeMuscles(:,3));
 s = normalizeVector3d(r_ - r);
 
 % [Iglic 1990, S.37, Equ.2]
-F = cell2sym(activeMuscles(:,2)).*A.*s;
+f = cell2sym(activeMuscles(:,2));
+assume(f >= 0) % Muscles can only pull
+F = f.*A.*s;
 
 % Moment of F around hip rotation center
 momentF = cross(r, F);
@@ -165,6 +161,10 @@ rZ = double(R.RzSym);
 fa = double(R.fa);
 ft = double(R.ft);
 fp = double(R.fp);
+if fa < 0 || ft < 0 || fp < 0
+    warning(['Unphysiolocial / negative value of fa (' num2str(fa,1) '), ' ...
+        'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
+end
 
 rMag = vectorNorm3d([rX rY rZ]);      % Magnitude of R
 rMagP = rMag / abs(WB) * 100;         % Magnitude of R in percentage body weight
@@ -295,14 +295,9 @@ HM(2).Muscle.Piriformis1.Pos = [0.1 0.1 -5.5];
 
 
 % Transform from 'IPL' to 'ASR' coordinate system
-TFM=createRotationOx(deg2rad(180))*createRotationOz(deg2rad(90));
-for b=1:length(HM)
-    muscles = fieldnames(HM(b).Muscle);
-    for m = 1:length(muscles)
-        HM(b).Muscle.(muscles{m}).Pos =...
-            transformPoint3d(HM(b).Muscle.(muscles{m}).Pos, TFM);
-    end
-end
+TFM = createRotationOx(deg2rad(180))*createRotationOz(deg2rad(90));
+TFM = repmat(TFM,1,1,length(HM));
+HM = transformTLEM2(HM, TFM);
 
 varargout{1}=x0;
 varargout{2}=l_ref;
