@@ -26,9 +26,11 @@ TODO GUI:
 - Add y unit in Validation Tab
 - Rename Pelvic Bend to Pelvic Tilt in Home Tab: Patient Specific Parameters
 - Verify visualization of HJF in local femur or pelvis CS
+- Option to visualize other cadaver data in visualization window
 
-DOCUMENTATION
+VALIDATION:
 - Source of the OrthoLoad force data
+- Greater Trochanter of H4L
 
 TOTEST:
 - Time consumption of single functions (tic toc)

@@ -1,5 +1,13 @@
 % Import TLEM 2.0 data and save as TLEM2_0.mat in data
-% including structure LE (Lower Extremity) and muscleList 
+% including structure LE (Lower Extremity) and muscleList
+
+%% Look for old data
+if exist('data\TLEM2_0.mat','file')
+    load('data\TLEM2_0.mat','LE','muscleList')
+    old_LE=LE;
+    old_muscleList=muscleList;
+    clearvars LE muscleList;
+end
 
 %% Import .stl files
 tempFileName = 'TLEM 2.0 - Bones - Local Reference Frame - ';
@@ -191,8 +199,16 @@ end
 % Add additional user selected landmarks
 landmarks = {'AcetabularRoof';
              'MostCranialIlium';
+             'MostCaudalIlium'
              'MostMedialIlium';
-             'MostLateralIlium'};
+             'MostLateralIlium';};
+ for l = 1:length(landmarks)
+     if exist('old_LE','var')
+         if isfield(old_LE(1).Landmarks, landmarks{l,1})
+             landmarks{l,2} = old_LE(1).Landmarks.(landmarks{l,1}).Pos;
+         end
+     end
+ end
 landmarksOut = selectLandmarks(LE(1).Mesh,landmarks);
 
 for l = 1:length(landmarks)

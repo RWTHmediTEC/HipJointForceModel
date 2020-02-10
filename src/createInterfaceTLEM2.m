@@ -174,6 +174,15 @@ gui.Home.Parameters.EditText_BodyWeight = uicontrol('Parent', gui.Home.Parameter
     'String', data.T.BodyWeight,...
     'Callback', @onEditText_BodyWeight);
 
+% Panel body height
+gui.Home.Parameters.Panel_BodyHeight = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
+    'Title', 'Body Height [cm]');
+
+gui.Home.Parameters.EditText_BodyHeight = uicontrol('Parent', gui.Home.Parameters.Panel_BodyHeight,...
+    'Style', 'edit',...
+    'String', data.T.BodyHeight,...
+    'Callback', @onEditText_BodyHeight);
+
 % Panel hip joint width
 gui.Home.Parameters.Panel_HipJointWidth = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
     'Title', 'Hip Joint Width [mm]');
@@ -262,7 +271,7 @@ gui.Home.Parameters.PushButton_ResetParameters = uicontrol('Parent', gui.Home.Pa
     'Callback', @onPushButton_ResetParameters);
 
 % Adjust layout
-set(gui.Home.Parameters.Layout_V, 'Height', [-2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -0.6])
+set(gui.Home.Parameters.Layout_V, 'Height', [-2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -0.6])
 
 %% Box panel model
 gui.Home.Model.BoxPanel = uix.BoxPanel('Parent', gui.Home.Layout_V_Right,...
@@ -620,6 +629,13 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
     function onEditText_BodyWeight(scr, ~)
         % User has edited the body weight
         data.S.BodyWeight = str2double(get(scr, 'String'));
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onEditText_BodyHeight(scr, ~)
+        % User has edited the body height
+        data.S.BodyHeight = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end

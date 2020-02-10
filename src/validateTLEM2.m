@@ -26,6 +26,7 @@ OL(s).rAlpha = atand(HJFtrans(1) / HJFtrans(3));
             
 data.S.Side                    = OL(s).Subject(end);
 data.S.BodyWeight              = OL(s).BodyWeight;
+data.S.BodyHeight              = OL(s).BodyHeight;
 data.S.PelvicBend              = 0; % !!! No data available
 data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
 data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;

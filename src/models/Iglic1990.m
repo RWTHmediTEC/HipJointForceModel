@@ -7,6 +7,7 @@ function funcHandles = Iglic1990
 % [Johnston 1979] 1979 - Johnston - Reconstruction of the Hip
 % [McLeish 1970] 1970 - McLeish - Abduction forces in the one-legged stance
 % [Clauser 1969] 1969 - Clauser - Weight, volume and centre of mass of segments of the human body
+% [Dostal 1981] 1981 - Dostal A three-dimensional biomechanical model of hip musculature
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;
@@ -28,7 +29,9 @@ end
 function jointAngles = Position(~)
 
 % Only used for visualization
-[x0, l_ref]=Dostal1981_Iglic1990_Table2('visu',0);
+[~, Scale] = Dostal1981('visu',0);
+l_ref = 1/2 * Scale(1).HipJointWidth;
+x0 = Scale(2).FemoralLength;
 phi = 0.5;
 
 % Calculate the joint angles
@@ -80,7 +83,9 @@ View          = data.View;
 
 %% Define Parameters
 G = -9.81;                         % Weight force
-[x0, l_ref, HM]=Dostal1981_Iglic1990_Table2('visu',0); % Option to visualize Dostal's cadaver data
+[HM, Scale] = Dostal1981('visu',0);
+l_ref = 1/2 * Scale(1).HipJointWidth;
+x0 = Scale(2).FemoralLength;
 WB = BW * G;                       % total body weight
 WL = 0.161 * WB;                   % weight of the supporting limb
 W = [0, WB - WL, 0];               % 'WB - WL'
@@ -203,159 +208,5 @@ data.rMagP  = rMagP;
 data.rPhi   = rPhi;
 data.rTheta = rTheta;
 data.rAlpha = rAlpha;
-
-end
-
-function varargout = Dostal1981_Iglic1990_Table2(varargin)
-
-% Parsing
-p = inputParser;
-logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
-addParameter(p,'visualization',false,logParValidFunc);
-parse(p,varargin{:});
-visu = p.Results.visualization;
-
-HJC = [0 0 0];
-
-% Data from [Dostal 1981] as presented in [Iglic 1990, S.37, Table 2]
-x0=42.3;
-l_ref= 8.45;
-
-% Gluteus Medius Anterior
-% Origin
-HM(1).Muscle.GluteusMediusAnterior1.Type={'Origin'};
-HM(1).Muscle.GluteusMediusAnterior1.Pos = [-10.2 -2.7 -6.2];
-% Insertion
-HM(2).Muscle.GluteusMediusAnterior1.Type={'Insertion'};
-HM(2).Muscle.GluteusMediusAnterior1.Pos = [  2.6  1.8 -7.3];
-
-% Gluteus Minimus Anterior
-% Origin
-HM(1).Muscle.GluteusMinimusAnterior1.Type={'Origin'};
-HM(1).Muscle.GluteusMinimusAnterior1.Pos = [- 7.3 -2.9 -4.1];
-% Insertion
-HM(2).Muscle.GluteusMinimusAnterior1.Type={'Insertion'};
-HM(2).Muscle.GluteusMinimusAnterior1.Pos = [  2.7 -0.4 -6.9];
-
-% Tensor Fasciae Latae
-% Origin
-HM(1).Muscle.TensorFasciaeLatae1.Type={'Origin'};
-HM(1).Muscle.TensorFasciaeLatae1.Pos = [-7.8 -4.5 -5.6];
-% Insertion
-HM(2).Muscle.TensorFasciaeLatae1.Type={'Insertion'};
-HM(2).Muscle.TensorFasciaeLatae1.Pos = [43.6 -2.2 -3.3];
-
-% Rectus Femoris
-% Origin
-HM(1).Muscle.RectusFemoris1.Type={'Origin'};
-HM(1).Muscle.RectusFemoris1.Pos = [-3.7 -4.3 -2.6];
-% Insertion
-HM(2).Muscle.RectusFemoris1.Type={'Insertion'};
-HM(2).Muscle.RectusFemoris1.Pos = [41.5 -4.3 -0.2];
-
-% Gluteus Medius Mid
-% Origin
-HM(1).Muscle.GluteusMediusMid1.Type={'Origin'};
-HM(1).Muscle.GluteusMediusMid1.Pos = [-13.2 0.2 -1.8];
-% Insertion
-HM(2).Muscle.GluteusMediusMid1.Type={'Insertion'};
-HM(2).Muscle.GluteusMediusMid1.Pos = [  2.6  1.8 -7.3];
-
-% Gluteus Minimus Mid
-% Origin
-HM(1).Muscle.GluteusMinimusMid1.Type={'Origin'};
-HM(1).Muscle.GluteusMinimusMid1.Pos = [- 8.8 0.4 -2.0];
-% Insertion
-HM(2).Muscle.GluteusMinimusMid1.Type={'Insertion'};
-HM(2).Muscle.GluteusMinimusMid1.Pos = [  2.7 -0.4 -6.9];
-
-% Gluteus Medius Posterior
-% Origin
-HM(1).Muscle.GluteusMediusPosterior1.Type={'Origin'};
-HM(1).Muscle.GluteusMediusPosterior1.Pos = [-9.7 4.8  1.5];
-% Insertion
-HM(2).Muscle.GluteusMediusPosterior1.Type={'Insertion'};
-HM(2).Muscle.GluteusMediusPosterior1.Pos = [ 2.6 1.8 -7.3];
-
-% Gluteus Minimus Posterior
-% Origin
-HM(1).Muscle.GluteusMinimusPosterior1.Type={'Origin'};
-HM(1).Muscle.GluteusMinimusPosterior1.Pos = [-7.1 2.6 0.0];
-% Insertion
-HM(2).Muscle.GluteusMinimusPosterior1.Type={'Insertion'};
-HM(2).Muscle.GluteusMinimusPosterior1.Pos = [2.7 -0.4 -6.9];
-
-% Piriformis
-% Origin
-HM(1).Muscle.Piriformis1.Type={'Origin'};
-HM(1).Muscle.Piriformis1.Pos = [-5.5 7.8 4.7];
-% Insertion
-HM(2).Muscle.Piriformis1.Type={'Insertion'};
-HM(2).Muscle.Piriformis1.Pos = [0.1 0.1 -5.5];
-
-
-% Transform from 'IPL' to 'ASR' coordinate system
-TFM = createRotationOx(deg2rad(180))*createRotationOz(deg2rad(90));
-TFM = repmat(TFM,1,1,length(HM));
-HM = transformTLEM2(HM, TFM);
-
-varargout{1}=x0;
-varargout{2}=l_ref;
-varargout{3}=HM;
-varargout{4}=NaN;
-
-if visu
-    % ColorMap
-    cmap = hsv(length(fieldnames(HM(1).Muscle)));
-    
-    figH=figure('Color','w');
-    axH=axes(figH);
-    hold(axH,'on')
-    lineProps.Marker = 'o';
-    lineProps.MarkerSize = 5;
-    lineProps.Color = 'k';
-    lineProps.MarkerEdgeColor = lineProps.Color;
-    lineProps.MarkerFaceColor = lineProps.Color;
-    drawPoint3d(axH,HJC,lineProps)
-    lineProps.MarkerSize = 2;
-
-    % Loop over bones with muscles
-    BwM = find(~arrayfun(@(x) isempty(x.Muscle), HM));
-    for b = BwM
-        Muscles = fieldnames(HM(b).Muscle);
-        % Loop over the muscles of the bone
-        for m = 1:length(Muscles)
-            % Check if the muscle originates from this bone
-            oIdx = strcmp(HM(b).Muscle.(Muscles{m}).Type, 'Origin');
-                Origin = HM(b).Muscle.(Muscles{m}).Pos(oIdx,:);
-                % Loop over the other bones exept the bone of Origin
-                for bb = BwM(BwM~=b)
-                    matchingMuscle = fieldnames(HM(bb).Muscle);
-                    if any(strcmp(Muscles(m), matchingMuscle))
-                        % Check if it is the bone of insertion
-                        iIdx = strcmp(HM(bb).Muscle.(Muscles{m}).Type, 'Insertion');
-                        if any(iIdx)
-                            Insertion = HM(bb).Muscle.(Muscles{m}).Pos(iIdx,:);
-                        end
-                    end
-                end
-                
-                % Combine Origin, Via points & Insertion
-                mPoints = [Origin; Insertion];
-                lineProps.DisplayName = Muscles{m};
-                lineProps.Color = cmap(m,:);
-                lineProps.MarkerEdgeColor = lineProps.Color;
-                lineProps.MarkerFaceColor = lineProps.Color;
-                drawPoint3d(axH, mPoints, lineProps);
-                drawLabels3d(axH, mPoints, [Muscles{m}([1,end]);Muscles{m}([1,end])], lineProps);
-        end
-    end
-    axis(axH, 'equal', 'tight'); 
-    grid(axH, 'minor');
-    xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
-    title('Data from [Dostal 1981] as presented in [Iglic 1990, S.37, Table 2]')
-    medicalViewButtons(axH,'ASR')
-    varargout{4}=axH;
-end
 
 end

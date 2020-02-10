@@ -1,9 +1,12 @@
 % Import OrthoLoad data and save as OrthoLoad.mat in data
 % including structure OL (OrthoLoad)
 
+sides={'R','L'};
+
 %% Create structure OL
 Subject = {'H1L' 'H2R' 'H3L' 'H4L' 'H5L' 'H6R' 'H7R' 'H8L' 'H9L' 'H10R'};
-Sex = {'m' 'm' 'm' 'm' 'f' 'm' 'm' 'm' 'm' 'f'};
+Sex     = {'m'   'm'   'm'   'm'   'f'   'm'   'm'   'm'   'm'   'f'};
+Height  = [178   172   168   178   168   176   179   178   181   162];
 OL = repmat(struct('Subject', [], 'Sex', []), length(Subject),1);
 
 %% Hardcoding of implant parameters from '2016 - Bergmann - Standardized Loads Acting in Hip Implants'
@@ -17,8 +20,10 @@ for s = 1:length(Subject)
     
 OL(s).Subject = Subject{s};
 OL(s).Sex     = Sex{s};
+OL(s).BodyHeight = Height(s);
 
-Side = Subject{s}(end);
+Side_IL = Subject{s}(end);
+Side_CL = sides{~strcmp(Side_IL,sides)};
 
 %% Load landmark data
 % Read landmark file
@@ -32,33 +37,26 @@ for t = 1:size(tempContent,1)
 end
 
 %% Calculate scaling parameters
-% HipJointWidth, PelvicWidth, PelvicHeight, PelvicDepth and FemoralLength
+% See createDataTLEM2.m for the exact definitions
 
 % Pelvic parameters
-OL(s).HipJointWidth = distancePoints3d(OL(s).LM.HJC_R, OL(s).LM.HJC_L);
-OL(s).PelvicWidth = distancePoints3d(OL(s).LM.ASIS_R, OL(s).LM.ASIS_L);
+TFM = createSISP_TFM(OL(s).LM.ASIS_L, OL(s).LM.ASIS_R, OL(s).LM.PSIS_L, OL(s).LM.PSIS_R);
 
-midPointPSIS = midPoint3d(OL(s).LM.PSIS_L, OL(s).LM.PSIS_R);
+ASIS_IL = transformPoint3d(OL(s).LM.(['ASIS_' Side_IL]), TFM);
+ASIS_CL = transformPoint3d(OL(s).LM.(['ASIS_' Side_CL]), TFM);
+HJC_IL  = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), TFM);
+HJC_CL  = transformPoint3d(OL(s).LM.(['HJC_' Side_CL]), TFM);
+PSIS_IL = transformPoint3d(OL(s).LM.(['PSIS_' Side_IL]), TFM);
 
-% Create rotation into pelvic coordiante system
-SISplane = createPlane(OL(s).LM.ASIS_L, midPointPSIS, OL(s).LM.ASIS_R);
-pCSrot(3,:) = normalizeVector3d(OL(s).LM.ASIS_R - OL(s).LM.ASIS_L);
-pCSrot(2,:) = normalizeVector3d(planeNormal(SISplane));
-pCSrot(1,:) = normalizeVector3d(crossProduct3d(pCSrot(2,:), pCSrot(3,:)));
-
-% Pelvic height
-ASIS = transformPoint3d(OL(s).LM.(['ASIS_' Side]), pCSrot);
-HJC = transformPoint3d(OL(s).LM.(['HJC_' Side]), pCSrot);
-OL(s).PelvicHeight = abs(ASIS(2) - HJC(2));
-
-% Pelvic depth
-PSIS = transformPoint3d(OL(s).LM.(['PSIS_' Side]), pCSrot);
-OL(s).PelvicDepth = abs(ASIS(1) - PSIS(1));
+OL(s).HipJointWidth = abs(HJC_IL(3) - HJC_CL(3)); % Hip joint width
+OL(s).PelvicWidth = abs(ASIS_IL(3) - ASIS_CL(3)); % Pelvic width
+OL(s).PelvicHeight = abs(ASIS_IL(2) - HJC_IL(2)); % Pelvic height
+OL(s).PelvicDepth = abs(ASIS_IL(1) - PSIS_IL(1)); % Pelvic depth
 
 % Femoral parameters
 % Femoral length [Wu2002]
-midPointEC = midPoint3d(OL(s).LM.(['LEC_' Side]), OL(s).LM.(['MEC_' Side]));
-OL(s).FemoralLength = distancePoints3d(midPointEC, OL(s).LM.(['HJC_' Side]));
+midPointEC = midPoint3d(OL(s).LM.(['LEC_' Side_IL]), OL(s).LM.(['MEC_' Side_IL]));
+OL(s).FemoralLength = distancePoints3d(midPointEC, OL(s).LM.(['HJC_' Side_IL]));
 
 %% Add skinning parameters 
 % NeckLength, FemoralVersion and CCD angle [CCD]

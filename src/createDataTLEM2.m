@@ -1,14 +1,27 @@
 function data = createDataTLEM2(data, TLEMversion)
+% References:
+% [Carbone 2015] 2015 - Carbone - TLEM 2.0 - A comprehensive  
+% musculoskeletal geometry dataset for subject-specific modeling of lower 
+% extremity
+% [Winter 2009] 2009 - Winter - Biomechanics and Motor Control of Human 
+% Movement - Fourth Edition
 
 if nargin == 0
-    TLEMversion = 'TLEM2_0';
     % Build structure which contains default data
     data.View = 'Femur';                     % View of the HJF: Pelvis; Femur
     data.FemoralTransformation = 'Skinning'; % Femoral transformation method: Scaling; Skinning
     data.MusclePath = 'StraightLine';        % Muscle Path Model: StraightLine; ViaPoint; ObstacleSet
-    data.T.Side = 'R';                       % Side of the hip joint: R:Right; L:Left
-    data.T.BodyWeight = 45;                  % Patient's body weight [kg]
-    data.T.PelvicBend = 0;                   % Pelvic Bend [°]
+    % Cadaver
+    TLEMversion = 'TLEM2_0';
+    % Side of the hip joint: R:Right; L:Left
+    data.T.Side = 'R';
+    % Patient's body weight [kg]
+    data.T.BodyWeight = 45;
+     % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
+    data.T.BodyHeight = 813/10/0.53;      
+    % Pelvic Bend [°]
+    data.T.PelvicBend = 0;
+    
 end
 
 data.TLEMversion = TLEMversion;
@@ -36,26 +49,16 @@ data.T.LE = LE;
 data.MuscleList = muscleList;
 
 %% Scaling and skinning parameters
-
 % Pelvic parameters:
 % HipJointWidth  = Distance between the hip joint centers
 % PelvicWidth    = Distance between the two ASISs along Z-Axis
 % PelvicHeight   = Distance between HRC and ASIS along Y-Axis
 % PelvicDepth    = Distance between ASIS and PSIS along X-Axis
-%
-% Femoral parameters:
-% FemoralLength  = Distance between HRC and the midpoint between medial 
-%                  and lateral epicondyle along y-Axis
-% FemoralVersion = Angle between neck axis and condylar line projected 
-%                  on transverse plane 
-% NeckLength     = Distance between hip joint center projected on neck axis
-%                  and point where the neck axis and straight femur axis cross
-% CCD            = Angle between neck axis and straight femur axis
 
 % Pelvic parameters % !!! Use consistent landmarks (either TLEM or vertices) 
 data.T.Scale(1).HipJointWidth = 2 * (...
     data.T.LE(1).Joints.Hip.Pos(3) -... 
-    min(data.T.LE(1).Mesh.vertices(:,3)));  % No consideration of width of the pubic symphysis
+    min(data.T.LE(1).Mesh.vertices(:,3)));  % !!! No consideration of width of the pubic symphysis
 data.T.Scale(1).PelvicWidth  =...
     data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(3) -...
     data.T.LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos(3);
@@ -64,6 +67,15 @@ data.T.Scale(1).PelvicHeight =...
 data.T.Scale(1).PelvicDepth =...
     data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(1) -...
     data.T.LE(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos(1);
+
+% Femoral parameters:
+% FemoralLength  = Distance between HRC and the midpoint between medial 
+%                  and lateral epicondyle along y-Axis
+% FemoralVersion = Angle between neck axis and condylar line projected 
+%                  on transverse plane 
+% NeckLength     = Distance between hip joint center projected on neck axis
+%                  and point where the neck axis and straight femur axis cross
+% CCD            = Angle between neck axis and straight femur axis
 
 % Load controls [Bergmann2016]
 load(['femur' data.TLEMversion 'Controls'], 'Controls', 'LMIdx')
@@ -87,6 +99,7 @@ data.T.Scale(2).CCD = rad2deg(vectorAngle3d(Controls(3,:) - Controls(2,:), Contr
               
 data.S.Side       = data.T.Side;
 data.S.BodyWeight = data.T.BodyWeight;
+data.S.BodyHeight = data.T.BodyHeight;
 data.S.PelvicBend = data.T.PelvicBend;
 
 data.S.LE    = data.T.LE;

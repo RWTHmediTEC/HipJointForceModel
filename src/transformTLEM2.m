@@ -12,12 +12,12 @@ for b = 1:length(LE)
             joints = fieldnames(LE(b).Joints);
             for j = 1:length(joints)
                 % Joint position
-                LE(b).Joints.(joints{j}).Pos =...
-                    transformPoint3d(LE(b).Joints.(joints{j}).Pos, TFM(:,:,b));
+                LE(b).Joints.(joints{j}).Pos = transformPoint3d(...
+                    LE(b).Joints.(joints{j}).Pos, TFM(:,:,b));
                 % Joint axis
                 if isfield(LE(b).Joints.(joints{j}), 'Axis')
-                    %                 LE(b).Joints.(joints{j}).Axis =...
-                    %                     transformVector3d(LE(b).Joints.(joints{j}).Axis, TFM(:,:,b));
+                    % LE(b).Joints.(joints{j}).Axis =...
+                    %    transformVector3d(LE(b).Joints.(joints{j}).Axis, TFM(:,:,b));
                 end
             end
         end
@@ -26,8 +26,18 @@ for b = 1:length(LE)
             if ~isempty(LE(b).Muscle)
                 fascicles = fieldnames(LE(b).Muscle);
                 for m = 1:length(fascicles)
-                    LE(b).Muscle.(fascicles{m}).Pos =...
-                        transformPoint3d(LE(b).Muscle.(fascicles{m}).Pos, TFM(:,:,b));
+                    LE(b).Muscle.(fascicles{m}).Pos = transformPoint3d(...
+                        LE(b).Muscle.(fascicles{m}).Pos, TFM(:,:,b));
+                end
+            end
+        end
+        % Landmarks
+        if isfield(LE(b),'Landmarks')
+            if ~isempty(LE(b).Landmarks)
+                landmarks = fieldnames(LE(b).Landmarks);
+                for m = 1:length(landmarks)
+                    LE(b).Landmarks.(landmarks{m}).Pos = transformPoint3d(...
+                        LE(b).Landmarks.(landmarks{m}).Pos, TFM(:,:,b));
                 end
             end
         end

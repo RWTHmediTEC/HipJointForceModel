@@ -1,4 +1,6 @@
 function varargout = Fick1850(varargin)
+% Reference:
+% [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des Oberschenkels
 
 % Parsing
 p = inputParser;
@@ -6,9 +8,6 @@ logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
 addParameter(p,'visualization',true,logParValidFunc);
 parse(p,varargin{:});
 visu = p.Results.visualization;
-
-% Values from: [Fick 1850]
-% 1850 - Fick - Statische Betrachtung der Muskulatur des Oberschenkels
 
 % [Fick 1850, S.103-104]
 Moment.TensorFasciae=[12.495  7.605 0.001];
@@ -22,116 +21,64 @@ HJC = [76 40 119];
 
 % [Fick 1850, S.105-106]
 % Tensor Fasciae
-% Origin
-HM(1).Muscle.TensorFasciae1.Type={'Origin'};
-HM(1).Muscle.TensorFasciae1.Pos = [24 -18 80];
-HM(1).Muscle.TensorFasciae2.Type={'Origin'};
-HM(1).Muscle.TensorFasciae2.Pos = [28  10 96];
-% Insertion
-HM(2).Muscle.TensorFasciae1.Type={'Insertion'};
-HM(2).Muscle.TensorFasciae1.Pos = [64 449 103];
-HM(2).Muscle.TensorFasciae2.Type={'Insertion'};
-HM(2).Muscle.TensorFasciae2.Pos = [55 447 110];
+HM(1).Muscle.TensorFasciae1.Pos = [24 -18 80]; % Origin
+HM(1).Muscle.TensorFasciae2.Pos = [28  10 96]; % Origin
+HM(2).Muscle.TensorFasciae1.Pos = [64 449 103]; % Insertion
+HM(2).Muscle.TensorFasciae2.Pos = [55 447 110]; % Insertion
 
 % Sartorius
-% Origin
-HM(1).Muscle.Sartorius1.Type={'Origin'};
-HM(1).Muscle.Sartorius1.Pos = [16  0  90];
-HM(1).Muscle.Sartorius2.Type={'Origin'};
-HM(1).Muscle.Sartorius2.Pos = [16  0 100];
-% Insertion
-HM(2).Muscle.Sartorius1.Type={'Insertion'};
-HM(2).Muscle.Sartorius1.Pos = [66 467 146];
-HM(2).Muscle.Sartorius2.Type={'Insertion'};
-HM(2).Muscle.Sartorius2.Pos = [64 450 144];
+HM(1).Muscle.Sartorius1.Pos = [16  0  90]; % Origin
+HM(1).Muscle.Sartorius2.Pos = [16  0 100]; % Origin
+HM(2).Muscle.Sartorius1.Pos = [66 467 146]; % Insertion
+HM(2).Muscle.Sartorius2.Pos = [64 450 144]; % Insertion
 
 % % Adductor Longus
-% % Origin
-% LE(1).Muscle.AdductorLongus1.Type={'Origin'};
-% LE(1).Muscle.AdductorLongus1.Pos = [34 64 170];
-% LE(1).Muscle.AdductorLongus2.Type={'Origin'};
-% LE(1).Muscle.AdductorLongus2.Pos = [36 40 190];
-% % Insertion
-% LE(2).Muscle.AdductorLongus1.Type={'Insertion'};
-% LE(2).Muscle.AdductorLongus1.Pos = [78 200 106];
-% LE(2).Muscle.AdductorLongus2.Type={'Insertion'};
-% LE(2).Muscle.AdductorLongus2.Pos = [62 276 123];
+% LE(1).Muscle.AdductorLongus1.Pos = [34 64 170]; % Origin
+% LE(1).Muscle.AdductorLongus2.Pos = [36 40 190]; % Origin
+% LE(2).Muscle.AdductorLongus1.Pos = [78 200 106]; % Insertion
+% LE(2).Muscle.AdductorLongus2.Pos = [62 276 123]; % Insertion
 % 
 % % Adductor Brevis
-% % Origin
-% LE(1).Muscle.AdductorBrevis1.Type={'Origin'};
-% LE(1).Muscle.AdductorBrevis1.Pos = [36 40 190];
-% LE(1).Muscle.AdductorBrevis2.Type={'Origin'};
-% LE(1).Muscle.AdductorBrevis2.Pos = [62 91 182];
-% % Insertion
-% LE(2).Muscle.AdductorBrevis1.Type={'Insertion'};
-% LE(2).Muscle.AdductorBrevis1.Pos = [78 200 106];
-% LE(2).Muscle.AdductorBrevis2.Type={'Insertion'};
-% LE(2).Muscle.AdductorBrevis2.Pos = [93 115  93];
+% LE(1).Muscle.AdductorBrevis1.Pos = [36 40 190]; % Origin
+% LE(1).Muscle.AdductorBrevis2.Pos = [62 91 182]; % Origin
+% LE(2).Muscle.AdductorBrevis1.Pos = [78 200 106]; % Insertion
+% LE(2).Muscle.AdductorBrevis2.Pos = [93 115  93]; % Insertion
 % 
 % % Adductor Pectineus
-% % Origin
-% LE(1).Muscle.AdductorPectineus1.Type={'Origin'};
-% LE(1).Muscle.AdductorPectineus1.Pos = [36 40 190];
-% LE(1).Muscle.AdductorPectineus2.Type={'Origin'};
-% LE(1).Muscle.AdductorPectineus2.Pos = [62 91 182];
-% % Insertion
-% LE(2).Muscle.AdductorPectineus1.Type={'Insertion'};
-% LE(2).Muscle.AdductorPectineus1.Pos = [78 200 106];
-% LE(2).Muscle.AdductorPectineus2.Type={'Insertion'};
-% LE(2).Muscle.AdductorPectineus2.Pos = [93 115  93];
+% LE(1).Muscle.AdductorPectineus1.Pos = [36 40 190]; % Origin
+% LE(1).Muscle.AdductorPectineus2.Pos = [62 91 182]; % Origin
+% LE(2).Muscle.AdductorPectineus1.Pos = [78 200 106]; % Insertion
+% LE(2).Muscle.AdductorPectineus2.Pos = [93 115  93]; % Insertion
 
 % Rectus Femoris
-% Origin
-HM(1).Muscle.RectusFemoris1.Type={'Origin'};
-HM(1).Muscle.RectusFemoris1.Pos = [16 12 103];
-HM(1).Muscle.RectusFemoris2.Type={'Origin'};
-HM(1).Muscle.RectusFemoris2.Pos = [31 33 99];
-% Insertion
-HM(2).Muscle.RectusFemoris1.Type={'Insertion'};
-HM(2).Muscle.RectusFemoris1.Pos = [24 396 113];
-HM(2).Muscle.RectusFemoris2.Type={'Insertion'};
-HM(2).Muscle.RectusFemoris2.Pos = [20 396 153];
+HM(1).Muscle.RectusFemoris1.Pos = [16 12 103]; % Origin
+HM(1).Muscle.RectusFemoris2.Pos = [31 33  99]; % Origin
+HM(2).Muscle.RectusFemoris1.Pos = [24 396 113]; % Insertion
+HM(2).Muscle.RectusFemoris2.Pos = [20 396 153]; % Insertion
 
 % Gluteus Medius
-% Origin
-HM(1).Muscle.GluteusMedius1.Type={'Origin'};
-HM(1).Muscle.GluteusMedius1.Pos = [136 -30 140];
-HM(1).Muscle.GluteusMedius2.Type={'Origin'};
-HM(1).Muscle.GluteusMedius2.Pos = [136 -60 147];
-HM(1).Muscle.GluteusMedius3.Type={'Origin'};
-HM(1).Muscle.GluteusMedius3.Pos = [108 -84 125];
-HM(1).Muscle.GluteusMedius4.Type={'Origin'};
-HM(1).Muscle.GluteusMedius4.Pos = [ 28  10  96];
-% Insertion
-HM(2).Muscle.GluteusMedius1.Type={'Insertion'};
-HM(2).Muscle.GluteusMedius1.Pos = [107 40 84];
-HM(2).Muscle.GluteusMedius2.Type={'Insertion'};
-HM(2).Muscle.GluteusMedius2.Pos = [107 40 84];
-HM(2).Muscle.GluteusMedius3.Type={'Insertion'};
-HM(2).Muscle.GluteusMedius3.Pos = [ 72 70 60];
-HM(2).Muscle.GluteusMedius4.Type={'Insertion'};
-HM(2).Muscle.GluteusMedius4.Pos = [ 72 70 60];
+HM(1).Muscle.GluteusMedius1.Pos = [136 -30 140]; % Origin
+HM(1).Muscle.GluteusMedius2.Pos = [136 -60 147]; % Origin
+HM(1).Muscle.GluteusMedius3.Pos = [108 -84 125]; % Origin
+HM(1).Muscle.GluteusMedius4.Pos = [ 28  10  96]; % Origin
+HM(2).Muscle.GluteusMedius1.Pos = [107 40 84]; % Insertion
+HM(2).Muscle.GluteusMedius2.Pos = [107 40 84]; % Insertion
+HM(2).Muscle.GluteusMedius3.Pos = [ 72 70 60]; % Insertion
+HM(2).Muscle.GluteusMedius4.Pos = [ 72 70 60]; % Insertion
 
 % Gluteus Minimus
-% Origin
-HM(1).Muscle.GluteusMinimus1.Type={'Origin'};
-HM(1).Muscle.GluteusMinimus1.Pos = [100 10 135];
-HM(1).Muscle.GluteusMinimus2.Type={'Origin'};
-HM(1).Muscle.GluteusMinimus2.Pos = [100  0 135];
-HM(1).Muscle.GluteusMinimus3.Type={'Origin'};
-HM(1).Muscle.GluteusMinimus3.Pos = [ 78 -42 102];
-HM(1).Muscle.GluteusMinimus4.Type={'Origin'};
-HM(1).Muscle.GluteusMinimus4.Pos = [ 28  10  96];
-% Insertion
-HM(2).Muscle.GluteusMinimus1.Type={'Insertion'};
-HM(2).Muscle.GluteusMinimus1.Pos = [ 72 70 60];
-HM(2).Muscle.GluteusMinimus2.Type={'Insertion'};
-HM(2).Muscle.GluteusMinimus2.Pos = [ 77 48 62];
-HM(2).Muscle.GluteusMinimus3.Type={'Insertion'};
-HM(2).Muscle.GluteusMinimus3.Pos = [ 77 48 62];
-HM(2).Muscle.GluteusMinimus4.Type={'Insertion'};
-HM(2).Muscle.GluteusMinimus4.Pos = [ 72 70 60];
+HM(1).Muscle.GluteusMinimus1.Pos = [100  10 135]; % Origin
+HM(1).Muscle.GluteusMinimus2.Pos = [100   0 135]; % Origin
+HM(1).Muscle.GluteusMinimus3.Pos = [ 78 -42 102]; % Origin
+HM(1).Muscle.GluteusMinimus4.Pos = [ 28  10  96]; % Origin
+HM(2).Muscle.GluteusMinimus1.Pos = [ 72 70 60]; % Insertion
+HM(2).Muscle.GluteusMinimus2.Pos = [ 77 48 62]; % Insertion
+HM(2).Muscle.GluteusMinimus3.Pos = [ 77 48 62]; % Insertion
+HM(2).Muscle.GluteusMinimus4.Pos = [ 72 70 60]; % Insertion
+
+% Add types
+HM(1).Muscle=structfun(@(x) setfield(x,'Type',{'Origin'}), HM(1).Muscle, 'uni',0);
+HM(2).Muscle=structfun(@(x) setfield(x,'Type',{'Insertion'}), HM(2).Muscle, 'uni',0);
 
 varargout{1}=Moment;
 varargout{2}=HJC;
