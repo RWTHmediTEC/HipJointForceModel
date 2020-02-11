@@ -1,3 +1,5 @@
+function importDataOrthoLoad()
+
 % Import OrthoLoad data and save as OrthoLoad.mat in data
 % including structure OL (OrthoLoad)
 
@@ -68,3 +70,5 @@ end
 
 %% Save data
 save('data\OrthoLoad.mat', 'OL')
+
+end

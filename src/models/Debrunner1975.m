@@ -64,7 +64,7 @@ function data = Calculation(data)
 LE                = data.S.LE;
 activeMuscles     = data.activeMuscles;
 BodyWeight        = data.S.BodyWeight;
-PelvicBend        = data.S.PelvicBend;
+PelvicTilt        = data.S.PelvicTilt;
 HipJointWidth     = data.S.Scale(1).HipJointWidth;
 Side              = data.S.Side;
 View              = data.View;
@@ -159,7 +159,7 @@ end
 % Rotation matrices for local pelvic CS
 TFMx = createRotationOx(0);
 TFMy = createRotationOy(0);
-TFMz = createRotationOz(deg2rad(PelvicBend));
+TFMz = createRotationOz(deg2rad(PelvicTilt));
 
 if strcmp(View, 'Femur') == 1
     rDir = -1 * rDir;

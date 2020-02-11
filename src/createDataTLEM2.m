@@ -19,8 +19,8 @@ if nargin == 0
     data.T.BodyWeight = 45;
      % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
     data.T.BodyHeight = 813/10/0.53;      
-    % Pelvic Bend [°]
-    data.T.PelvicBend = 0;
+    % Pelvic Tilt [°]
+    data.T.PelvicTilt = 0;
     
 end
 
@@ -96,11 +96,10 @@ data.T.Scale(2).NeckLength = distancePoints3d(Controls(1,:), Controls(2,:));
 data.T.Scale(2).CCD = rad2deg(vectorAngle3d(Controls(3,:) - Controls(2,:), Controls(1,:) - Controls(2,:)));
 
 %% Save initally as (T)emplate and (S)ubject
-              
 data.S.Side       = data.T.Side;
 data.S.BodyWeight = data.T.BodyWeight;
 data.S.BodyHeight = data.T.BodyHeight;
-data.S.PelvicBend = data.T.PelvicBend;
+data.S.PelvicTilt = data.T.PelvicTilt;
 
 data.S.LE    = data.T.LE;
 data.S.Scale = data.T.Scale;

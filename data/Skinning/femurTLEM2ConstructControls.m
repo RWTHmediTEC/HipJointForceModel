@@ -48,7 +48,7 @@ end
 %% Construct controls
 load(['femur' TLEMversion 'Controls.mat'])
 
-% Construction of P1 [Bergmann2016]
+% Construction of P1 [Bergmann 2016]
 neckAxis = createLine3d(femur.vertices(LMIdx.NeckAxis(1),:), femur.vertices(LMIdx.NeckAxis(2),:));
 shaftAxis = createLine3d(femur.vertices(LMIdx.ShaftAxis(1),:), femur.vertices(LMIdx.ShaftAxis(2),:));
 [~, P1, ~] = distanceLines3d(neckAxis, shaftAxis);

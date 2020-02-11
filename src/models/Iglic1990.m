@@ -79,7 +79,7 @@ function data = Calculation(data)
 BW            = data.S.BodyWeight;
 activeMuscles = data.activeMuscles;
 side          = data.S.Side;
-View          = data.View;
+view          = data.View;
 
 %% Define Parameters
 G = -9.81;                         % Weight force
@@ -184,7 +184,7 @@ TFMx = createRotationOx(deg2rad(phi));
 TFMy = createRotationOy(0);
 TFMz = createRotationOz(0);
 
-if strcmp(View, 'Femur') == 1
+if strcmp(view, 'Femur') == 1
     rDir = -1 * rDir;
     % Rotation matrices for local femur COS
     TFMx = createRotationOx(deg2rad(ny));

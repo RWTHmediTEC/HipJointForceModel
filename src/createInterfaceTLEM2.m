@@ -192,14 +192,14 @@ gui.Home.Parameters.EditText_HipJointWidth = uicontrol('Parent', gui.Home.Parame
     'String', data.T.Scale(1).HipJointWidth,...
     'Callback', @onEditText_HipJointWidth);
 
-% Panel pelvic bend
-gui.Home.Parameters.Panel_PelvicBend = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
-    'Title', 'Pelvic Bend [°]');
+% Panel pelvic tilt
+gui.Home.Parameters.Panel_PelvicTilt = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
+    'Title', 'Pelvic Tilt [°]');
 
-gui.Home.Parameters.EditText_PelvicBend = uicontrol('Parent', gui.Home.Parameters.Panel_PelvicBend,...
+gui.Home.Parameters.EditText_PelvicTilt = uicontrol('Parent', gui.Home.Parameters.Panel_PelvicTilt,...
     'Style', 'edit',...
-    'String', data.T.PelvicBend,...
-    'Callback', @onEditText_PelvicBend);
+    'String', data.T.PelvicTilt,...
+    'Callback', @onEditText_PelvicTilt);
 
 % Panel pelvic width
 gui.Home.Parameters.Panel_PelvicWidth = uix.Panel('Parent', gui.Home.Parameters.Layout_V,...
@@ -647,9 +647,9 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         updateHomeTab();
     end
 
-    function onEditText_PelvicBend(scr, ~)
-        % User has edited the pelvic bend
-        data.S.PelvicBend = str2double(get(scr, 'String'));
+    function onEditText_PelvicTilt(scr, ~)
+        % User has edited the pelvic tilt
+        data.S.PelvicTilt = str2double(get(scr, 'String'));
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -706,7 +706,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
     function onPushButton_ResetParameters(~, ~)
         data.S.Side = data.T.Side;
         data.S.BodyWeight = data.T.BodyWeight;
-        data.S.PelvicBend = data.T.PelvicBend;
+        data.S.PelvicTilt = data.T.PelvicTilt;
         data.S.Scale = data.T.Scale;
         updateParameters();
         gui.IsUpdated = false;
@@ -893,7 +893,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
     function updateParameters()
         set(gui.Home.Parameters.EditText_BodyWeight,     'String', data.S.BodyWeight);
         set(gui.Home.Parameters.EditText_HipJointWidth,  'String', data.S.Scale(1).HipJointWidth);
-        set(gui.Home.Parameters.EditText_PelvicBend,     'String', data.S.PelvicBend);
+        set(gui.Home.Parameters.EditText_PelvicTilt,     'String', data.S.PelvicTilt);
         set(gui.Home.Parameters.EditText_PelvicWidth,    'String', data.S.Scale(1).PelvicWidth);
         set(gui.Home.Parameters.EditText_PelvicHeight,   'String', data.S.Scale(1).PelvicHeight);
         set(gui.Home.Parameters.EditText_PelvicDepth,    'String', data.S.Scale(1).PelvicDepth);
@@ -1010,8 +1010,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         hold (gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, 'on')
         drawPoint(gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, 1:NoS, [data.Results(:).rMagP],   'color', 'b', markerProps)
         drawPoint(gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, 1:NoS, [data.Results(:).OrrMagP], 'color', 'g', markerProps)
-        S.rMagP.mean = mean([data.Results(:).rMagP]);
-        O.rMagP.mean = mean([data.Results(:).OrrMagP]);
+        S.rMagP.mean = median([data.Results(:).rMagP]);
+        O.rMagP.mean = median([data.Results(:).OrrMagP]);
         plot(gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, [1,NoS], [S.rMagP.mean,S.rMagP.mean], 'color', 'b')
         plot(gui.Validation.Axis_MagnitudePercentageBodyWeightSingle, [1,NoS], [O.rMagP.mean,O.rMagP.mean], 'color', 'g')
         
@@ -1019,8 +1019,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         hold (gui.Validation.Axis_FrontalAngleSingle, 'on')
         drawPoint(gui.Validation.Axis_FrontalAngleSingle, 1:NoS, [data.Results(:).rPhi],  'color', 'b', markerProps)
         drawPoint(gui.Validation.Axis_FrontalAngleSingle, 1:NoS, [data.Results(:).OrPhi], 'color', 'g', markerProps)
-        S.rPhi.mean = mean([data.Results(:).rPhi]);
-        O.rPhi.mean = mean([data.Results(:).OrPhi]);
+        S.rPhi.mean = median([data.Results(:).rPhi]);
+        O.rPhi.mean = median([data.Results(:).OrPhi]);
         plot(gui.Validation.Axis_FrontalAngleSingle, [1,NoS], [S.rPhi.mean,S.rPhi.mean], 'color', 'b')
         plot(gui.Validation.Axis_FrontalAngleSingle, [1,NoS], [O.rPhi.mean,O.rPhi.mean], 'color', 'g')
         
@@ -1028,8 +1028,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         hold (gui.Validation.Axis_SagittalAngleSingle, 'on')
         drawPoint(gui.Validation.Axis_SagittalAngleSingle, 1:NoS, [data.Results(:).rTheta],  'color', 'b', markerProps)
         drawPoint(gui.Validation.Axis_SagittalAngleSingle, 1:NoS, [data.Results(:).OrTheta], 'color', 'g', markerProps)
-        S.rTheta.mean = mean([data.Results(:).rTheta]);
-        O.rTheta.mean = mean([data.Results(:).OrTheta]);
+        S.rTheta.mean = median([data.Results(:).rTheta]);
+        O.rTheta.mean = median([data.Results(:).OrTheta]);
         plot(gui.Validation.Axis_SagittalAngleSingle, [1,NoS], [S.rTheta.mean,S.rTheta.mean], 'color', 'b')
         plot(gui.Validation.Axis_SagittalAngleSingle, [1,NoS], [O.rTheta.mean,O.rTheta.mean], 'color', 'g')
         
@@ -1037,8 +1037,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         hold (gui.Validation.Axis_TransverseAngleSingle, 'on')
         drawPoint(gui.Validation.Axis_TransverseAngleSingle, 1:NoS, [data.Results(:).rAlpha],  'color', 'b', markerProps)
         drawPoint(gui.Validation.Axis_TransverseAngleSingle, 1:NoS, [data.Results(:).OrAlpha], 'color', 'g', markerProps)
-        S.rAlpha.mean = mean([data.Results(:).rAlpha]);
-        O.rAlpha.mean = mean([data.Results(:).OrAlpha]);
+        S.rAlpha.mean = median([data.Results(:).rAlpha]);
+        O.rAlpha.mean = median([data.Results(:).OrAlpha]);
         plot(gui.Validation.Axis_TransverseAngleSingle, [1,NoS], [S.rAlpha.mean,S.rAlpha.mean], 'color', 'b')
         plot(gui.Validation.Axis_TransverseAngleSingle, [1,NoS], [O.rAlpha.mean,O.rAlpha.mean], 'color', 'g')
         
@@ -1047,6 +1047,11 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1], 'Heights', [-1, -1])
         boxplot(gui.Validation.Axis_FrontalAngleBoxPlot,[[data.Results(:).OrPhi]',[data.Results(:).rPhi]'],{'In-vivo','Simulated'})
         boxplot(gui.Validation.Axis_SagittalAngleBoxPlot,[[data.Results(:).OrTheta]',[data.Results(:).rTheta]'],{'In-vivo','Simulated'})
         boxplot(gui.Validation.Axis_TransverseAngleBoxPlot,[[data.Results(:).OrAlpha]',[data.Results(:).rAlpha]'],{'In-vivo','Simulated'})
+        
+        gui.Validation.Axis_MagnitudePercentageBodyWeightBoxPlot.YLim=gui.Validation.Axis_MagnitudePercentageBodyWeightSingle.YLim;
+        gui.Validation.Axis_FrontalAngleBoxPlot.YLim=gui.Validation.Axis_FrontalAngleSingle.YLim;
+        gui.Validation.Axis_SagittalAngleBoxPlot.YLim=gui.Validation.Axis_SagittalAngleSingle.YLim;
+        gui.Validation.Axis_TransverseAngleBoxPlot.YLim=gui.Validation.Axis_TransverseAngleSingle.YLim;
     end
 
 end

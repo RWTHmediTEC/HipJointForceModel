@@ -2,32 +2,38 @@ function Results = validateTLEM2(data, gui)
 % Calculate validation parameters for the OrthoLoad subjects
 
 if exist('data\OrthoLoad.mat', 'file')
-    load('OrthoLoad', 'OL')
+    load('OrthoLoad.mat', 'OL')
 else
-    importDataOrthoLoad
+    importDataOrthoLoad()
+    load('OrthoLoad.mat', 'OL')
 end
         
 Results = repmat(struct('Subject', []), length(OL),1);
 
 for s = 1:length(OL)
     
-% Load body weight and forces
-load([OL(s).Subject '_' char(data.Posture) '.mat'])
-OL(s).BodyWeight = meanPFP.Weight_N / 9.81;
+% Load body weight and HJF of OrthoLoad subjects
+% !!! Add the source of the mat files !!!
+load([OL(s).Subject '_' char(data.Posture) '.mat'],'meanPFP')
+OL(s).BodyWeight = meanPFP.Weight_N/9.81; % [N] to [kg]
 
 OL(s).rMagP = norm(meanPFP.HJF_pBW);
 
+% The HJF of the OrthoLoad subjects is given in the [Bergmann 2016]
+% coordinate system (CS). The transformation from the TLEM CS [Wu 2002] 
+% to the [Bergmann 2016] CS is loaded and the inverse (=transpose) is 
+% applied to the OrthoLoad HJF to transform it into the TLEM CS.
 load(['femur' data.TLEMversion 'Controls.mat'], 'fwTFM2AFCS')
-HJFtrans = transpose(fwTFM2AFCS(1:3,1:3)) * transpose(meanPFP.HJF_pBW);
+HJF_TLEM = transformPoint3d(meanPFP.HJF_pBW, fwTFM2AFCS(1:3,1:3)');
 
-OL(s).rPhi   = atand(HJFtrans(3) / HJFtrans(2));
-OL(s).rTheta = atand(HJFtrans(1) / HJFtrans(2));
-OL(s).rAlpha = atand(HJFtrans(1) / HJFtrans(3));
+OL(s).rPhi   = atand(HJF_TLEM(3) / HJF_TLEM(2));
+OL(s).rTheta = atand(HJF_TLEM(1) / HJF_TLEM(2));
+OL(s).rAlpha = atand(HJF_TLEM(1) / HJF_TLEM(3));
             
 data.S.Side                    = OL(s).Subject(end);
 data.S.BodyWeight              = OL(s).BodyWeight;
 data.S.BodyHeight              = OL(s).BodyHeight;
-data.S.PelvicBend              = 0; % !!! No data available
+data.S.PelvicTilt              = 0; % !!! No data available
 data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
 data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
 data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;

@@ -30,7 +30,7 @@ phi = 0.5;
 % Calculate the joint angles
 b = 0.48 * l;
 ny = asind(b/x0);
-jointAngles = {[phi 0 data.S.PelvicBend], [ny 0 0], 0, 0, -ny, 0};
+jointAngles = {[phi 0 data.S.PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
 
 end
 
@@ -77,7 +77,7 @@ function data = Calculation(data)
 LE            = data.S.LE;
 muscleList    = data.MuscleList;
 BW            = data.S.BodyWeight;
-pelvicTilt    = data.S.PelvicBend;
+pelvicTilt    = data.S.PelvicTilt;
 hipJointWidth = data.S.Scale(1).HipJointWidth;
 femoralLength = data.S.Scale(2).FemoralLength;
 activeMuscles = data.activeMuscles;
