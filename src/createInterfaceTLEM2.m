@@ -983,9 +983,9 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             gui.Home.Results.Axis_TransverseView.View = [0, TransverseViewAngle];
             gui.Home.Results.Axis_TransverseView.CameraUpVector = [-1, 0, 0];
             
-            quiver3D(gui.Home.Results.Axis_FrontalView,    -data.rDir*75, data.rDir*55, 'r')
-            quiver3D(gui.Home.Results.Axis_SagittalView,   -data.rDir*75, data.rDir*55, 'r')
-            quiver3D(gui.Home.Results.Axis_TransverseView, -data.rDir*75, data.rDir*55, 'r')
+            drawArrow3d(gui.Home.Results.Axis_FrontalView,    -data.rDir*75, data.rDir*55, 'r')
+            drawArrow3d(gui.Home.Results.Axis_SagittalView,   -data.rDir*75, data.rDir*55, 'r')
+            drawArrow3d(gui.Home.Results.Axis_TransverseView, -data.rDir*75, data.rDir*55, 'r')
         
             set(gui.Home.Results.Label_post_antHJFpercBW,  'String', round(data.rX));
             set(gui.Home.Results.Label_inf_supHJFpercBW,   'String', round(data.rY));

@@ -52,7 +52,7 @@ if visJoints
                 jAxisOrigin = jCenter - 60 * jAxis;
                 jAxisEnd = jAxisOrigin + 120 * jAxis;
                 text(axH, jAxisEnd(1), jAxisEnd(2), jAxisEnd(3), joints{j});
-                quiver3D(axH, jAxisOrigin, 120 * jAxis, 'g', 0.9);
+                drawArrow3d(axH, jAxisOrigin, 120 * jAxis, 'g');
             end
         end
     end
