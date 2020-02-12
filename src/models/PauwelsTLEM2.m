@@ -40,7 +40,7 @@ end
 %% Active muscles
 function [activeMuscles, enable] = Muscles(gui)
 % User is allowed to edit the default values
-enable = 'off';
+enable = 'on';
 
 % Default fascicles of the model
 activeMuscles = {...
