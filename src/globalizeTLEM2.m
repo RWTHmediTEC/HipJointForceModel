@@ -24,9 +24,9 @@ LE = transformTLEM2(LE, transTFM);
 %% Position TLEM2 according to the model
 calculateTLEM2 = str2func(data.Model);
 modelHandles = calculateTLEM2();
-jointAngles = modelHandles.Position(data);
+data.jointAngles = modelHandles.Position(data);
 
-LE = positionTLEM2(LE, jointAngles);
+LE = positionTLEM2(LE, data.jointAngles);
 
 %% Mirror TLEM2 for the left side
 switch data.S.Side

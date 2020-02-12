@@ -122,44 +122,7 @@ rX = double(Results.RxSym);
 rY = double(Results.RySym);
 rZ = double(Results.RzSym);
 
-rMag = norm([rX rY rZ]);              % Magnitude of R
-rMagP = rMag / abs(S*G) * 100;        % Magnitude of R in percentage body weight
-rDir = normalizeVector3d([rX rY rZ]); % Direction of R
-
-if Side == 'L'
-    rZ = -1 * rZ;
-end
-
-% Rotation matrices for local pelvic CS
-TFMx = createRotationOx(0);
-TFMy = createRotationOy(0);
-TFMz = createRotationOz(0);
-
-if strcmp(View, 'Femur') == 1
-    rDir = -1 * rDir;
-    
-    % Rotation matrices for local femur CS
-    TFMx = createRotationOx();
-    TFMy = createRotationOy();
-    TFMz = createRotationOz();
-end
-
-[rX, rY, rZ] = transformPoint3d(rX, rY, rZ, TFMx*TFMy*TFMz);
-
-rPhi   = atand(rZ / rY); % Angle in frontal plane
-rTheta = atand(rX / rY); % Angle in sagittal plane
-rAlpha = atand(rX / rZ); % Angle in horizontal plane
-
-% Save results in data
-data.rX     = rX;
-data.rY     = rY;
-data.rZ     = rZ;
-data.rDir   = rDir;
-data.rMag   = rMag;
-data.rMagP  = rMagP;
-data.rPhi   = rPhi;
-data.rTheta = rTheta;
-data.rAlpha = rAlpha;
+data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
 end
 

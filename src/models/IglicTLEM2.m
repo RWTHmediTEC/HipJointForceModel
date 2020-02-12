@@ -25,12 +25,12 @@ function jointAngles = Position(data)
 
 % Inputs
 l = data.S.Scale(1).HipJointWidth/2;
-x0 = data.S.Scale(2).FemoralLength;
-phi = 0.5;
+x0 = data.S.Scale(2).FemoralLength; % Femoral length
+phi = 0.5; % Pelvic bend [°]: rotation around the posterior-anterior axis
 
 % Calculate the joint angles
 b = 0.48 * l;
-ny = asind(b/x0);
+ny = asind(b/x0); % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
 jointAngles = {[phi 0 0], [ny 0 0], 0, 0, -ny, 0};
 
 end
@@ -85,9 +85,7 @@ function data = Calculation(data)
 LE            = data.S.LE;
 muscleList    = data.MuscleList;
 BW            = data.S.BodyWeight;
-pelvicTilt    = data.S.PelvicTilt;
 hipJointWidth = data.S.Scale(1).HipJointWidth;
-femoralLength = data.S.Scale(2).FemoralLength;
 activeMuscles = data.activeMuscles;
 musclePath    = data.MusclePath;
 side          = data.S.Side;
@@ -98,7 +96,6 @@ G = -9.81;                         % weight force
 
 % Subject-specific values
 l = hipJointWidth/2;               % Half the distance between the two hip rotation centers
-x0 = femoralLength;                % Femoral length
 WB = BW * G;                       % total body weight
 % Generic values
 WL = 0.161 * WB;                   % weight of the supporting limb
@@ -107,8 +104,6 @@ b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1
 c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
 a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
 d = 0;                             % !QUESTIONABLE! antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
-phi = 0.5;                         % Pelvic bend [°]: rotation around the posterior-anterior axis
-ny = asind(b/x0);                  % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
 
 % Create matrices for muscle origin points r, muscle insertion points r'
 % and relative physiological cross-sectional areas A
@@ -205,42 +200,6 @@ if fa < 0 || ft < 0 || fp < 0
         'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
 end
 
-rMag = norm([rX rY rZ]);              % Magnitude of R
-rMagP = rMag / abs(WB) * 100;         % Magnitude of R in percentage body weight
-rDir = normalizeVector3d([rX rY rZ]); % Direction of R
-
-if side == 'L'
-    rZ = -1 * rZ;
-end
-
-% Rotation matrices for local pelvic COS
-TFMx = createRotationOx(deg2rad(phi));
-TFMy = createRotationOy();
-TFMz = createRotationOz(deg2rad(pelvicTilt));
-
-if strcmp(view, 'Femur') == 1
-    rDir = -1 * rDir;
-    % Rotation matrices for local femur COS
-    TFMx = createRotationOx(deg2rad(ny));
-    TFMy = createRotationOy();
-    TFMz = createRotationOz();
-end
-
-[rX, rY, rZ] = transformPoint3d(rX, rY, rZ, TFMx*TFMy*TFMz);
-
-rPhi   = atand(rZ / rY); % Angle in frontal plane
-rTheta = atand(rX / rY); % Angle in sagittal plane
-rAlpha = atand(rX / rZ); % Angle in horizontal plane
-
-% Save results in data
-data.rX     = rX;
-data.rY     = rY;
-data.rZ     = rZ;
-data.rDir   = rDir;
-data.rMag   = rMag;
-data.rMagP  = rMagP;
-data.rPhi   = rPhi;
-data.rTheta = rTheta;
-data.rAlpha = rAlpha;
+data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
 end

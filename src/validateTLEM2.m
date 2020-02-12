@@ -10,23 +10,29 @@ end
         
 Results = repmat(struct('Subject', []), length(OL),1);
 
+g=9.81;
+
 for s = 1:length(OL)
     
 % Load body weight and HJF of OrthoLoad subjects
 % !!! Add the source of the mat files !!!
 load([OL(s).Subject '_' char(data.Posture) '.mat'],'meanPFP')
-OL(s).BodyWeight = meanPFP.Weight_N/9.81; % [N] to [kg]
+OL(s).BodyWeight = meanPFP.Weight_N/g; % [N] to [kg]
 
 OL(s).rMagP = norm(meanPFP.HJF_pBW);
 
-% The HJF of the OrthoLoad subjects is given in the [Bergmann 2016]
-% coordinate system (CS). The transformation from the TLEM CS [Wu 2002] 
-% to the [Bergmann 2016] CS is loaded and the inverse (=transpose) is 
+% The HJF of the OrthoLoad subjects is given in the OrthLoad coordinate 
+% system (CS) [Bergmann 2016]. The transformation from the TLEM CS  
+% [Wu 2002] to the OrthoLoad CS is loaded and the inverse (=transpose) is 
 % applied to the OrthoLoad HJF to transform the OrthoLoad HJF into the TLEM
 % CS.
+% !!! This is not correct. OrthoLoad CS has to be recalculated after
+% scaling !!!
+% !!! Better present the validation results in the OrthoLoad CS !!!
 load(['femur' data.TLEMversion 'Controls.mat'], 'fwTFM2AFCS')
 HJF_TLEM = transformPoint3d(meanPFP.HJF_pBW, fwTFM2AFCS(1:3,1:3)');
 
+OL(s).R_pBW = HJF_TLEM;
 OL(s).rPhi   = atand(HJF_TLEM(3) / HJF_TLEM(2));
 OL(s).rTheta = atand(HJF_TLEM(1) / HJF_TLEM(2));
 OL(s).rAlpha = atand(HJF_TLEM(1) / HJF_TLEM(3));
@@ -34,7 +40,7 @@ OL(s).rAlpha = atand(HJF_TLEM(1) / HJF_TLEM(3));
 data.S.Side                    = OL(s).Subject(end);
 data.S.BodyWeight              = OL(s).BodyWeight;
 data.S.BodyHeight              = OL(s).BodyHeight;
-data.S.PelvicTilt              = 0; % !!! No data available
+data.S.PelvicTilt              = 0; % !!! No data available !!!
 data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
 data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
 data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
@@ -64,22 +70,18 @@ Results(s).NeckLength     = OL(s).NeckLength;
 Results(s).CCD            = OL(s).CCD;
             
 % Force parameters
-Results(s).rX         = data.rX;
-Results(s).rY         = data.rY;
-Results(s).rZ         = data.rZ;
+Results(s).R_pBW      = 100 * [data.rX data.rY data.rZ] / (data.S.BodyWeight * g);
 Results(s).rMag       = data.rMag;
 Results(s).rMagP      = data.rMagP;
-Results(s).OrrMagP    = OL(s).rMagP;
-Results(s).errP       = abs((data.rMagP - OL(s).rMagP) / OL(s).rMagP * 100);
-Results(s).rPhi       = data.rPhi;          
-Results(s).OrPhi      = OL(s).rPhi;
-Results(s).errPhi     = abs(abs(data.rPhi) - abs(OL(s).rPhi));
+Results(s).rPhi       = data.rPhi;
 Results(s).rTheta     = data.rTheta;
-Results(s).OrTheta    = OL(s).rTheta;
-Results(s).errTheta   = abs(data.rTheta - OL(s).rTheta);
 Results(s).rAlpha     = data.rAlpha;
-Results(s).OrAlpha    = OL(s).rAlpha;
-Results(s).errAlpha   = abs(data.rAlpha - OL(s).rAlpha);
+
+Results(s).OL_R_pBW    = OL(s).R_pBW;
+Results(s).OL_rMagP    = OL(s).rMagP;
+Results(s).OL_Phi      = OL(s).rPhi;
+Results(s).OL_Theta    = OL(s).rTheta;
+Results(s).OL_Alpha    = OL(s).rAlpha;
 end
         
 end
