@@ -1,9 +1,5 @@
 function data = convertGlobalHJF2LocalHJF(R, data)
 
-if data.S.Side == 'L'
-    R(3) = -R(3);
-end
-
 switch data.View
     case 'Pelvis'
         % Joint angles of the pelvis
@@ -16,13 +12,22 @@ switch data.View
     otherwise
         error('Pelvis or Femur?')
 end
-TFMx = createRotationOx(deg2rad(jointAngles(1)));
-TFMy = createRotationOy(deg2rad(jointAngles(2)));
-TFMz = createRotationOz(deg2rad(jointAngles(3)));
+% Transform back into bone CS -> use negative joint angles
+switch data.S.Side
+    % Rotation around x axis depends on the side
+    case 'R'
+        TFMx = createRotationOx(deg2rad(-jointAngles(1)));
+    case 'L'
+        TFMx = createRotationOx(deg2rad( jointAngles(1)));
+end
+TFMy = createRotationOy(deg2rad(-jointAngles(2)));
+TFMz = createRotationOz(deg2rad(-jointAngles(3)));
+
 R = transformVector3d(R, TFMx*TFMy*TFMz);
 
-rMag = norm(R); % Magnitude of R
-rMagP = rMag / abs(data.S.BodyWeight) * 100; % Magnitude of R in % body weight
+% Convert to % body weight
+R=R/abs(data.S.BodyWeight*9.81) * 100;
+
 rDir = normalizeVector3d(R); % Direction of R
 
 rPhi   = atand(R(3)/R(2)); % Angle in frontal plane
@@ -34,8 +39,6 @@ data.rX     = R(1);
 data.rY     = R(2);
 data.rZ     = R(3);
 data.rDir   = rDir;
-data.rMag   = rMag;
-data.rMagP  = rMagP;
 data.rPhi   = rPhi;
 data.rTheta = rTheta;
 data.rAlpha = rAlpha;

@@ -70,12 +70,19 @@ Results(s).NeckLength     = OL(s).NeckLength;
 Results(s).CCD            = OL(s).CCD;
             
 % Force parameters
-Results(s).R_pBW      = 100 * [data.rX data.rY data.rZ] / (data.S.BodyWeight * g);
-Results(s).rMag       = data.rMag;
-Results(s).rMagP      = data.rMagP;
-Results(s).rPhi       = data.rPhi;
-Results(s).rTheta     = data.rTheta;
-Results(s).rAlpha     = data.rAlpha;
+% OrthoLoad HJF is presented for the right side for all subjects. Left
+% sides were mirrored. Hence, for left sides the simulated HJF is also
+% mirrored.
+switch data.S.Side
+    case 'R'
+        R=[data.rX data.rY data.rZ];
+    case 'L'
+        R=[data.rX data.rY -data.rZ];
+end
+Results(s).R_pBW      = R;
+Results(s).rPhi       = atand(R(3)/R(2));
+Results(s).rTheta     = atand(R(1)/R(2));
+Results(s).rAlpha     = atand(R(1)/R(3));
 
 Results(s).OL_R_pBW    = OL(s).R_pBW;
 Results(s).OL_rMagP    = OL(s).rMagP;

@@ -116,7 +116,6 @@ switch side
 end
 HM = transformTLEM2(HM, TFM);
 
-
 % Get muscle origin points and muscle insertion points
 NoAM = size(activeMuscles,1); % Number of active muscles
 [r, r_] = deal(nan(NoAM,3));
