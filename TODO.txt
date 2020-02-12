@@ -20,6 +20,7 @@ Muscle recruitment
 
 - Implement pelvic tilt based on APP instead of SISP [Wu2002]
 Scaling laws
+- Correct bone coordinate system after scaling
 - Implementierung des LBS für die Hüfte
 
 TODO GUI:

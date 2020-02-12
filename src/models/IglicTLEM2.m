@@ -1,7 +1,7 @@
 function funcHandles = IglicTLEM2
 % The model of [Iglic 1990] using the TLEM2 cadaver data instead of
 % Dostal's cadaver data. Some adaptions were necessary to solve the model
-% that question the validity of the [Iglic 1990] model. See below for 
+% that questions the validity of the [Iglic 1990] model. See below for 
 % further information.
 
 funcHandles.Posture     = @Posture;
@@ -215,7 +215,7 @@ end
 
 % Rotation matrices for local pelvic COS
 TFMx = createRotationOx(deg2rad(phi));
-TFMy = createRotationOy(0);
+TFMy = createRotationOy();
 TFMz = createRotationOz(deg2rad(pelvicTilt));
 
 if strcmp(view, 'Femur') == 1

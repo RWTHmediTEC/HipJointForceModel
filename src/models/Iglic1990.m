@@ -181,8 +181,8 @@ end
 
 % Rotation matrices for local pelvic COS
 TFMx = createRotationOx(deg2rad(phi));
-TFMy = createRotationOy(0);
-TFMz = createRotationOz(0);
+TFMy = createRotationOy();
+TFMz = createRotationOz();
 
 if strcmp(view, 'Femur') == 1
     rDir = -1 * rDir;

@@ -30,4 +30,16 @@ if strcmp(data.FemoralTransformation, 'Skinning')
     data = skinFemur(data);
 end
 
+%% Correct bone coordinate systems
+% Bone CSs may have changed due to scaling and have to be corrected
+boneCS_TFM = repmat(eye(4), 1, 1, 6);
+% Pelvis
+% TODO
+% Femur
+boneCS_TFM(:,:,2) = createFemurWu2002_TFM(...
+    data.S.LE(2).Landmarks.MedialEpicondyle.Pos,...
+    data.S.LE(2).Landmarks.LateralEpicondyle.Pos,...
+    data.S.LE(2).Joints.Hip.Pos);
+
+data.S.LE = transformTLEM2(data.S.LE, boneCS_TFM);
 end

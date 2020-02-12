@@ -22,7 +22,8 @@ OL(s).rMagP = norm(meanPFP.HJF_pBW);
 % The HJF of the OrthoLoad subjects is given in the [Bergmann 2016]
 % coordinate system (CS). The transformation from the TLEM CS [Wu 2002] 
 % to the [Bergmann 2016] CS is loaded and the inverse (=transpose) is 
-% applied to the OrthoLoad HJF to transform it into the TLEM CS.
+% applied to the OrthoLoad HJF to transform the OrthoLoad HJF into the TLEM
+% CS.
 load(['femur' data.TLEMversion 'Controls.mat'], 'fwTFM2AFCS')
 HJF_TLEM = transformPoint3d(meanPFP.HJF_pBW, fwTFM2AFCS(1:3,1:3)');
 

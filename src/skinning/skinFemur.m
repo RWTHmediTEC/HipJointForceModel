@@ -114,13 +114,13 @@ LE(2).Mesh = skinnedMesh;
 LE(2).Joints.Hip.Pos = newControls(1,:);
 % !!! Positions of the knee joint and axis have to be updated, too !!!
 % Muscles
-    muscles = fieldnames(LE(2).Muscle);
-    for m = 1:length(muscles)
-        for n = 1:length(LE(2).Muscle.(muscles{m}).Type)
-            trans = LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:) - data.T.LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:);
-            LE(2).Muscle.(muscles{m}).Pos(n,:) = LE(2).Muscle.(muscles{m}).Pos(n,:) + trans;
-        end
+muscles = fieldnames(LE(2).Muscle);
+for m = 1:length(muscles)
+    for n = 1:length(LE(2).Muscle.(muscles{m}).Type)
+        trans = LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:) - data.T.LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:);
+        LE(2).Muscle.(muscles{m}).Pos(n,:) = LE(2).Muscle.(muscles{m}).Pos(n,:) + trans;
     end
+end
     
 data.S.LE(2) = LE(2);
 

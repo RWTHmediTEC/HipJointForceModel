@@ -35,11 +35,11 @@ H_Light(1) = light(axH); light(axH, 'Position', -1*(get(H_Light(1),'Position')))
 
 % Visualize joint axes
 if visJoints
-    % pointProps.Marker          = 'o';
-    % pointProps.MarkerSize      = 5;
-    % pointProps.LineStyle       = 'none';
-    % pointProps.MarkerEdgeColor = 'k';
-    % pointProps.MarkerFaceColor = 'k';
+    pointProps.Marker          = 'o';
+    pointProps.MarkerSize      = 5;
+    pointProps.LineStyle       = 'none';
+    pointProps.MarkerEdgeColor = 'k';
+    pointProps.MarkerFaceColor = 'k';
     for b = 2:length(LE)
         % Get joints of the bone
         joints = fieldnames(LE(b).Joints);
@@ -48,11 +48,11 @@ if visJoints
                 jCenter = LE(b).Joints.(joints{j}).Pos;
                 jAxis = LE(b).Joints.(joints{j}).Axis;
                 % Draw joint center
-                % drawPoint3d(axH, jCenter, pointProps);
+                drawPoint3d(axH, jCenter, pointProps);
                 jAxisOrigin = jCenter - 60 * jAxis;
-                % jAxisEnd = jAxisOrigin + 120 * jAxis;
-                % text(axH, jAxisEnd(1), jAxisEnd(2), jAxisEnd(3), joints{j});
-                quiver3D(axH, jAxisOrigin, 120 * jAxis, rand(1,3), 0.9);
+                jAxisEnd = jAxisOrigin + 120 * jAxis;
+                text(axH, jAxisEnd(1), jAxisEnd(2), jAxisEnd(3), joints{j});
+                quiver3D(axH, jAxisOrigin, 120 * jAxis, 'g', 0.9);
             end
         end
     end

@@ -291,7 +291,7 @@ gui.Home.Model.Panel_Model = uix.Panel('Parent', gui.Home.Model.Layout_V,...
 % Get models
 models = dir('src\models\*.m');
 [~, models] = arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
-data.Model = models{3};
+data.Model = models{1};
 postures ={}; default=nan;
 updateModel()
 gui.Home.Model.ListBox_Model = uicontrol( 'Parent', gui.Home.Model.Panel_Model,...
@@ -347,6 +347,7 @@ gui.Home.Visualization.Panel_Visualization = uix.Panel('Parent', gui.Home.Visual
 
 gui.Home.Visualization.Axis_Visualization = axes('Parent', gui.Home.Visualization.Panel_Visualization);
 
+data = scaleTLEM2(data);
 data = globalizeTLEM2(data);
 visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Visualization.Axis_Visualization, 'Muscles', data.activeMuscles);
 
