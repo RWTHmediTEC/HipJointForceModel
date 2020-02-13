@@ -19,8 +19,6 @@ for s = 1:length(OL)
 load([OL(s).Subject '_' char(data.Posture) '.mat'],'meanPFP')
 OL(s).BodyWeight = meanPFP.Weight_N/g; % [N] to [kg]
 
-OL(s).rMagP = norm(meanPFP.HJF_pBW);
-
 % The HJF of the OrthoLoad subjects is given in the OrthLoad coordinate system (CS) [Bergmann 2016].
 OL_rBW = transformPoint3d(meanPFP.HJF_pBW,medicalCoordinateSystemTFM('RAS','ASR'));
 
@@ -32,7 +30,7 @@ OL(s).rAlpha = atand(OL_rBW(1) / OL_rBW(3));
 data.S.Side                    = OL(s).Subject(end);
 data.S.BodyWeight              = OL(s).BodyWeight;
 data.S.BodyHeight              = OL(s).BodyHeight;
-data.S.PelvicTilt              = 0; % !!! No data available !!!
+data.S.PelvicTilt              = 0; % Not available for OrthoLoad subjects
 data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
 data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
 data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
@@ -78,7 +76,6 @@ Results(s).rTheta     = atand(R(1)/R(2));
 Results(s).rAlpha     = atand(R(1)/R(3));
 
 Results(s).OL_R_pBW    = OL(s).R_pBW;
-Results(s).OL_rMagP    = OL(s).rMagP;
 Results(s).OL_Phi      = OL(s).rPhi;
 Results(s).OL_Theta    = OL(s).rTheta;
 Results(s).OL_Alpha    = OL(s).rAlpha;

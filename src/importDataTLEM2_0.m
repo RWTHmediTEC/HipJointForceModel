@@ -1,6 +1,7 @@
 % Import TLEM 2.0 data and save as TLEM2_0.mat in data
 % including structure LE (Lower Extremity) and muscleList
 
+
 %% Look for old data
 if exist('data\TLEM2_0.mat','file')
     load('data\TLEM2_0.mat','LE','muscleList')
@@ -8,6 +9,7 @@ if exist('data\TLEM2_0.mat','file')
     old_muscleList=muscleList;
     clearvars LE muscleList;
 end
+
 
 %% Import .stl files
 tempFileName = 'TLEM 2.0 - Bones - Local Reference Frame - ';
@@ -26,8 +28,9 @@ for b = 1:NoB
         stlRead([tempFileName Bones{b} BoneSuffix{b} '.stl']);
 end
 
+
 %% Import joint centers
-[~,~,jRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A6 - Joint Center and Axes.xlsx');
+jRaw = readcell('TLEM 2.0 - Musculoskeletal Model Dataset - Table A6 - Joint Center and Axes.xlsx');
 % Delete the first 3 lines
 jRaw(1:3,:) = [];
 % Delete lines only containing "nan"
@@ -66,22 +69,24 @@ for j = 1:size(jRaw,1)/2
     LE(childIdx).Parent = find(ismember({LE.Name},jRaw(j*2-1,2)));
 end
 
+
 %% Import muscle elements including PCSA (Physiological Cross-Sectional Areas)
-[~,~,mRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A3 - Muscle-tendon lines-of-action.xlsx');
-[~,~,aRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A7 - Muscle-tendon architecture.xlsx');
+mRaw = readcell('TLEM 2.0 - Musculoskeletal Model Dataset - Table A3 - Muscle-tendon lines-of-action.xlsx');
+lRaw = readcell('TLEM 2.0 - Musculoskeletal Model Dataset - Table 1 - Muscle list.xlsx');
+aRaw = readcell('TLEM 2.0 - Musculoskeletal Model Dataset - Table A7 - Muscle-tendon architecture.xlsx');
 % Change RectusFemoris for consistency
 aRaw(123:124,1) = {'RectusFemoris1', 'RectusFemoris2'};
 % Delete the first 2 lines
 mRaw(1:2,:) = [];
 aRaw(1:2,:) = [];
-% Delete columns containing just "nan"
-mRaw(:,sum(cellfun('isclass', mRaw, 'char'))==0) = [];
+lRaw(1:2,:) = [];
 % Replace nan by ''
 mRaw(~cellfun('isclass', mRaw(:,1), 'char'),1) = {''};
 mRaw(~cellfun('isclass', mRaw(:,2), 'char'),2) = {''};
 % Erase spaces
 mRaw(:,1:2) = erase(mRaw(:,1:2),' ');
 muscleList = mRaw(:,1);
+lRaw(:,1) = erase(lRaw(:,1),' ');
 % Fill missing names
 mRaw(:,1:2) = fillmissing(mRaw(:,1:2),'previous');
 % Special case: PsoasMajor starts with a Via point and not with Origin
@@ -120,6 +125,10 @@ for m = 1:length(muscleList)
     musclePCSA = unique(cell2mat(muscleData(:,5)));
     assert(length(musclePCSA)==1)
     muscleList{m,5} = muscleList{m,4} * musclePCSA * 100; % [cm²] to [mm²]
+    % add lines of action
+    if isequal(lRaw(m,1), muscleList(m,1))
+        muscleList(m,6) = lRaw(m,3);
+    end
 end
 
 % Fascicle list
@@ -127,7 +136,7 @@ fascicleList = mRaw(:,2);
 
 for b = 1:NoB
     LE(b).Muscle = [];
-    % Get the muscles that are conneted to the bone
+    % Get the muscles that are connected to the bone
     mIdx = find(ismember(string(mRaw(:,4)), Bones{1,b}));
     Fascicles = fascicleList(mIdx);
     for m = 1:length(mIdx)
@@ -156,8 +165,47 @@ for m = 1:length(Fascicles)
 %     D = [D; d];
 end
 
+
+%% Import wrapping surfaces
+sRaw = readcell('TLEM 2.0 - Musculoskeletal Model Dataset - Table A5 - Wrapping Surfaces.xlsx');
+% Delete 3 first rows
+sRaw(1:3,:) = [];
+% Erase spaces
+sRaw(:,1) = erase(sRaw(:,1),' ');
+
+surfaceList = sRaw;
+% Add surface data (center, axis and radius of the cylinder) to data struct        
+for s = 1:size(sRaw,1)    
+    for b = 1:size(LE,2)
+        if isequal(sRaw{s,2},LE(b).Name)
+            LE(b).Surface.(surfaceList{s}).Center = cell2mat(sRaw(s,3:5))*1000;
+            LE(b).Surface.(surfaceList{s}).Axis = cell2mat(sRaw(s,6:8));
+            LE(b).Surface.(surfaceList{s}).Radius = cell2mat(sRaw(s,9))*1000;
+        end
+    end
+end
+% add muscles to surface they wrap over
+LE(1).Surface.GluteusMaximus.Muscles = 		{'GluteusMaximusInferior'; ...
+											'GluteusMaximusSuperior'};
+LE(2).Surface.Iliopsoas.Muscles = 			{'IliacusLateralis'; ...
+											'IliacusMedialis'; ...
+											'IliacusMid'; ...
+											'RectusFemoris'; ...
+											'PsoasMajor'};
+LE(2).Surface.QuadricepsFemoris.Muscles = 	{'VastusIntermedius'; ...
+											'VastusLateralisInferior'; ...
+											'VastusLateralisSuperior'; ...
+											'VastusMedialisInferior'; ...
+											'VastusMedialisMid'; ...
+											'VastusMedialisSuperior'; ...
+											'RectusFemoris'};
+LE(2).Surface.Gastrocnemius.Muscles = 		{'GastrocnemiusLateralis'; ...
+											'GastrocnemiusMedialis'; ...
+											'Plantaris'};
+
+                                        
 %% Import bony landmarks
-[~,~,lRaw] = xlsread('TLEM 2.0 - Musculoskeletal Model Dataset - Table A2 - Bony landmarks.xlsx');
+lmRaw = readcell('TLEM 2.0 - Musculoskeletal Model Dataset - Table A2 - Bony landmarks.xlsx');
 
 for b = 1:NoB
     LE(b).Landmarks = [];
@@ -169,11 +217,11 @@ REQ(2,1:7)  = deal(1);
 REQ(2,8:11) = deal(2); % More landmarks can be added here
 
 % Erase spaces
-lRaw(REQ(1,1:length(REQ))) = erase(lRaw(REQ(1,1:length(REQ))),' ');
+lmRaw(REQ(1,1:length(REQ))) = erase(lmRaw(REQ(1,1:length(REQ))),' ');
 
 % Create landmark fields including coordinates
 for r = 1:length(REQ)
-    LE(REQ(2,r)).Landmarks.(lRaw{REQ(1,r)}).Pos = cell2mat(lRaw(REQ(1,r),2:4))*1000; % [m] to [mm]
+    LE(REQ(2,r)).Landmarks.(lmRaw{REQ(1,r)}).Pos = cell2mat(lmRaw(REQ(1,r),2:4))*1000; % [m] to [mm]
 end
 
 % Save node closest to landmark
