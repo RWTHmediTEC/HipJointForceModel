@@ -78,11 +78,11 @@ data.T.Scale(1).PelvicDepth =...
 % CCD            = Angle between neck axis and straight femur axis
 
 % Load controls [Bergmann2016]
-load(['femur' data.TLEMversion 'Controls'], 'Controls', 'LMIdx')
+load(['femur' data.TLEMversion 'Controls'], 'Controls')
 % Construct reference line to measure femoral version
 postConds = [...
-    data.T.LE(2).Mesh.vertices(LMIdx.MedialPosteriorCondyle,:);...
-    data.T.LE(2).Mesh.vertices(LMIdx.LateralPosteriorCondyle,:)];
+    data.T.LE(2).Landmarks.MedialPosteriorCondyle.Pos;...
+    data.T.LE(2).Landmarks.LateralPosteriorCondyle.Pos];
 transversePlane = createPlane(Controls(3,:), Controls(2,:) - Controls(3,:));
 projPostCond = projPointOnPlane(postConds, transversePlane);
 projPostCondLine = createLine3d(projPostCond(1,:), projPostCond(2,:));

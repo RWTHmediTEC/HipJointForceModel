@@ -20,7 +20,7 @@ end
 
 % Load TLEMversion controls
 % mat files are created with data\Skinning\femurTLEM2ConstructControls.m
-load(['femur' data.TLEMversion 'Controls'], 'Controls', 'LMIdx')
+load(['femur' data.TLEMversion 'Controls'], 'Controls')
 
 P = 1:size(Controls,1);
 
@@ -66,8 +66,9 @@ newControls(1,:) = newControls(1,:) + neckLengthAdjust *...
 
 % Construct reference lines to measure femoral version 
 postConds = transformPoint3d([...
-    LE(2).Mesh.vertices(LMIdx.MedialPosteriorCondyle,:);...
-    LE(2).Mesh.vertices(LMIdx.LateralPosteriorCondyle,:)], scaleFemur);
+    LE(2).Mesh.vertices(data.T.LE(2).Landmarks.MedialPosteriorCondyle.Node,:);...
+    LE(2).Mesh.vertices(data.T.LE(2).Landmarks.LateralPosteriorCondyle.Node,:)],...
+    scaleFemur);
 transversePlane = createPlane(newControls(3,:), newControls(2,:) - newControls(3,:));
 projPostCond = projPointOnPlane(postConds, transversePlane);
 % Posterior condyle line projected onto the transverse plane

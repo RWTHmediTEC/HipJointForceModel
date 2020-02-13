@@ -1,4 +1,4 @@
-function TFM = createFemurWu2002_TFM(MEC, LEC, HJC)
+function TFM = createFemurCS_TFM_Wu2002(MEC, LEC, HJC)
 % Midpoint between the epicondyles
 MEC_LEC_midPoint=midPoint3d(MEC, LEC);
 % Mechanical axis is the connection of EC midpoint and hip joint center

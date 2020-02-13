@@ -42,7 +42,7 @@ end
 % See createDataTLEM2.m for the exact definitions
 
 % Pelvic parameters
-TFM = createSISP_TFM(OL(s).LM.ASIS_L, OL(s).LM.ASIS_R, OL(s).LM.PSIS_L, OL(s).LM.PSIS_R);
+TFM = createPelvisCS_TFM_Wu2002(OL(s).LM.ASIS_L, OL(s).LM.ASIS_R, OL(s).LM.PSIS_L, OL(s).LM.PSIS_R);
 
 ASIS_IL = transformPoint3d(OL(s).LM.(['ASIS_' Side_IL]), TFM);
 ASIS_CL = transformPoint3d(OL(s).LM.(['ASIS_' Side_CL]), TFM);

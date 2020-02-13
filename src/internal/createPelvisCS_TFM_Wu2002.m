@@ -1,5 +1,6 @@
-function TFM = createSISP_TFM(ASIS_R, ASIS_L, PSIS_R, PSIS_L,varargin)
-% Construct the pelvic SISP coordinate system recommended by the ISB [Wu 2002]
+function TFM = createPelvisCS_TFM_Wu2002(ASIS_R, ASIS_L, PSIS_R, PSIS_L,varargin)
+% Construct the pelvic superior iliac spine plane (SISP) coordinate system 
+% recommended by the ISB [Wu 2002]
 
 p = inputParser;
 isPoint3d = @(x) validateattributes(x,{'numeric'},...

@@ -180,8 +180,8 @@ end
 pelvisNS = createns(LE(1).Mesh.vertices);
 landmarksPelvis = fieldnames(LE(1).Landmarks);
 % [IDX,D] = deal([]);
-for l = 1:length(landmarksPelvis)
-    LE(1).Landmarks.(landmarksPelvis{l}).Node = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{l}).Pos);
+for lm = 1:length(landmarksPelvis)
+    LE(1).Landmarks.(landmarksPelvis{lm}).Node = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{lm}).Pos);
 % %     [idx, d] = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{l}).Pos);
 % %     IDX = [IDX; idx];
 % %     D = [D; d];
@@ -189,32 +189,60 @@ end
 
 landmarksFemur = fieldnames(LE(2).Landmarks);
 % [IDX,D] = deal([]);
-for l = 1:length(landmarksFemur)
-    LE(2).Landmarks.(landmarksFemur{l}).Node = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{l}).Pos);
+for lm = 1:length(landmarksFemur)
+    LE(2).Landmarks.(landmarksFemur{lm}).Node = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{lm}).Pos);
 %     [idx, d] = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{l}).Pos);
 %     IDX = [IDX; idx];
 %     D = [D; d];
 end
 
-% Add additional user selected landmarks
-landmarks = {'AcetabularRoof';
-             'MostCranialIlium';
-             'MostCaudalIlium'
-             'MostMedialIlium';
-             'MostLateralIlium';};
- for l = 1:length(landmarks)
+%% Add additional landmarks
+% Pelvis
+% Manually detected landmarks
+manuLMpelvis = {'AcetabularRoof';...
+    'MostCranialIlium';'MostCaudalIschium';...
+    'MostMedialIlium';'MostLateralIlium'};
+ for lm = 1:size(manuLMpelvis,1)
      if exist('old_LE','var')
-         if isfield(old_LE(1).Landmarks, landmarks{l,1})
-             landmarks{l,2} = old_LE(1).Landmarks.(landmarks{l,1}).Pos;
+         if isfield(old_LE(1).Landmarks, manuLMpelvis{lm,1})
+             manuLMpelvis{lm,2} = old_LE(1).Landmarks.(manuLMpelvis{lm,1}).Pos;
          end
      end
  end
-landmarksOut = selectLandmarks(LE(1).Mesh,landmarks);
-
-for l = 1:length(landmarks)
-LE(1).Landmarks.(landmarksOut{l,1}).Pos  = cell2mat(landmarksOut(l,2));
-LE(1).Landmarks.(landmarksOut{l,1}).Node = cell2mat(landmarksOut(l,3));
+manuLMpelvis = selectLandmarks(LE(1).Mesh, manuLMpelvis);
+for lm = 1:size(manuLMpelvis,1)
+    LE(1).Landmarks.(manuLMpelvis{lm,1}).Pos  = manuLMpelvis{lm,2};
+    LE(1).Landmarks.(manuLMpelvis{lm,1}).Node = manuLMpelvis{lm,3};
 end
+
+
+% Femur
+% Manually detected landmarks
+manuLMfemur = {'IntercondylarNotch'}; 
+ for lm = 1:length(manuLMfemur)
+     if exist('old_LE','var')
+         if isfield(old_LE(2).Landmarks, manuLMfemur{lm,1})
+             manuLMfemur{lm,2} = old_LE(2).Landmarks.(manuLMfemur{lm,1}).Pos;
+         end
+     end
+ end
+manuLMfemur = selectLandmarks(LE(2).Mesh, manuLMfemur);
+for lm = 1:size(manuLMfemur,1)
+    LE(2).Landmarks.(manuLMfemur{lm,1}).Pos  = manuLMfemur{lm,2};
+    LE(2).Landmarks.(manuLMfemur{lm,1}).Node = manuLMfemur{lm,3};
+end
+
+% Automatically detected landmarks
+addpath('D:\Biomechanics\Hip\Code\AutomaticFemoralCoordinateSystem')
+[~, autoLMIdx] = automaticFemoralCS(LE(2).Mesh, 'r',...
+    'definition', 'Bergmann2016', 'visu', true, 'verbose', true);
+% save('data\TLEM2_femurLandmarks.mat', 'automaticLMIdx')
+autoLMfemur={'MedialPosteriorCondyle';'LateralPosteriorCondyle';'NeckAxis';'ShaftAxis'};
+for lm = 1:size(autoLMfemur,1)
+    LE(2).Landmarks.(autoLMfemur{lm}).Pos  = LE(2).Mesh.vertices(autoLMIdx.(autoLMfemur{lm})',:);
+    LE(2).Landmarks.(autoLMfemur{lm}).Node = autoLMIdx.(autoLMfemur{lm})';
+end
+
 
 %% Save data
 save('data\TLEM2_0.mat', 'LE', 'muscleList')

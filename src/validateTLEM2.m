@@ -21,20 +21,13 @@ OL(s).BodyWeight = meanPFP.Weight_N/g; % [N] to [kg]
 
 OL(s).rMagP = norm(meanPFP.HJF_pBW);
 
-% The HJF of the OrthoLoad subjects is given in the OrthLoad coordinate 
-% system (CS) [Bergmann 2016]. The transformation from the TLEM CS  
-% [Wu 2002] to the OrthoLoad CS is loaded and the inverse (=transpose) is 
-% applied to the OrthoLoad HJF to transform the OrthoLoad HJF into the TLEM
-% CS.
-% !!! OrthoLoad CS has to be recalculated after scaling !!!
-% !!! Better present the validation results in the OrthoLoad CS !!!
-load(['femur' data.TLEMversion 'Controls.mat'], 'fwTFM2AFCS')
-HJF_TLEM = transformPoint3d(meanPFP.HJF_pBW, fwTFM2AFCS(1:3,1:3)');
+% The HJF of the OrthoLoad subjects is given in the OrthLoad coordinate system (CS) [Bergmann 2016].
+OL_rBW = transformPoint3d(meanPFP.HJF_pBW,medicalCoordinateSystemTFM('RAS','ASR'));
 
-OL(s).R_pBW = HJF_TLEM;
-OL(s).rPhi   = atand(HJF_TLEM(3) / HJF_TLEM(2));
-OL(s).rTheta = atand(HJF_TLEM(1) / HJF_TLEM(2));
-OL(s).rAlpha = atand(HJF_TLEM(1) / HJF_TLEM(3));
+OL(s).R_pBW  = OL_rBW;
+OL(s).rPhi   = atand(OL_rBW(3) / OL_rBW(2));
+OL(s).rTheta = atand(OL_rBW(1) / OL_rBW(2));
+OL(s).rAlpha = atand(OL_rBW(1) / OL_rBW(3));
             
 data.S.Side                    = OL(s).Subject(end);
 data.S.BodyWeight              = OL(s).BodyWeight;
@@ -72,6 +65,7 @@ Results(s).CCD            = OL(s).CCD;
 % OrthoLoad HJF is presented for the right side for all subjects. Left
 % sides were mirrored. Hence, for left sides the simulated HJF is also
 % mirrored.
+% !!! Simulated HJF has to be transformed into the OrthoLoad CS for comparison !!!
 switch data.S.Side
     case 'R'
         R=[data.rX data.rY data.rZ];

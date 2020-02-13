@@ -4,7 +4,7 @@ addpath(genpath('..\..\..\HipJointReactionForceModel'))
 
 fileFolder=fullfile(fileparts([mfilename('fullpath'), '.m']));
 
-TLEMversion = 'TLEM2_0';
+TLEMversion = 'TLEM2_1';
 
 % Load original data
 switch TLEMversion
@@ -26,47 +26,32 @@ switch TLEMversion
         error('No valid TLEM version')
 end
 
-%% Manual landmarks
-femur = LE(2).Mesh;
-% Correction of some of the landmarks
-landmarksIn{1,1} = 'IntercondylarNotch';
-if exist([fileFolder '\femurTLEM2manualLandmarks.mat'], 'file')
-    load([fileFolder '\femurTLEM2manualLandmarks.mat'], 'manuaLMIdx')
-    landmarksIn{1,2}=femur.vertices(manuaLMIdx.IntercondylarNotch,:);
-    landmarksIn{1,3}=manuaLMIdx.IntercondylarNotch; 
-end
-landmarksOut = selectLandmarks(femur, landmarksIn);
-manuaLMIdx.(landmarksIn{1,1}) = landmarksOut{1,3};
-save([fileFolder '\femurTLEM2manualLandmarks.mat'], 'manuaLMIdx')
 
-%% Automatic femoral coordinate system
+femur = LE(2).Mesh;
 HJC = LE(2).Joints.Hip.Pos;
-if ~exist([fileFolder '\femur' TLEMversion 'Controls.mat'], 'file')
-    addpath('D:\Biomechanics\Hip\Code\AutomaticFemoralCoordinateSystem')
-    [TFM2femoralCS.Bergmann2016, LMIdx] = automaticFemoralCS(femur, 'r', 'HJC', HJC,...
-        'definition', 'Bergmann2016', 'visu', true, 'verbose', true);
-    save([fileFolder '\femur' TLEMversion 'Controls.mat'], 'TFM2femoralCS', 'LMIdx')
-end
+
 
 %% Construct controls
 load([fileFolder '\femur' TLEMversion 'Controls.mat'])
 
 % Replace automatic detected ICN with manual detected ICN
-LMIdx.IntercondylarNotch=manuaLMIdx.IntercondylarNotch;
-LMIdx.GreaterTrochanter=LE(2).Landmarks.GreaterTrochanter.Node;
-LMIdx.LesserTrochanter=LE(2).Landmarks.LesserTrochanter.Node;
+ICN_Idx=LE(2).Landmarks.IntercondylarNotch.Node;
+GT_Idx=LE(2).Landmarks.GreaterTrochanter.Node;
+LT_Idx=LE(2).Landmarks.LesserTrochanter.Node;
+NeckAxis_Idx=LE(2).Landmarks.NeckAxis.Node;
+ShaftAxis_Idx=LE(2).Landmarks.ShaftAxis.Node;
 
 % Construction of P1 [Bergmann 2016]
-neckAxis = createLine3d(femur.vertices(LMIdx.NeckAxis(1),:), femur.vertices(LMIdx.NeckAxis(2),:));
-shaftAxis = createLine3d(femur.vertices(LMIdx.ShaftAxis(1),:), femur.vertices(LMIdx.ShaftAxis(2),:));
+neckAxis = createLine3d(femur.vertices(NeckAxis_Idx(1),:), femur.vertices(NeckAxis_Idx(2),:));
+shaftAxis = createLine3d(femur.vertices(ShaftAxis_Idx(1),:), femur.vertices(ShaftAxis_Idx(2),:));
 [~, P1, ~] = distanceLines3d(neckAxis, shaftAxis);
 
 % Controls
 Controls(1,:) = projPointOnLine3d(HJC,neckAxis); % hip joint center projected on neck axis
 Controls(2,:) = P1; % straight femur axis (proximal point: P1) [Bergmann2016]
-Controls(3,:) = femur.vertices(LMIdx.IntercondylarNotch,:); % straight femur axis (distal point: P2) [Bergmann2016]
-Controls(4,:) = femur.vertices(LMIdx.GreaterTrochanter,:);
-Controls(5,:) = femur.vertices(LMIdx.LesserTrochanter,:);
+Controls(3,:) = femur.vertices(ICN_Idx,:); % straight femur axis (distal point: P2) [Bergmann2016]
+Controls(4,:) = femur.vertices(GT_Idx,:);
+Controls(5,:) = femur.vertices(LT_Idx,:);
 
 BE = [1,2; 2,3; 2,4; 2,5];
 
@@ -93,4 +78,4 @@ medicalViewButtons('ASR')
 drawLine3d(neckAxis, 'Color', 'r');
 drawLine3d(shaftAxis, 'Color', 'r');
 
-save([fileFolder '\femur' TLEMversion 'Controls.mat'], 'TFM2femoralCS', 'LMIdx', 'Controls', 'BE')
+save([fileFolder '\femur' TLEMversion 'Controls.mat'], 'Controls', 'BE')
