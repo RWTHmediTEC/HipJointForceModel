@@ -1,6 +1,6 @@
 function data = skinFemur(data)
-% Linear blend skinning (LBS) of femur changing femoral length, femoral version,
-% CCD angle and neck length
+% Linear blend skinning (LBS) of femur changing femoral length, femoral 
+% version, CCD angle and neck length
 
 LE      = data.T.LE;
 T.Scale = data.T.Scale;
@@ -19,12 +19,14 @@ else
 end
 
 % Load TLEMversion controls
+% mat files are created with data\Skinning\femurTLEM2ConstructControls.m
 load(['femur' data.TLEMversion 'Controls'], 'Controls', 'LMIdx')
 
 P = 1:size(Controls,1);
 
 % Create TLEMversion weights
 if ~exist(['femur' data.TLEMversion 'Weights.mat'], 'file')
+    disp('Skinning weights are calculated. This may take a few minutes ...')
     % Compute boundary conditions
     [bVertices,bConditions] = boundary_conditions(LE(2).Mesh.vertices, LE(2).Mesh.faces, Controls, P);
     % Compute weights

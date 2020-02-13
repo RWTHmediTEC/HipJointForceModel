@@ -26,8 +26,7 @@ OL(s).rMagP = norm(meanPFP.HJF_pBW);
 % [Wu 2002] to the OrthoLoad CS is loaded and the inverse (=transpose) is 
 % applied to the OrthoLoad HJF to transform the OrthoLoad HJF into the TLEM
 % CS.
-% !!! This is not correct. OrthoLoad CS has to be recalculated after
-% scaling !!!
+% !!! OrthoLoad CS has to be recalculated after scaling !!!
 % !!! Better present the validation results in the OrthoLoad CS !!!
 load(['femur' data.TLEMversion 'Controls.mat'], 'fwTFM2AFCS')
 HJF_TLEM = transformPoint3d(meanPFP.HJF_pBW, fwTFM2AFCS(1:3,1:3)');
