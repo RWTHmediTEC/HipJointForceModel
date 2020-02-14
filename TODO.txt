@@ -22,10 +22,8 @@ Scaling laws
 - Implement LBS for the pelvis bone
 
 TODO GUI:
-- Home Tab: Results: Verify visualization of HJF in local femur or pelvis CS
 - Validation Tab: Add y unit [%BW] or [°] to axes
 - Validation Tab: Add option to switch between [Bergmann 2016] and [Wu 2002] femur bone CS
-- Home Tab: Results: Transverse view for pelvis: axis are wrong?
 - Home Tab: Settings: Option to visualize other cadaver data in visualization window
 
 VALIDATION:

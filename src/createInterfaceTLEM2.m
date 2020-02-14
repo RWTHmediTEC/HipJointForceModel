@@ -1080,53 +1080,58 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 %% Box panel results
 
     function updateResults
+        delete([...
+            gui.Home.Results.Axis_FrontalView   .Children,...
+            gui.Home.Results.Axis_SagittalView  .Children,...
+            gui.Home.Results.Axis_TransverseView.Children])
+        
+        visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_FrontalView,...
+            'Bones', find(strcmp({data.S.LE.Name}, data.View)));
+        visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_SagittalView,...
+            'Bones', find(strcmp({data.S.LE.Name}, data.View)));
+        visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_TransverseView,...
+            'Bones', find(strcmp({data.S.LE.Name}, data.View)));
+        
+        gui.Home.Results.Axis_FrontalView.View = [90 ,0];
+        gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
+        
+        switch data.S.Side
+            case 'R'
+                gui.Home.Results.Axis_SagittalView.View = [0, 90];
+            case 'L'
+                gui.Home.Results.Axis_SagittalView.View = [0, -90];
+        end
+        gui.Home.Results.Axis_SagittalView.CameraUpVector = [0, 1, 0];
+        
+        switch data.View
+            case 'Pelvis'
+                gui.Home.Results.Axis_TransverseView.View = [0, 0];
+                gui.Home.Results.Axis_TransverseView.CameraUpVector = [1, 0, 0];
+            case 'Femur'
+                gui.Home.Results.Axis_TransverseView.View = [0, 180];
+                gui.Home.Results.Axis_TransverseView.CameraUpVector = [-1, 0, 0];
+        end
+        
         % Plot hip joint force vector
         if gui.IsUpdated
-            
-            delete([gui.Home.Results.Axis_FrontalView   .Children,...
-                    gui.Home.Results.Axis_SagittalView  .Children,...
-                    gui.Home.Results.Axis_TransverseView.Children])
-            
-            visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_FrontalView,...
-                'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-            visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_SagittalView,...
-                'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-            visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_TransverseView,...
-                'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-            
-            gui.Home.Results.Axis_FrontalView.View = [90 ,0];
-            gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
-                    
-            switch data.S.Side
-                case 'R'
-                    gui.Home.Results.Axis_SagittalView.View = [0, 90];
-                case 'L'
-                    gui.Home.Results.Axis_SagittalView.View = [0, -90];
-            end
-            gui.Home.Results.Axis_SagittalView.CameraUpVector = [0, 1, 0];
-            
+            rDir = normalizeVector3d(data.HJF.(data.View).Wu2002.R);
             switch data.View
                 case 'Pelvis'
-                    TransverseViewAngle = 0;
                     Dist2HJC = 55;
                 case 'Femur'
-                    TransverseViewAngle = 180;
                     Dist2HJC = 75;
             end
-            gui.Home.Results.Axis_TransverseView.View = [0, TransverseViewAngle];
-            gui.Home.Results.Axis_TransverseView.CameraUpVector = [-1, 0, 0];
+            drawArrow3d(gui.Home.Results.Axis_FrontalView,    -rDir*Dist2HJC, rDir*55, 'r')
+            drawArrow3d(gui.Home.Results.Axis_SagittalView,   -rDir*Dist2HJC, rDir*55, 'r')
+            drawArrow3d(gui.Home.Results.Axis_TransverseView, -rDir*Dist2HJC, rDir*55, 'r')
             
-            drawArrow3d(gui.Home.Results.Axis_FrontalView,    -data.rDir*Dist2HJC, data.rDir*55, 'r')
-            drawArrow3d(gui.Home.Results.Axis_SagittalView,   -data.rDir*Dist2HJC, data.rDir*55, 'r')
-            drawArrow3d(gui.Home.Results.Axis_TransverseView, -data.rDir*Dist2HJC, data.rDir*55, 'r')
-        
             set(gui.Home.Results.Label_post_antHJFpercBW,  'String', round(data.rX));
             set(gui.Home.Results.Label_inf_supHJFpercBW,   'String', round(data.rY));
             set(gui.Home.Results.Label_med_latHJFpercBW,   'String', round(data.rZ));
             set(gui.Home.Results.Label_FrontalAngle,       'String', abs(data.rPhi));
             set(gui.Home.Results.Label_SagittalAngle,      'String', abs(data.rTheta));
-            set(gui.Home.Results.Label_TransverseAngle,    'String', abs(data.rAlpha));     
-        
+            set(gui.Home.Results.Label_TransverseAngle,    'String', abs(data.rAlpha));
+            
             % Disable push button
             set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'g', 'Enable', 'off');
         else
@@ -1142,9 +1147,6 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         structfun(@(x) set(x,'XTick',1:length(data.Results)), gui.Validation.Axes)
         structfun(@(x) set(x,'XTickLabel',{data.Results.Subject}), gui.Validation.Axes)
         structfun(@(x) set(x,'XLim',[0.5, length(data.Results) + 0.5]), gui.Validation.Axes)
-
-        markerProps.Marker = 'x';
-        markerProps.Markersize = 7;
         
         invivo=reshape([data.Results.OL_R_pBW],[3,10])';
         simulated=reshape([data.Results.R_pBW],[3,10])';
@@ -1173,6 +1175,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             [data.Results(:).OL_Alpha]',[data.Results(:).rAlpha]')
         
         function plotValidationResults(singleHandle, boxPlotHandle, invivo, simulated)
+            markerProps.Marker = 'x';
+            markerProps.Markersize = 7;
             hold(singleHandle,'on');
             drawPoint(singleHandle, 1:length(invivo),    invivo,    'color', 'g', markerProps)
             drawPoint(singleHandle, 1:length(simulated), simulated, 'color', 'b', markerProps)

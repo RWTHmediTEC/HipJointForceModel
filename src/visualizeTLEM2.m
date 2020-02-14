@@ -1,17 +1,22 @@
 function visualizeTLEM2(LE, muscleList, axH, varargin)
 
-% Input parsing
+%% Input parsing
 p = inputParser;
 valFctBones = @(x) validateattributes(x, {'numeric'}, {'>=',1, '<=',length(LE)});
 addParameter(p, 'Bones', length(LE), valFctBones);
 addParameter(p, 'Joints', false, @islogical);
 addParameter(p, 'Muscles', {}, @iscell);
+addParameter(p, 'Surfaces', {}, @iscell);
+addParameter(p, 'ShowSurf', false, @islogical);
 parse(p, varargin{:});
 
 NoB = p.Results.Bones;
 visJoints = p.Results.Joints;
 visMuscles = p.Results.Muscles;
 if ~isempty(visMuscles); visMuscles=visMuscles(:,1); end
+Surfaces = p.Results.Surfaces;
+visSurfaces = p.Results.ShowSurf;
+
 
 %% Visualization of the model
 hold(axH,'on')
@@ -21,19 +26,24 @@ patchProps.FaceAlpha    = 1;
 patchProps.EdgeLighting = 'gouraud';
 patchProps.FaceLighting = 'gouraud';
 
-% Visualize bones
+%% Visualize bones
 if NoB == 1 || NoB == 2
-    meshHandle = patch(axH, LE(NoB).Mesh, patchProps);
+    % Draws bone only if its pelvis (1) or femur (2). Transforms bone back 
+    % to its local bone CS (-> neutral postion). Used for Frontal, Sagittal 
+    % and Transversal View in the Results panel.
+    patch(axH, transformPoint3d(LE(NoB).Mesh, inv(LE(NoB).TFM)), patchProps);
 else
+    % Draws all the bones. Used for Visualization panel
     for n = 1:NoB
-        meshHandle = zeros(NoB);
-        meshHandle(n) = patch(axH, LE(n).Mesh, patchProps);
+        patch(axH, LE(n).Mesh, patchProps);
     end
 end
 
-H_Light(1) = light(axH); light(axH, 'Position', -1*(get(H_Light(1),'Position')));
+% Lighting of the bones
+H_Light(1) = light(axH);
+light(axH, 'Position', -1*(get(H_Light(1),'Position')));
 
-% Visualize joint axes
+%% Visualize joint axes
 if visJoints
     pointProps.Marker          = 'o';
     pointProps.MarkerSize      = 5;
@@ -58,7 +68,7 @@ if visJoints
     end
 end
 
-% Visualize muscles
+%% Visualize muscles
 if ~isempty(visMuscles)
     lineProps.Marker = 'o';
     lineProps.MarkerSize = 2;
@@ -108,6 +118,28 @@ if ~isempty(visMuscles)
     end
 end
 
+%% Visualize wrapping cylinders
+if visSurfaces
+    if ~isempty(Surfaces)
+        for s = 1:size(Surfaces,1) % run through all the surfaces
+            for b = 1:2 % run through pelvis and femur (only bones with wrapping
+                if isequal(Surfaces{s,2},LE(b).Name)
+                    cCenter = LE(b).Surface.(Surfaces{s,1}).Center;
+                    cAxis   = LE(b).Surface.(Surfaces{s,1}).Axis;
+                    radius = LE(b).Surface.(Surfaces{s,1}).Radius;
+                    startPoint  = cCenter + cAxis * 160;
+                    endPoint    = cCenter;
+                    drawCylinder(axH, [startPoint, endPoint, radius], 'open', ...
+                        'FaceColor', 'red', ...
+                        'FaceAlpha', 0.2, ...
+                        'FaceLighting', 'gouraud');
+                end
+            end
+        end
+    end
+end
+
+%%
 axis(axH, 'equal', 'tight');
 xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
 
