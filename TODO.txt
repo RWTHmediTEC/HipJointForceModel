@@ -17,26 +17,25 @@ Muscle path models
 - Store calculation of muscle vectors / moment arms in single function
 Muscle recruitment
 - Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
-
-- Implement pelvic tilt based on APP instead of SISP [Wu2002]
 Scaling laws
-- Correct bone coordinate system after scaling
-- Implementierung des LBS für die Hüfte
+- Verify LBS for OrthoLoad subjects
+- Implement LBS for the pelvis bone
 
 TODO GUI:
-- Add y unit in Validation Tab
-- Verify visualization of HJF in local femur or pelvis CS
-- Option to visualize other cadaver data in visualization window
+- Home Tab: Results: Verify visualization of HJF in local femur or pelvis CS
+- Validation Tab: Add y unit [%BW] or [°] to axes
+- Validation Tab: Add option to switch between [Bergmann 2016] and [Wu 2002] femur bone CS
+- Home Tab: Results: Transverse view for pelvis: axis are wrong?
+- Home Tab: Settings: Option to visualize other cadaver data in visualization window
 
 VALIDATION:
-- Source of the OrthoLoad force data
+- Source of the OrthoLoad force data should be documented
 - Greater Trochanter of H4L is missing
 
 TOTEST:
 - Time consumption of single functions (tic toc)
 
 NOTES:
-- Landmarke GT für Subject H4L fehlt
 - Review lines of action:
 	rectusfemoris
 	tensorfasciaelatae

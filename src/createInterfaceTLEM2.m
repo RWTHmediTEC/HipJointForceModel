@@ -1107,16 +1107,18 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             
             switch data.View
                 case 'Pelvis'
-                    TransverseViewAngle = 0;                    
+                    TransverseViewAngle = 0;
+                    Dist2HJC = 55;
                 case 'Femur'
                     TransverseViewAngle = 180;
+                    Dist2HJC = 75;
             end
             gui.Home.Results.Axis_TransverseView.View = [0, TransverseViewAngle];
             gui.Home.Results.Axis_TransverseView.CameraUpVector = [-1, 0, 0];
             
-            drawArrow3d(gui.Home.Results.Axis_FrontalView,    -data.rDir*75, data.rDir*55, 'r')
-            drawArrow3d(gui.Home.Results.Axis_SagittalView,   -data.rDir*75, data.rDir*55, 'r')
-            drawArrow3d(gui.Home.Results.Axis_TransverseView, -data.rDir*75, data.rDir*55, 'r')
+            drawArrow3d(gui.Home.Results.Axis_FrontalView,    -data.rDir*Dist2HJC, data.rDir*55, 'r')
+            drawArrow3d(gui.Home.Results.Axis_SagittalView,   -data.rDir*Dist2HJC, data.rDir*55, 'r')
+            drawArrow3d(gui.Home.Results.Axis_TransverseView, -data.rDir*Dist2HJC, data.rDir*55, 'r')
         
             set(gui.Home.Results.Label_post_antHJFpercBW,  'String', round(data.rX));
             set(gui.Home.Results.Label_inf_supHJFpercBW,   'String', round(data.rY));
@@ -1143,7 +1145,6 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 
         markerProps.Marker = 'x';
         markerProps.Markersize = 7;
-        
         
         invivo=reshape([data.Results.OL_R_pBW],[3,10])';
         simulated=reshape([data.Results.R_pBW],[3,10])';

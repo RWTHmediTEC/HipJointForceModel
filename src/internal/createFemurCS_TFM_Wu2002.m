@@ -1,4 +1,4 @@
-function TFM = createFemurCS_TFM_Wu2002(MEC, LEC, HJC)
+function TFM = createFemurCS_TFM_Wu2002(MEC, LEC, HJC,side)
 % Midpoint between the epicondyles
 MEC_LEC_midPoint=midPoint3d(MEC, LEC);
 % Mechanical axis is the connection of EC midpoint and hip joint center
@@ -11,5 +11,10 @@ X = normalizeVector3d(crossProduct3d(MechanicalAxis(4:6), EpicondyleAxis(4:6)));
 Z = normalizeVector3d(crossProduct3d(X, Y));
 
 TFM = inv([[inv([X; Y; Z]), HJC']; [0 0 0 1]]);
+
+switch side
+    case 'L'
+        TFM=createRotationOy(pi)*TFM; %#ok<MINV>
+end
 
 end

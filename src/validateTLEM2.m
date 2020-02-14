@@ -19,8 +19,9 @@ for s = 1:length(OL)
 load([OL(s).Subject '_' char(data.Posture) '.mat'],'meanPFP')
 OL(s).BodyWeight = meanPFP.Weight_N/g; % [N] to [kg]
 
-% The HJF of the OrthoLoad subjects is given in the OrthLoad coordinate system (CS) [Bergmann 2016].
-OL_rBW = transformPoint3d(meanPFP.HJF_pBW,medicalCoordinateSystemTFM('RAS','ASR'));
+% The HJF of the OrthoLoad subjects is given in the OrthLoad CS [Bergmann 2016].
+% Use definition 'ASR' [Wu 2002] instead of 'RAS' [Bergmann 2016].
+OL_rBW = transformVector3d(meanPFP.HJF_pBW,medicalCoordinateSystemTFM('RAS','ASR'));
 
 OL(s).R_pBW  = OL_rBW;
 OL(s).rPhi   = atand(OL_rBW(3) / OL_rBW(2));
@@ -61,17 +62,16 @@ Results(s).CCD            = OL(s).CCD;
             
 % Force parameters
 
-% Transformed simulated HJF from [Wu 2002] to the OrthoLoad CS [Bergmann 2016]
-% TODO
+% Use simulated HJF in the OrthoLoad CS [Bergmann 2016] for the comparison
+% Use definition 'ASR' [Wu 2002] instead of 'RAS' [Bergmann 2016].
+R=transformVector3d(data.HJF.Femur.Bergmann2016.R, medicalCoordinateSystemTFM('RAS','ASR'));
 
 % OrthoLoad HJF is presented for the right side for all subjects. Left
 % sides were mirrored. Hence, for left sides the simulated HJF is also
 % mirrored.
 switch data.S.Side
-    case 'R'
-        R=[data.rX data.rY data.rZ];
     case 'L'
-        R=[data.rX data.rY -data.rZ];
+        R(3)=-R(3);
 end
 Results(s).R_pBW      = R;
 Results(s).rPhi       = atand(R(3)/R(2));

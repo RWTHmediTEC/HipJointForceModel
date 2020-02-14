@@ -35,8 +35,8 @@ end
 boneCS_TFM = repmat(eye(4), 1, 1, 6);
 % Pelvis
 boneCS_TFM(:,:,1) = createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE);
-% Femur
-boneCS_TFM(:,:,2) = createFemurCS_TFM_Wu2002_TLEM2(data.S.LE);
+% Femur. Should be always the right side 'R' before scaling.
+boneCS_TFM(:,:,2) = createFemurCS_TFM_Wu2002_TLEM2(data.S.LE,'R');
 
 data.S.LE = transformTLEM2(data.S.LE, boneCS_TFM);
 end
