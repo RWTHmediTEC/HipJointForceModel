@@ -83,7 +83,7 @@ view          = data.View;
 
 %% Define Parameters
 G = -9.81;                         % Weight force
-[HM, Scale] = Dostal1981('visu',0);
+[HM, Scale] = Dostal1981('visu',1);
 l_ref = 1/2 * Scale(1).HipJointWidth;
 x0 = Scale(2).FemoralLength;
 WB = BW * G;                       % total body weight

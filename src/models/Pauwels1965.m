@@ -84,12 +84,11 @@ function data = Calculation(data)
 
 % Inputs
 Side              = data.S.Side;
-View              = data.View;
 
 %% Define parameters
 G = -9.81; % Weight force
 
-[S, S5, abc] = derivationFromBrauneAndFischer189X; 
+[~, S5, abc] = derivationFromBrauneAndFischer189X; 
 
 [BO, alphaM] = derivationFromFick1850;
 % BO = 40; % Moment arm of the muscle force M [Pauwels 1965, S.111]

@@ -138,7 +138,8 @@ if visu
     axis(axH, 'equal', 'tight'); 
     grid(axH, 'minor');
     xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
-    medicalViewButtons(axH,'PIR')
+    title(axH,'Data from [Fick 1850]')
+    anatomicalViewButtons(axH,'PIR')
     varargout{4}=axH;
 end
 

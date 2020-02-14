@@ -149,8 +149,8 @@ if visu
     axis(axH, 'equal', 'tight'); 
     grid(axH, 'minor');
     xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
-    title('Data from [Dostal 1981] as presented in [Iglic 1990, S.37, Table 2]')
-    medicalViewButtons(axH,'ASR')
+    title(axH,'Data from [Dostal 1981]')
+    anatomicalViewButtons(axH,'ASR')
     varargout{4}=axH;
 end
 
