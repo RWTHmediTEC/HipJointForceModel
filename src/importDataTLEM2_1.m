@@ -127,12 +127,8 @@ LE(4).Muscle.RectusFemoris2.Pos = [0.00397,0.01249, 0.00462] * ScaleFactor;
 
 femurNS = createns(LE(2).Mesh.vertices);
 Fascicles = fieldnames(LE(2).Muscle);
-% [IDX,D] = deal([]);
 for m = 1:length(Fascicles)
     LE(2).Muscle.(Fascicles{m}).Node = knnsearch(femurNS, LE(2).Muscle.(Fascicles{m}).Pos);
-%     [idx, d] = knnsearch(femurNS, LE(2).Muscle.(Fascicles{m}).Pos);
-%     IDX = [IDX; idx];
-%     D = [D; d];
 end
 
 %% Save data

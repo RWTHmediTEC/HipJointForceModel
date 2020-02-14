@@ -60,10 +60,13 @@ Results(s).NeckLength     = OL(s).NeckLength;
 Results(s).CCD            = OL(s).CCD;
             
 % Force parameters
+
+% Transformed simulated HJF from [Wu 2002] to the OrthoLoad CS [Bergmann 2016]
+% TODO
+
 % OrthoLoad HJF is presented for the right side for all subjects. Left
 % sides were mirrored. Hence, for left sides the simulated HJF is also
 % mirrored.
-% !!! Simulated HJF has to be transformed into the OrthoLoad CS for comparison !!!
 switch data.S.Side
     case 'R'
         R=[data.rX data.rY data.rZ];

@@ -227,21 +227,20 @@ end
 % Save node closest to landmark
 pelvisNS = createns(LE(1).Mesh.vertices);
 landmarksPelvis = fieldnames(LE(1).Landmarks);
-% [IDX,D] = deal([]);
 for lm = 1:length(landmarksPelvis)
-    LE(1).Landmarks.(landmarksPelvis{lm}).Node = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{lm}).Pos);
-% %     [idx, d] = knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{l}).Pos);
-% %     IDX = [IDX; idx];
-% %     D = [D; d];
+    [LE(1).Landmarks.(landmarksPelvis{lm}).Node, tempDist] = ...
+        knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{lm}).Pos);
+    if tempDist > 3 % [mm]
+        warning(['The landmark ' landmarksPelvis{lm} ' was more than 3 mm away' ...
+            ' from the nearest vertex and therefore not saved!'])
+        LE(1).Landmarks.(landmarksPelvis{lm})=...
+            rmfield(LE(1).Landmarks.(landmarksPelvis{lm}), 'Node');
+    end
 end
 
 landmarksFemur = fieldnames(LE(2).Landmarks);
-% [IDX,D] = deal([]);
 for lm = 1:length(landmarksFemur)
     LE(2).Landmarks.(landmarksFemur{lm}).Node = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{lm}).Pos);
-%     [idx, d] = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{l}).Pos);
-%     IDX = [IDX; idx];
-%     D = [D; d];
 end
 
 %% Add additional landmarks
@@ -284,7 +283,6 @@ end
 addpath('D:\Biomechanics\Hip\Code\AutomaticFemoralCoordinateSystem')
 [~, autoLMIdx] = automaticFemoralCS(LE(2).Mesh, 'r',...
     'definition', 'Bergmann2016', 'visu', true, 'verbose', true);
-% save('data\TLEM2_femurLandmarks.mat', 'automaticLMIdx')
 autoLMfemur={'MedialPosteriorCondyle';'LateralPosteriorCondyle';'NeckAxis';'ShaftAxis'};
 for lm = 1:size(autoLMfemur,1)
     LE(2).Landmarks.(autoLMfemur{lm}).Pos  = LE(2).Mesh.vertices(autoLMIdx.(autoLMfemur{lm})',:);

@@ -1,4 +1,4 @@
-function TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, ICN, NeckAxis, ShaftAxis, HJC)
+function TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, ICN, NeckAxis, ShaftAxis, HJC, side)
 
 %% Construction of P1
 [~, P1, ~] = distanceLines3d(NeckAxis, ShaftAxis);
@@ -12,5 +12,9 @@ Z = normalizeVector3d(StraightFemurAxis(4:6));
 Y = normalizeVector3d(crossProduct3d(StraightFemurAxis(4:6), PosteriorCondyleAxis(4:6)));
 X = normalizeVector3d(crossProduct3d(Y, Z));
 TFM = inv([[inv([X; Y; Z]), HJC']; [0 0 0 1]]);
+
+if strcmp(side, 'L')
+    TFM=createRotationOz(pi)*TFM; %#ok<MINV>
+end
 
 end
