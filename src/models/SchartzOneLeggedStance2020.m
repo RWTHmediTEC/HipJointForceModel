@@ -52,8 +52,8 @@ activeMuscles = {...
     'GluteusMinimusAnterior2';
     'TensorFasciaeLatae1';
     'TensorFasciaeLatae2';
-%     'RectusFemoris1';
-%     'RectusFemoris2';
+    'RectusFemoris1';
+    'RectusFemoris2';
     'GluteusMinimusMid1';
     'GluteusMinimusMid2';
     'GluteusMinimusPosterior1';
