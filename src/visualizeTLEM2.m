@@ -5,7 +5,7 @@ p = inputParser;
 valFctBones = @(x) validateattributes(x, {'numeric'}, {'>=',1, '<=',length(LE)});
 addParameter(p, 'Bones', length(LE), valFctBones);
 addParameter(p, 'Joints', false, @islogical);
-addParameter(p, 'Muscles', {}, @(x) isstruct(x) || isempty(x));
+addParameter(p, 'Muscles', {}); %  @(x) isstruct(x) || isempty(x)
 addParameter(p, 'MuscleList', {}, @iscell);
 addParameter(p, 'Surfaces', {}, @iscell);
 addParameter(p, 'ShowSurf', false, @islogical);
@@ -14,7 +14,7 @@ parse(p, varargin{:});
 NoB = p.Results.Bones;
 visJoints = p.Results.Joints;
 Muscles = p.Results.Muscles;
-if ~isempty(Muscles); Muscles=Muscles(:,1); end
+% if ~isempty(Muscles); Muscles=Muscles(:,1); end
 MuscleList = p.Results.MuscleList;
 Surfaces = p.Results.Surfaces;
 visSurfaces = p.Results.ShowSurf;

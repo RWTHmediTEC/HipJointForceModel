@@ -45,7 +45,7 @@ classdef Cylinder < ParametricSurface
         function [obj] = computeSurfaceMeshInLocalCoordinates(obj)
             
             u = 2*pi*[0:0.05:1];
-            v =      [-obj.lngth/2:0.5:obj.lngth/2];
+            v =      [-obj.lngth/2:5:obj.lngth/2];
             
             obj.xSurfMeshLocalCoordinates = zeros(length(v), length(u));
             obj.ySurfMeshLocalCoordinates = zeros(length(v), length(u));
