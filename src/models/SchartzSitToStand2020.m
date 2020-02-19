@@ -122,7 +122,6 @@ function data = Calculation(data)
 LE            = data.S.LE;
 muscleList    = data.MuscleList;
 BW            = data.S.BodyWeight;
-PelvicBend    = data.S.PelvicBend;
 HipJointWidth = data.S.Scale(1).HipJointWidth;
 FemoralLength = data.S.Scale(2).FemoralLength;
 activeMuscles = data.activeMuscles;
@@ -209,45 +208,6 @@ rY = double(R.RySym);
 rZ = double(R.RzSym);
 % f = double(R.f);
 
-rMag = norm([rX rY rZ]);              % Magnitude of R
-rMagP = rMag / abs(Wb) * 100;         % Magnitude of R in percentage body weight
-rDir = normalizeVector3d([rX rY rZ]); % Direction of R
-
-if Side == 'L'
-    rZ = -1 * rZ;
-end
-
-% Rotation matrices for local pelvic COS
-% TFMx = createRotationOx(deg2rad(phi));
-% TFMy = createRotationOy(0);
-% TFMz = createRotationOz(deg2rad(PelvicBend));
-
-if strcmp(View, 'Femur') == 1
-    rDir = -1 * rDir;
-%     
-%     ny = asin(b/x0);
-%     
-%     % Rotation matrices for local femur COS
-%     TFMx = createRotationOx(ny);
-%     TFMy = createRotationOy();
-%     TFMz = createRotationOz();
-end
-
-% [rX, rY, rZ] = transformPoint3d(rX, rY, rZ, TFMx*TFMy*TFMz);
-
-rPhi   = atand(rZ / rY); % Angle in frontal plane
-rTheta = atand(rX / rY); % Angle in sagittal plane
-rAlpha = atand(rX / rZ); % Angle in horizontal plane
-
-% Save results in data
-data.rX     = rX;
-data.rY     = rY;
-data.rZ     = rZ;
-data.rDir   = rDir;
-data.rMag   = rMag;
-data.rMagP  = rMagP;
-data.rPhi   = rPhi;
-data.rTheta = rTheta;
-data.rAlpha = rAlpha;
+data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
 end

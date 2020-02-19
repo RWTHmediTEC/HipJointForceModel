@@ -16,7 +16,7 @@ end
             pBone = LE(b).Parent;
             % Get joints of the bone
             jts = fieldnames(LE(b).Joints);
-            if isempty(pBone) || pBone < 2
+            if isempty(pBone) || pBone < 2 % pBone non-existant (i.e. hip) or pBone is hip
                 % The root joint is a spherical joint
                 LE(b).TFM = ...
                     createRotationOx(jointAngles{b}(1)) * ...
