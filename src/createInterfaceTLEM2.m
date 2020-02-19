@@ -412,11 +412,14 @@ gui.Home.Visualization.Panel_Visualization = uix.Panel(...
     'Parent', gui.Home.Visualization.Layout_V);
 
 gui.Home.Visualization.Axis_Visualization = axes(...
-    'Parent', gui.Home.Visualization.Panel_Visualization);
+    'Parent', gui.Home.Visualization.Panel_Visualization,...
+    'ClippingStyle', 'rectangle');
 
 data = scaleTLEM2(data);
 data = globalizeTLEM2(data);
-visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Visualization.Axis_Visualization,'Muscles', data.activeMuscles);
+visualizeTLEM2(data.S.LE, gui.Home.Visualization.Axis_Visualization, ...
+    'Muscles', data.S.MusclePaths, 'MuscleList', data.MuscleList, ...
+    'Surfaces', data.SurfaceList)
 
 gui.Home.Visualization.Axis_Visualization.View = [90, 0];
 gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
@@ -424,7 +427,8 @@ gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
 % Push buttons
 gui.Home.Visualization.Layout_Grid = uix.Grid(...
     'Parent', gui.Home.Visualization.Layout_V,...
-    'Spacing', 3);
+    'Spacing', 1,...
+    'Padding', 2);
 
 uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
     'Style', 'PushButton',...
@@ -480,8 +484,9 @@ gui.Home.Results.Layout_H_Bottom = uix.HBox(...
 gui.Home.Results.Panel_FrontalView = uix.Panel(...
     'Parent',gui.Home.Results.Layout_H_Top,...
     'Title', 'Frontal View');
-gui.Home.Results.Axis_FrontalView = axes(gui.Home.Results.Panel_FrontalView);
-visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_FrontalView,...
+gui.Home.Results.Axis_FrontalView = axes(gui.Home.Results.Panel_FrontalView, ...
+                                         'ClippingStyle', 'rectangle');
+visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_FrontalView,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
 gui.Home.Results.Axis_FrontalView.View = [90, 0];
 gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
@@ -490,8 +495,9 @@ gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
 gui.Home.Results.Panel_SagittalView = uix.Panel(...
     'Parent', gui.Home.Results.Layout_H_Top,...
     'Title', 'Sagittal View');
-gui.Home.Results.Axis_SagittalView = axes(gui.Home.Results.Panel_SagittalView);
-visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_SagittalView,...
+gui.Home.Results.Axis_SagittalView = axes(gui.Home.Results.Panel_SagittalView, ...
+                                         'ClippingStyle', 'rectangle');
+visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_SagittalView,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
 switch data.S.Side
     case 'R'
@@ -505,9 +511,9 @@ gui.Home.Results.Axis_SagittalView.CameraUpVector = [0, 1, 0];
 gui.Home.Results.Panel_TransverseView = uix.Panel(...
     'Parent', gui.Home.Results.Layout_H_Top,...
     'Title', 'Transverse View');
-gui.Home.Results.Axis_TransverseView = axes(gui.Home.Results.Panel_TransverseView);
-
-visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_TransverseView,...
+gui.Home.Results.Axis_TransverseView = axes(gui.Home.Results.Panel_TransverseView, ...
+                                         'ClippingStyle', 'rectangle');
+visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_TransverseView,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
             
 switch data.View
@@ -685,6 +691,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         % User has chosen TLEM 2.0 version
         data = createDataTLEM2(data, 'TLEM2_0');
         data = scaleTLEM2(data);
+        data = muscleDefinitionTLEM2(data);
         updateParameters();
         gui.IsUpdated = false;
         updateHomeTab();
@@ -694,6 +701,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         % User has chosen TLEM 2.1 version
         data = createDataTLEM2(data, 'TLEM2_1');
         data = scaleTLEM2(data);
+        data = muscleDefinitionTLEM2(data);
         updateParameters();
         gui.IsUpdated = false;
         updateHomeTab();
@@ -1051,8 +1059,9 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         gui.Home.Model.modelHandle = calculateTLEM2();
         [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
         % Set muscle path model to straight line
-        data.MusclePath = 'StraightLine';
+        data.MusclePath = 'ObstacleSet';
         updateMusclePath();
+        data = musclePathsTLEM2(data);
         [postures, default] = gui.Home.Model.modelHandle.Posture();
         data.Posture = postures(default, 2);
         if isfield(gui.Home.Model, 'ListBox_Posture') == 1
@@ -1062,8 +1071,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 
     function updateMuscleList()
         % Get the indices of the muscles used in the current model
-        mListValues = find(ismember(data.MuscleList(:,1), unique(cellfun(@(x)...
-            regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
+        mListValues = find(ismember(data.MuscleList(:,1), ...
+            unique(cellfun(@(x)regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
         gui.Home.Model.ListBox_MuscleList.Value = mListValues;
         gui.Home.Model.ListBox_MuscleList.Enable = gui.Home.Model.MuscleListEnable;
     end
@@ -1074,7 +1083,9 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         data = scaleTLEM2(data);
         data = globalizeTLEM2(data);
         delete(gui.Home.Visualization.Axis_Visualization.Children);
-        visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Visualization.Axis_Visualization, 'Muscles', data.activeMuscles);
+        visualizeTLEM2(data.S.LE, gui.Home.Visualization.Axis_Visualization, ...
+            'Muscles', data.S.MusclePaths, 'MuscleList', data.MuscleList, ...
+            'Surfaces', data.SurfaceList);
     end
 
 %% Box panel results
@@ -1085,11 +1096,11 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             gui.Home.Results.Axis_SagittalView  .Children,...
             gui.Home.Results.Axis_TransverseView.Children])
         
-        visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_FrontalView,...
+        visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_FrontalView,...
             'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-        visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_SagittalView,...
+        visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_SagittalView,...
             'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-        visualizeTLEM2(data.S.LE, data.MuscleList, gui.Home.Results.Axis_TransverseView,...
+        visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_TransverseView,...
             'Bones', find(strcmp({data.S.LE.Name}, data.View)));
         
         gui.Home.Results.Axis_FrontalView.View = [90 ,0];

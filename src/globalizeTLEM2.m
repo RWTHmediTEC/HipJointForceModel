@@ -38,5 +38,5 @@ switch data.S.Side
 end
 
 data.S.LE = LE;
-
+data = musclePathsTLEM2(data);
 end

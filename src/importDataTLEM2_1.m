@@ -1,4 +1,4 @@
-function importDataTLEM2_1(LE, muscleList)
+function importDataTLEM2_1(LE, muscleList, surfaceList)
 % !!! Update of muscleList needed? !!!
 
 % Update TLEM 2.0 to TLEM 2.1
@@ -132,6 +132,6 @@ for m = 1:length(Fascicles)
 end
 
 %% Save data
-save('data\TLEM2_1.mat', 'LE', 'muscleList')
+save('data\TLEM2_1.mat', 'LE', 'muscleList', 'surfaceList')
 
 end

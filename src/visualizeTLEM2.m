@@ -1,19 +1,21 @@
-function visualizeTLEM2(LE, muscleList, axH, varargin)
+function visualizeTLEM2(LE, axH, varargin)
 
 %% Input parsing
 p = inputParser;
 valFctBones = @(x) validateattributes(x, {'numeric'}, {'>=',1, '<=',length(LE)});
 addParameter(p, 'Bones', length(LE), valFctBones);
 addParameter(p, 'Joints', false, @islogical);
-addParameter(p, 'Muscles', {}, @iscell);
+addParameter(p, 'Muscles', {}, @(x) isstruct(x) || isempty(x));
+addParameter(p, 'MuscleList', {}, @iscell);
 addParameter(p, 'Surfaces', {}, @iscell);
 addParameter(p, 'ShowSurf', false, @islogical);
 parse(p, varargin{:});
 
 NoB = p.Results.Bones;
 visJoints = p.Results.Joints;
-visMuscles = p.Results.Muscles;
-if ~isempty(visMuscles); visMuscles=visMuscles(:,1); end
+Muscles = p.Results.Muscles;
+if ~isempty(Muscles); Muscles=Muscles(:,1); end
+MuscleList = p.Results.MuscleList;
 Surfaces = p.Results.Surfaces;
 visSurfaces = p.Results.ShowSurf;
 
@@ -68,55 +70,44 @@ if visJoints
     end
 end
 
-%% Visualize muscles
-if ~isempty(visMuscles)
+%% Visualize muscles initialisation
+if ~isempty(Muscles)
+    % again propreties for lines and markers
     lineProps.Marker = 'o';
+    lineProps.Linestyle = '-';
     lineProps.MarkerSize = 2;
-    % Loop over bones with muscles
-    BwM = find(~arrayfun(@(x) isempty(x.Muscle), LE));
-    for b = BwM
-        Muscles = fieldnames(LE(b).Muscle);
-        % Loop over the muscles of the bone
-        for m = 1:length(Muscles)
-            Via = [];
-            % Check if the muscle originates from this bone
-            oIdx = strcmp(LE(b).Muscle.(Muscles{m}).Type, 'Origin');
-            if any(oIdx) && ismember(Muscles{m}, visMuscles)
-                Origin = LE(b).Muscle.(Muscles{m}).Pos(oIdx,:);
-                % Check if there are Via points on the bone of Origin
-                vIdx = strcmp(LE(b).Muscle.(Muscles{m}).Type, 'Via');
-                if any(vIdx)
-                    Via = LE(b).Muscle.(Muscles{m}).Pos(vIdx,:);
-                end
-                % Loop over the other bones exept the bone of Origin
-                for bb = BwM(BwM~=b)
-                    matchingMuscle = fieldnames(LE(bb).Muscle);
-                    if any(strcmp(Muscles(m), matchingMuscle))
-                        % Check if there are Via points on the bone
-                        vIdx = strcmp(LE(bb).Muscle.(Muscles{m}).Type, 'Via');
-                        if any(vIdx)
-                            Via = [Via; LE(bb).Muscle.(Muscles{m}).Pos(vIdx,:)];
-                        end
-                        % Check if it is the bone of insertion
-                        iIdx = strcmp(LE(bb).Muscle.(Muscles{m}).Type, 'Insertion');
-                        if any(iIdx)
-                            Insertion = LE(bb).Muscle.(Muscles{m}).Pos(iIdx,:);
-                        end
-                    end
-                end
-                
-                % Combine Origin, Via points & Insertion
-                mPoints = [Origin; Via; Insertion];
-                lineProps.DisplayName = Muscles{m};
-                colorIdx = strcmp(Muscles{m}(1:end-1), muscleList(:,1));
-                lineProps.Color = muscleList{colorIdx,2};
-                lineProps.MarkerEdgeColor = lineProps.Color;
-                lineProps.MarkerFaceColor = lineProps.Color;
-                drawPoint3d(axH, mPoints, lineProps);
+    for m = 1:length(Muscles)
+        lineProps.DisplayName = Muscles(m).Name{:}(1:end-1);
+        for c = 1:size(MuscleList,1)
+            if isequal(Muscles(m).Name{:}(1:end-1),MuscleList{c,1})
+                lineProps.Color = MuscleList{c,2};
             end
+        end
+        lineProps.MarkerEdgeColor = lineProps.Color;
+        lineProps.MarkerFaceColor = lineProps.Color;
+        if isempty(Muscles(m).Surface)
+            % drawing muscles as lines (Straight and Via), as there are no
+            % surfaces to be drawn
+            drawPoint3d(axH, Muscles(m).Points, lineProps);
+        elseif size(Muscles(m).Points,1) <= 2
+            % draws wrapped muscles between Origin and Insertion
+            Muscles(m).Surface.plotWrappingSystem(lineProps, axH);
+        elseif size(Muscles(m).Points,2) > 2
+            % draws wrapped muscles between two Via Points and the rest of
+            % the points between which no wrapping occurs
+            Muscles(m).Surface.plotWrappingSystem(lineProps, axH);
+            for p = 1:size(Muscles(m).Points,1)
+                if isequal(Muscles(m).Points(p,:), Muscles(m).Surface.straightLineSegments{1}.startPoint')
+                    pIdx = p;
+                    break;
+                end
+            end
+            drawPoint3d(axH, Muscles(m).Points(1:pIdx,:), lineProps);
+            drawPoint3d(axH, Muscles(m).Points(pIdx+1:end,:), lineProps);
         end
     end
 end
+
 
 %% Visualize wrapping cylinders
 if visSurfaces

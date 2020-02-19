@@ -31,22 +31,23 @@ switch TLEMversion
         if ~exist('data\TLEM2_0.mat', 'file')
             importDataTLEM2_0
         end
-        load('TLEM2_0', 'LE', 'muscleList')
+        load('TLEM2_0', 'LE', 'muscleList', 'surfaceList')
     case 'TLEM2_1'
         if ~exist('data\TLEM2_1.mat', 'file')
             if ~exist('data\TLEM2_0.mat', 'file')
                 importDataTLEM2_0
             end
-            load('TLEM2_0', 'LE', 'muscleList')
-            importDataTLEM2_1(LE, muscleList);
+            load('TLEM2_0', 'LE', 'muscleList', 'surfaceList')
+            importDataTLEM2_1(LE, muscleList, surfaceList);
         end
-        load('TLEM2_1', 'LE', 'muscleList')
+        load('TLEM2_1', 'LE', 'muscleList', 'surfaceList')
     otherwise
         error('No valid TLEM version')
 end
 
 data.T.LE = LE;
 data.MuscleList = muscleList;
+data.SurfaceList = surfaceList;
 
 %% Scaling and skinning parameters
 % Pelvic parameters:

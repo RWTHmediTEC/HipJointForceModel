@@ -291,4 +291,4 @@ end
 
 
 %% Save data
-save('data\TLEM2_0.mat', 'LE', 'muscleList')
+save('data\TLEM2_0.mat', 'LE', 'muscleList','surfaceList')
