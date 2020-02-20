@@ -144,11 +144,11 @@ gui.Home.Settings.RadioButton_ViaPoint = uicontrol(...
     'String', 'Via Point Model',...
     'Callback', @onViaPoint);
 
-gui.Home.Settings.RadioButton_ObstacleSet = uicontrol(...
+gui.Home.Settings.RadioButton_Wrapping = uicontrol(...
     'Parent', gui.Home.Settings.RadioButtonBox_MusclePath,...
     'Style', 'radiobutton',...
-    'String', 'Obstacle Set Method',...
-    'Callback', @onObstacleSet);
+    'String', 'Wrapping Method',...
+    'Callback', @onWrapping);
 
 set(gui.Home.Settings.(['RadioButton_' data.MusclePath]), 'Value', 1)
 
@@ -749,9 +749,9 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         updateHomeTab();
     end
 
-    function onObstacleSet(~, ~)
+    function onWrapping(~, ~)
         % User has set the muscle path model to obstacle set
-        data.MusclePath = 'ObstacleSet';
+        data.MusclePath = 'Wrapping';
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1015,14 +1015,14 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
     function updateMusclePath()
         set(gui.Home.Settings.RadioButton_StraightLine, 'Value', 0);
         set(gui.Home.Settings.RadioButton_ViaPoint, 'Value', 0);
-        set(gui.Home.Settings.RadioButton_ObstacleSet, 'Value', 0);
+        set(gui.Home.Settings.RadioButton_Wrapping, 'Value', 0);
         switch data.MusclePath
             case 'StraightLine'
                 set(gui.Home.Settings.RadioButton_StraightLine, 'Value', 1);
             case 'ViaPoint'
                 set(gui.Home.Settings.RadioButton_ViaPoint, 'Value', 1);
-            case 'ObstacleSet'
-                set(gui.Home.Settings.RadioButton_ObstacleSet, 'Value', 1);
+            case 'Wrapping'
+                set(gui.Home.Settings.RadioButton_Wrapping, 'Value', 1);
         end
     end
 
@@ -1059,7 +1059,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         gui.Home.Model.modelHandle = calculateTLEM2();
         [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
         % Set muscle path model to straight line
-        data.MusclePath = 'ObstacleSet';
+        data.MusclePath = 'Wrapping';
         updateMusclePath();
         data = musclePathsTLEM2(data);
         [postures, default] = gui.Home.Model.modelHandle.Posture();

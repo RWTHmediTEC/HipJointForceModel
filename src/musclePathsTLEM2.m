@@ -33,7 +33,7 @@ switch data.MusclePath
                 end
             end
         end
-    case 'ObstacleSet'
+    case 'Wrapping'
         for i = 1:length(ActiveMuscles)
             muscleWrappingSystem = {};
             for m = 1:length(mIdx) % loop through indexes of active muscles in muscle list

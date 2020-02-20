@@ -112,7 +112,7 @@ activeMuscles = {...
 
 % Disable muscle path models which are not supported
 set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'on');
-set(gui.Home.Settings.RadioButton_ObstacleSet, 'enable', 'on');
+set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'on');
 end
 
 %% Calculation of the hip joint force
@@ -169,7 +169,7 @@ switch MusclePath
             s(i,:) = MusclePaths(i).ViaAction(1,:);
             r(i,:) = MusclePaths(i).ViaAction(2,:);
         end
-    case 'ObstacleSet'
+    case 'Wrapping'
         for i = 1:length(MusclePaths)
             s(i,:) = MusclePaths(i).WrapAction(1,:);
             r(i,:) = MusclePaths(i).WrapAction(2,:);
