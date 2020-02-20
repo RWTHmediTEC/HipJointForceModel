@@ -1,4 +1,4 @@
-function visualizeTLEM2(LE, axH, varargin)
+function visualizeTLEM2(axH, LE, side, varargin)
 
 %% Input parsing
 p = inputParser;
@@ -29,11 +29,15 @@ patchProps.EdgeLighting = 'gouraud';
 patchProps.FaceLighting = 'gouraud';
 
 %% Visualize bones
-if NoB == 1 || NoB == 2
-    % Draws bone only if its pelvis (1) or femur (2). Transforms bone back 
-    % to its local bone CS (-> neutral postion). Used for Frontal, Sagittal 
-    % and Transversal View in the Results panel.
-    patch(axH, transformPoint3d(LE(NoB).Mesh, inv(LE(NoB).TFM)), patchProps);
+% NoB == 1 || NoB == 2 draws bone only pelvis (1) or femur (2). Transform 
+% bone back to its local bone CS (-> neutral postion). Used for Frontal, 
+% Sagittal and Transversal View in the Results panel.
+if NoB == 1
+    patch(axH, transformPoint3d(LE(NoB).Mesh, ...
+        createPelvisCS_TFM_Wu2002_TLEM2(LE)), patchProps);
+elseif  NoB == 2
+    patch(axH, transformPoint3d(LE(NoB).Mesh, ...
+        createFemurCS_TFM_Wu2002_TLEM2(LE, side)), patchProps);
 else
     % Draws all the bones. Used for Visualization panel
     for n = 1:NoB

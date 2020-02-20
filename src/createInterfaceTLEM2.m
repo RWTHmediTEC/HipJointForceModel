@@ -417,7 +417,8 @@ gui.Home.Visualization.Axis_Visualization = axes(...
 
 data = scaleTLEM2(data);
 data = globalizeTLEM2(data);
-visualizeTLEM2(data.S.LE, gui.Home.Visualization.Axis_Visualization, ...
+visualizeTLEM2(gui.Home.Visualization.Axis_Visualization, ...
+    data.S.LE, data.S.Side,...
     'Muscles', data.S.MusclePaths, 'MuscleList', data.MuscleList, ...
     'Surfaces', data.SurfaceList)
 
@@ -486,7 +487,8 @@ gui.Home.Results.Panel_FrontalView = uix.Panel(...
     'Title', 'Frontal View');
 gui.Home.Results.Axis_FrontalView = axes(gui.Home.Results.Panel_FrontalView, ...
                                          'ClippingStyle', 'rectangle');
-visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_FrontalView,...
+visualizeTLEM2(gui.Home.Results.Axis_FrontalView,...
+    data.S.LE, data.S.Side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
 gui.Home.Results.Axis_FrontalView.View = [90, 0];
 gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
@@ -497,7 +499,8 @@ gui.Home.Results.Panel_SagittalView = uix.Panel(...
     'Title', 'Sagittal View');
 gui.Home.Results.Axis_SagittalView = axes(gui.Home.Results.Panel_SagittalView, ...
                                          'ClippingStyle', 'rectangle');
-visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_SagittalView,...
+visualizeTLEM2(gui.Home.Results.Axis_SagittalView, ...
+    data.S.LE, data.S.Side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
 switch data.S.Side
     case 'R'
@@ -513,7 +516,8 @@ gui.Home.Results.Panel_TransverseView = uix.Panel(...
     'Title', 'Transverse View');
 gui.Home.Results.Axis_TransverseView = axes(gui.Home.Results.Panel_TransverseView, ...
                                          'ClippingStyle', 'rectangle');
-visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_TransverseView,...
+visualizeTLEM2(gui.Home.Results.Axis_TransverseView, ...
+    data.S.LE, data.S.Side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
             
 switch data.View
@@ -691,7 +695,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         % User has chosen TLEM 2.0 version
         data = createDataTLEM2(data, 'TLEM2_0');
         data = scaleTLEM2(data);
-        data = muscleDefinitionTLEM2(data);
+        data = musclePathsTLEM2(data);
         updateParameters();
         gui.IsUpdated = false;
         updateHomeTab();
@@ -701,7 +705,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         % User has chosen TLEM 2.1 version
         data = createDataTLEM2(data, 'TLEM2_1');
         data = scaleTLEM2(data);
-        data = muscleDefinitionTLEM2(data);
+        data = musclePathsTLEM2(data);
         updateParameters();
         gui.IsUpdated = false;
         updateHomeTab();
@@ -1059,9 +1063,9 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         gui.Home.Model.modelHandle = calculateTLEM2();
         [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
         % Set muscle path model to straight line
-        data.MusclePath = 'Wrapping';
+        data.MusclePath = 'StraightLine';
         updateMusclePath();
-        data = musclePathsTLEM2(data);
+        % data = musclePathsTLEM2(data);
         [postures, default] = gui.Home.Model.modelHandle.Posture();
         data.Posture = postures(default, 2);
         if isfield(gui.Home.Model, 'ListBox_Posture') == 1
@@ -1083,7 +1087,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         data = scaleTLEM2(data);
         data = globalizeTLEM2(data);
         delete(gui.Home.Visualization.Axis_Visualization.Children);
-        visualizeTLEM2(data.S.LE, gui.Home.Visualization.Axis_Visualization, ...
+        visualizeTLEM2(gui.Home.Visualization.Axis_Visualization, ...
+            data.S.LE, data.S.Side,...
             'Muscles', data.S.MusclePaths, 'MuscleList', data.MuscleList, ...
             'Surfaces', data.SurfaceList);
     end
@@ -1096,11 +1101,14 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             gui.Home.Results.Axis_SagittalView  .Children,...
             gui.Home.Results.Axis_TransverseView.Children])
         
-        visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_FrontalView,...
+        visualizeTLEM2(gui.Home.Results.Axis_FrontalView, ...
+            data.S.LE, data.S.Side,...
             'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-        visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_SagittalView,...
+        visualizeTLEM2(gui.Home.Results.Axis_SagittalView, ...
+            data.S.LE, data.S.Side,...
             'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-        visualizeTLEM2(data.S.LE, gui.Home.Results.Axis_TransverseView,...
+        visualizeTLEM2(gui.Home.Results.Axis_TransverseView, ...
+            data.S.LE, data.S.Side,...
             'Bones', find(strcmp({data.S.LE.Name}, data.View)));
         
         gui.Home.Results.Axis_FrontalView.View = [90 ,0];
@@ -1125,6 +1133,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         
         % Plot hip joint force vector
         if gui.IsUpdated
+            R = data.HJF.(data.View).Wu2002.R;
             rDir = normalizeVector3d(data.HJF.(data.View).Wu2002.R);
             switch data.View
                 case 'Pelvis'
@@ -1136,12 +1145,12 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             drawArrow3d(gui.Home.Results.Axis_SagittalView,   -rDir*Dist2HJC, rDir*55, 'r')
             drawArrow3d(gui.Home.Results.Axis_TransverseView, -rDir*Dist2HJC, rDir*55, 'r')
             
-            set(gui.Home.Results.Label_post_antHJFpercBW,  'String', round(data.rX));
-            set(gui.Home.Results.Label_inf_supHJFpercBW,   'String', round(data.rY));
-            set(gui.Home.Results.Label_med_latHJFpercBW,   'String', round(data.rZ));
-            set(gui.Home.Results.Label_FrontalAngle,       'String', abs(data.rPhi));
-            set(gui.Home.Results.Label_SagittalAngle,      'String', abs(data.rTheta));
-            set(gui.Home.Results.Label_TransverseAngle,    'String', abs(data.rAlpha));
+            set(gui.Home.Results.Label_post_antHJFpercBW,  'String', round(R(1)));
+            set(gui.Home.Results.Label_inf_supHJFpercBW,   'String', round(R(2)));
+            set(gui.Home.Results.Label_med_latHJFpercBW,   'String', round(R(3)));
+            set(gui.Home.Results.Label_FrontalAngle,       'String', round(abs(atand(R(3)/R(2)))));
+            set(gui.Home.Results.Label_SagittalAngle,      'String', round(abs(atand(R(1)/R(2)))));
+            set(gui.Home.Results.Label_TransverseAngle,    'String', round(abs(atand(R(1)/R(3)))));
             
             % Disable push button
             set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'g', 'Enable', 'off');
