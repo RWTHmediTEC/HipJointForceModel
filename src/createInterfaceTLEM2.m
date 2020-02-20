@@ -150,6 +150,13 @@ gui.Home.Settings.RadioButton_Wrapping = uicontrol(...
     'String', 'Wrapping Method',...
     'Callback', @onWrapping);
 
+gui.Home.Settings.Checkbox_ShowWrappingSurfaces = uicontrol(...
+    'Parent', gui.Home.Settings.RadioButtonBox_MusclePath,...
+    'Style', 'Checkbox',...
+    'String', 'Show Wrapping Surfaces',...
+    'Enable', 'off',...
+    'Callback', @onShowWrappingSurfaces);
+
 set(gui.Home.Settings.(['RadioButton_' data.MusclePath]), 'Value', 1)
 
 % % Adjust layout
@@ -420,7 +427,8 @@ data = globalizeTLEM2(data);
 visualizeTLEM2(gui.Home.Visualization.Axis_Visualization, ...
     data.S.LE, data.S.Side,...
     'Muscles', data.S.MusclePaths, 'MuscleList', data.MuscleList, ...
-    'Surfaces', data.SurfaceList)
+    'Surfaces', data.SurfaceList,'ShowWrapSurf',...
+    gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value);
 
 gui.Home.Visualization.Axis_Visualization.View = [90, 0];
 gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
@@ -761,6 +769,11 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         updateHomeTab();
     end
 
+    function onShowWrappingSurfaces(~, ~)
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
 
 %% Box panel patient specific parameters
 
@@ -1023,11 +1036,16 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         set(gui.Home.Settings.RadioButton_Wrapping, 'Value', 0);
         switch data.MusclePath
             case 'StraightLine'
-                set(gui.Home.Settings.RadioButton_StraightLine, 'Value', 1);
+                gui.Home.Settings.RadioButton_StraightLine.Value=1;
+                gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value=0;
+                gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Enable='off';
             case 'ViaPoint'
-                set(gui.Home.Settings.RadioButton_ViaPoint, 'Value', 1);
+                gui.Home.Settings.RadioButton_ViaPoint.Value=1;
+                gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value=0;
+                gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Enable='off';
             case 'Wrapping'
-                set(gui.Home.Settings.RadioButton_Wrapping, 'Value', 1);
+                gui.Home.Settings.RadioButton_Wrapping.Value=1;
+                gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Enable='on';
         end
     end
 
@@ -1091,7 +1109,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         visualizeTLEM2(gui.Home.Visualization.Axis_Visualization, ...
             data.S.LE, data.S.Side,...
             'Muscles', data.S.MusclePaths, 'MuscleList', data.MuscleList, ...
-            'Surfaces', data.SurfaceList);
+            'Surfaces', data.SurfaceList,'ShowWrapSurf',...
+            gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value);
     end
 
 %% Box panel results

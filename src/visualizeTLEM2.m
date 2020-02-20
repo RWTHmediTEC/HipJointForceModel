@@ -3,12 +3,13 @@ function visualizeTLEM2(axH, LE, side, varargin)
 %% Input parsing
 p = inputParser;
 valFctBones = @(x) validateattributes(x, {'numeric'}, {'>=',1, '<=',length(LE)});
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
 addParameter(p, 'Bones', length(LE), valFctBones);
 addParameter(p, 'Joints', false, @islogical);
 addParameter(p, 'Muscles', {}); %  @(x) isstruct(x) || isempty(x)
 addParameter(p, 'MuscleList', {}, @iscell);
 addParameter(p, 'Surfaces', {}, @iscell);
-addParameter(p, 'ShowSurf', false, @islogical);
+addParameter(p, 'ShowWrapSurf', false, logParValidFunc);
 parse(p, varargin{:});
 
 NoB = p.Results.Bones;
@@ -17,7 +18,7 @@ Muscles = p.Results.Muscles;
 % if ~isempty(Muscles); Muscles=Muscles(:,1); end
 MuscleList = p.Results.MuscleList;
 Surfaces = p.Results.Surfaces;
-visSurfaces = p.Results.ShowSurf;
+visWrapSurf = p.Results.ShowWrapSurf;
 
 
 %% Visualization of the model
@@ -114,7 +115,7 @@ end
 
 
 %% Visualize wrapping cylinders
-if visSurfaces
+if visWrapSurf
     if ~isempty(Surfaces)
         for s = 1:size(Surfaces,1) % run through all the surfaces
             for b = 1:2 % run through pelvis and femur (only bones with wrapping
