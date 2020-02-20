@@ -6,6 +6,7 @@ NoB = length(LE);
 % Convert from degree to radian
 jointAngles = cellfun(@deg2rad, jointAngles, 'uni', false);
 
+TFM=nan(4,4,NoB);
 computed = false(NoB,1);
 for b = 1:NoB
     fk_helper(b);
@@ -18,7 +19,7 @@ end
             jts = fieldnames(LE(b).Joints);
             if isempty(pBone) || pBone < 2 % pBone non-existant (i.e. hip) or pBone is hip
                 % The root joint is a spherical joint
-                LE(b).TFM = ...
+                TFM(:,:,b) = ...
                     createRotationOx(jointAngles{b}(1)) * ...
                     createRotationOy(jointAngles{b}(2)) * ...
                     createRotationOz(jointAngles{b}(3));
@@ -33,13 +34,13 @@ end
                 jAxis = LE(b).Joints.(pJoint).Axis;
                 % The other joints are revolute/hinge joints
                 ROT = createRotation3dLineAngle([jCenter, jAxis], jointAngles{b});
-                LE(b).TFM = LE(pBone).TFM*ROT;
+                TFM(:,:,b) = TFM(:,:,pBone)*ROT;
             end
             computed(b) = true;
         end
     end
 %-------------------------------------------------------------------------%
 % Transform bones
-LE = transformTLEM2(LE, reshape([LE.TFM], [4,4,NoB]));
+LE = transformTLEM2(LE, TFM);
 
 end
