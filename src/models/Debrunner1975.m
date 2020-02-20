@@ -53,8 +53,8 @@ activeMuscles = {...
     'GluteusMinimusPosterior2';};
 
 % Disable muscle path models which are not supported
-set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'off');
-set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'off');
+set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'on');
+set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'on');
 end
 
 %% Calculation of the hip joint force

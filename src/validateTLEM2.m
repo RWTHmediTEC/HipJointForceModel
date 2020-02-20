@@ -16,7 +16,7 @@ for s = 1:length(OL)
     
 % Load body weight and HJF of OrthoLoad subjects
 % !!! Add the source of the mat files !!!
-load([OL(s).Subject '_' char(data.Posture) '.mat'],'meanPFP')
+load([OL(s).Subject '_' data.Posture '.mat'],'meanPFP')
 OL(s).BodyWeight = meanPFP.Weight_N/g; % [N] to [kg]
 
 % The HJF of the OrthoLoad subjects is given in the OrthLoad CS [Bergmann 2016].

@@ -83,8 +83,8 @@ switch data.MusclePath
                                         % inputs for initial conditions
                                         % angle according to cylinder coordinates, heigth according to cylinder coordinates, tangent
                                         % vector defining initial direction, length of arc over the surface
-                                        switch data.Model
-                                            case 'SchartzSitToStand2020'
+                                        switch data.Posture
+                                            case 'SU'
                                                 if contains(MusclePaths(i).Name{1},{'GluteusMaximus', 'PsoasMajor'})
                                                     qCyl = [theta height -vector(1) vector(2) arcLength];
                                                 elseif contains(MusclePaths(i).Name{1},'Vastus')
@@ -92,7 +92,7 @@ switch data.MusclePath
                                                 else
                                                     qCyl = [theta height vector(1) vector(2) arcLength];
                                                 end
-                                            case {'SchartzOneLeggedStance2020', 'Debrunner1975', 'Eggert2018', 'Iglic1990', 'Pauwels1965'}
+                                            case {'OLS','LW'}
                                                 if contains(MusclePaths(i).Name{1},'GluteusMaximus')
                                                     qCyl = [theta height vector(1) vector(2) arcLength];
                                                 else
@@ -169,8 +169,8 @@ switch data.MusclePath
                                             % inputs for initial conditions
                                             % angle according to cylinder coordinates, heigth according to cylinder coordinates, tangent
                                             % vector defining initial direction, length of arc over the surface
-                                            switch data.Model
-                                                case 'SchartzSitToStand2020'
+                                            switch data.Posture
+                                                case 'SU'
                                                     if contains(MusclePaths(i).Name{1},['GluteusMaximus', 'PsoasMajor'])
                                                         qCyl = [theta height -vector(1) vector(2) arcLength];
                                                     elseif contains(MusclePaths(i).Name{1},'Vastus')
@@ -178,7 +178,7 @@ switch data.MusclePath
                                                     else
                                                         qCyl = [theta height vector(1) vector(2) arcLength];
                                                     end
-                                                case 'SchartzOneLeggedStance2020'
+                                                case {'OLS','LW'}
                                                     if contains(MusclePaths(i).Name{1},'GluteusMaximus')
                                                         qCyl = [theta height vector(1) vector(2) arcLength];
                                                     else

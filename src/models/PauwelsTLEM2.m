@@ -71,7 +71,7 @@ activeMuscles = {...
 
 % Disable muscle path models which are not supported
 set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'on');
-set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'off');
+set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'on');
 end
 
 %% Calculation of the hip joint force
@@ -86,7 +86,6 @@ musclePath    = data.MusclePath;
 HJC           = data.S.LE(1).Joints.Hip.Pos;
 HJW           = data.S.Scale(1).HipJointWidth;
 Side          = data.S.Side;
-View          = data.View;
 
 %% Define parameters
 G = -9.81; % Weight force

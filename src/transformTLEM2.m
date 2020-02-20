@@ -31,16 +31,18 @@ for b = 1:length(LE)
                 end
             end
         end
-        % Surfaces					 
-        if ~isempty(LE(b).Surface)
-            surfaces = fieldnames(LE(b).Surface);
-            for s = 1:length(surfaces)
-                % Center of surface
-                LE(b).Surface.(surfaces{s}).Center = ...
-                    transformPoint3d(LE(b).Surface.(surfaces{s}).Center, TFM(:,:,b));
-                % Axis of surface
-                LE(b).Surface.(surfaces{s}).Axis = ...
-                    transformVector3d(LE(b).Surface.(surfaces{s}).Axis, TFM(:,:,b));
+        % Surfaces
+        if isfield(LE(b),'Surface')
+            if ~isempty(LE(b).Surface)
+                surfaces = fieldnames(LE(b).Surface);
+                for s = 1:length(surfaces)
+                    % Center of surface
+                    LE(b).Surface.(surfaces{s}).Center = ...
+                        transformPoint3d(LE(b).Surface.(surfaces{s}).Center, TFM(:,:,b));
+                    % Axis of surface
+                    LE(b).Surface.(surfaces{s}).Axis = ...
+                        transformVector3d(LE(b).Surface.(surfaces{s}).Axis, TFM(:,:,b));
+                end
             end
         end
         % Landmarks

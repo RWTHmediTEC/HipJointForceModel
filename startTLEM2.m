@@ -1,4 +1,5 @@
 clearvars; close all; opengl hardware
+warning on backtrace; warning off verbose
 
 addpath(genpath('src'))
 addpath(genpath('data'))
