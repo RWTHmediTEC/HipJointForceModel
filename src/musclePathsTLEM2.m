@@ -7,6 +7,7 @@ tic;
 LE = data.S.LE;
 MuscleList = data.MuscleList;
 ActiveMuscles = data.activeMuscles;
+switch data.S.Side; case 'R'; side = 1; case 'L'; side = -1; end
 % Find the Index of the active muscle in Muscle List
 for i = 1:size(ActiveMuscles,1)
     tmpMuscles{i,1} = ActiveMuscles{i,1}(1:end-1);
@@ -45,7 +46,7 @@ switch data.MusclePath
                             for s = 1:length(Surface)
                                 sBol = ismember(ActiveMuscles{i}(1:end-1), LE(b).Surface.(Surface{s}).Muscles); % check if muscles wrapps arround surface
                                 if any(sBol)
-                                    % Initialize values for MatGeom (see Documentation of MatGeom3D)
+                                    % Initialize values for matGeom (see Documentation of MatGeom3D)
                                     testIntersection = {};
                                     cCenter = LE(b).Surface.(Surface{s}).Center; % Center of Cylinder
                                     cRadius = LE(b).Surface.(Surface{s}).Radius; % Radius of Cylinder
@@ -83,20 +84,12 @@ switch data.MusclePath
                                         % inputs for initial conditions
                                         % angle according to cylinder coordinates, heigth according to cylinder coordinates, tangent
                                         % vector defining initial direction, length of arc over the surface
+                                        qCyl = [theta height -side*abs(vector(1)) vector(2) arcLength];
                                         switch data.Posture
                                             case 'SU'
-                                                if contains(MusclePaths(i).Name{1},{'GluteusMaximus', 'PsoasMajor'})
-                                                    qCyl = [theta height -vector(1) vector(2) arcLength];
-                                                elseif contains(MusclePaths(i).Name{1},'Vastus')
-                                                    qCyl = [theta-0.2 height -abs(vector(1)) vector(2) arcLength];
-                                                else
-                                                    qCyl = [theta height vector(1) vector(2) arcLength];
-                                                end
-                                            case {'OLS','LW'}
-                                                if contains(MusclePaths(i).Name{1},'GluteusMaximus')
-                                                    qCyl = [theta height vector(1) vector(2) arcLength];
-                                                else
-                                                    qCyl = [theta height -vector(1) vector(2) arcLength];
+                                                if contains(MusclePaths(i).Name{1},'Vastus')
+                                                    qCyl(1) = qCyl(1)-side*0.3;
+                                                    qCyl(5) = qCyl(5)*2/3;
                                                 end
                                         end
                                         % adds the surface to the muscle wrapping system
@@ -106,9 +99,10 @@ switch data.MusclePath
                                         % cylinder
                                         straightVect = lineInsertion - lineOrigin;
                                         wrapVect = transformVector3d(muscleWrappingSystem.geodesics{1}.KP.t', cRot); % tangent vector
-                                        angleVect = vectorAngle3d(straightVect, wrapVect)*180/pi;
+                                        angleVect = rad2deg(vectorAngle3d(wrapVect,straightVect));
                                         if abs(angleVect - 90) <= 15 && abs(angleVect - 90) >= -15
-                                        	qCyl = [theta-0.3 height -vector(1) vector(2) arcLength]; % changing initial conditions for wrapping
+                                            angleCorrection = 0.6;
+                                        	qCyl(1) = qCyl(1)  -side*angleCorrection; % changing initial conditions for wrapping
                                             muscleWrappingSystem = MuscleWrappingSystem(lineOrigin', lineInsertion');
                                             muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCyl, qCyl);
                                         end
@@ -169,22 +163,7 @@ switch data.MusclePath
                                             % inputs for initial conditions
                                             % angle according to cylinder coordinates, heigth according to cylinder coordinates, tangent
                                             % vector defining initial direction, length of arc over the surface
-                                            switch data.Posture
-                                                case 'SU'
-                                                    if contains(MusclePaths(i).Name{1},['GluteusMaximus', 'PsoasMajor'])
-                                                        qCyl = [theta height -vector(1) vector(2) arcLength];
-                                                    elseif contains(MusclePaths(i).Name{1},'Vastus')
-                                                        qCyl = [theta+0.2 height -abs(vector(1)) vector(2) arcLength];
-                                                    else
-                                                        qCyl = [theta height vector(1) vector(2) arcLength];
-                                                    end
-                                                case {'OLS','LW'}
-                                                    if contains(MusclePaths(i).Name{1},'GluteusMaximus')
-                                                        qCyl = [theta height vector(1) vector(2) arcLength];
-                                                    else
-                                                        qCyl = [theta height -vector(1) vector(2) arcLength];
-                                                    end
-                                            end
+                                            qCyl = [theta height -side*abs(vector(1)) vector(2) arcLength];
                                             % adds the surface to the muscle wrapping system
                                             muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCyl, qCyl);
                                         end
@@ -284,7 +263,7 @@ toc;
         length = distancePoints3d(points(2,:),points(1,:));
         [thetaO,~,heightO] = cart2cyl(points(1,:));
         [thetaI,~,heightI] = cart2cyl(points(2,:));
-        vector = [thetaI-thetaO, heightI-heightO];
+        vector = normalizeVector3d([thetaI-thetaO, heightI-heightO]);
     end
 	
 	function Origin = createMusclePoints
