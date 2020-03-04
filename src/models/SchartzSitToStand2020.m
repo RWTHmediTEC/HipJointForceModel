@@ -11,9 +11,7 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'
-            'StandingUp' 'SU'};
+postures = {'StandingUp' 'SU'};
 end
 
 %% Calculate the joint angles for positioning of the TLEM2
