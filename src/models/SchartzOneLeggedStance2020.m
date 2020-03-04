@@ -12,8 +12,7 @@ function [postures, default] = Posture()
 
 default = 1;
 postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'
-            'StandingUp' 'SU'};
+            'LevelWalking' 'LW'};
 end
 
 %% Calculate the joint angles for positioning of the TLEM2
@@ -109,25 +108,11 @@ end
 
 % r is origin of line of action
 % s is normalized vector of line of action
-
 r = zeros(length(MusclePaths),3);
 s = zeros(length(MusclePaths),3);
-switch MusclePath
-    case 'StraightLine'
-        for i = 1:length(MusclePaths)
-            s(i,:) = MusclePaths(i).StraightAction(1,:);
-            r(i,:) = MusclePaths(i).StraightAction(2,:);
-        end
-    case 'ViaPoint'
-        for i = 1:length(MusclePaths)
-            s(i,:) = MusclePaths(i).ViaAction(1,:);
-            r(i,:) = MusclePaths(i).ViaAction(2,:);
-        end
-    case 'Wrapping'
-        for i = 1:length(MusclePaths)
-            s(i,:) = MusclePaths(i).WrapAction(1,:);
-            r(i,:) = MusclePaths(i).WrapAction(2,:);
-        end
+for i = 1:length(MusclePaths)
+    r(i,:) = MusclePaths(i).(MusclePath)(1:3);
+    s(i,:) = MusclePaths(i).(MusclePath)(4:6);
 end
 
 % Iglic 1990 equation 2

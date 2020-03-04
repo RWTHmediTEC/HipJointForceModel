@@ -47,7 +47,6 @@ switch data.MusclePath
                                 sBol = ismember(ActiveMuscles{i}(1:end-1), LE(b).Surface.(Surface{s}).Muscles); % check if muscles wrapps arround surface
                                 if any(sBol)
                                     % Initialize values for matGeom (see Documentation of MatGeom3D)
-                                    testIntersection = {};
                                     cCenter = LE(b).Surface.(Surface{s}).Center; % Center of Cylinder
                                     cRadius = LE(b).Surface.(Surface{s}).Radius; % Radius of Cylinder
                                     cAxis = LE(b).Surface.(Surface{s}).Axis; % Axis of Cylinder
@@ -101,7 +100,7 @@ switch data.MusclePath
                                         wrapVect = transformVector3d(muscleWrappingSystem.geodesics{1}.KP.t', cRot); % tangent vector
                                         angleVect = rad2deg(vectorAngle3d(wrapVect,straightVect));
                                         if abs(angleVect - 90) <= 15 && abs(angleVect - 90) >= -15
-                                            angleCorrection = 0.6;
+                                            angleCorrection = 0.3;
                                         	qCyl(1) = qCyl(1)  -side*angleCorrection; % changing initial conditions for wrapping
                                             muscleWrappingSystem = MuscleWrappingSystem(lineOrigin', lineInsertion');
                                             muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCyl, qCyl);
@@ -189,17 +188,17 @@ switch data.MusclePath
         end % i changes
 end
 
-%% create the line of actions for Straight Line, Via Point and muscle wrapping
-% StraightAction, ViaAction and WrapAction contains normalized vector and
+%% Create the line of actions for the muscle path models
+% StraightLine, ViaPoint and Wrapping contains normalized vector and
 % Starting Point for the Vector
 for i = 1:length(MusclePaths)
-    MusclePaths(i).StraightAction = [];
-    MusclePaths(i).ViaAction = [];
-    MusclePaths(i).WrapAction = [];
+    MusclePaths(i).StraightLine = [];
+    MusclePaths(i).ViaPoint = [];
+    MusclePaths(i).Wrapping = [];
     % creates normalized vector for straight Line an Line of action for
     % straight line
     NormStraight = normalizeVector3d(MusclePaths(i).Points(end,:) - MusclePaths(i).Points(1,:));
-    MusclePaths(i).StraightAction = [NormStraight; MusclePaths(i).Points(1,:)];
+    MusclePaths(i).StraightLine = [MusclePaths(i).Points(1,:) NormStraight];
     % creates normalized vector for via Line and Line of action for via
     % points
     if size(MusclePaths(i).Points,1) > 2 && isempty(MusclePaths(i).Surface)
@@ -210,12 +209,12 @@ for i = 1:length(MusclePaths)
         else 
             NormVia = normalizeVector3d(MusclePaths(i).Points(2,:) - MusclePaths(i).Points(1,:));
         end
-        MusclePaths(i).ViaAction = [NormVia; MusclePaths(i).Points(1,:)];
+        MusclePaths(i).ViaPoint = [MusclePaths(i).Points(1,:) NormVia];
     % creates normalized vector for wrapping w/o via points and Line of
     % action
     elseif size(MusclePaths(i).Points,1) == 2 && ~isempty(MusclePaths(i).Surface)
         NormWrap = MusclePaths(i).Surface.straightLineSegments{1}.e'; 
-        MusclePaths(i).WrapAction = [NormWrap; MusclePaths(i).Surface.straightLineSegments{1}.startPoint'];
+        MusclePaths(i).Wrapping = [MusclePaths(i).Surface.straightLineSegments{1}.startPoint' NormWrap];
     % creates normalized vector for wrapping with via points and Line of 
     % action. Checks if wrapping occurs between first two points of muscle
     % or not
@@ -229,18 +228,18 @@ for i = 1:length(MusclePaths)
             else
                 NormWrap = normalizeVector3d(MusclePaths(i).Points(2,:) - MusclePaths(i).Points(1,:));
             end
-            MusclePaths(i).WrapAction = [NormWrap; MusclePaths(i).Surface.straightLineSegments{1}.startPoint'];
+            MusclePaths(i).Wrapping = [MusclePaths(i).Surface.straightLineSegments{1}.startPoint' NormWrap];
         % checks if muscle starts with straight line from via points
         else
             NormWrap = MusclePaths(i).Surface.straightLineSegments{1}.e'; 
-            MusclePaths(i).WrapAction = [NormWrap; MusclePaths(i).Surface.straightLineSegments{1}.startPoint'];
+            MusclePaths(i).Wrapping = [MusclePaths(i).Surface.straightLineSegments{1}.startPoint' NormWrap];
         end
     end
-    if isempty(MusclePaths(i).ViaAction)
-        MusclePaths(i).ViaAction = MusclePaths(i).StraightAction;
+    if isempty(MusclePaths(i).ViaPoint)
+        MusclePaths(i).ViaPoint = MusclePaths(i).StraightLine;
     end
-    if isempty(MusclePaths(i).WrapAction)
-        MusclePaths(i).WrapAction = MusclePaths(i).ViaAction;
+    if isempty(MusclePaths(i).Wrapping)
+        MusclePaths(i).Wrapping = MusclePaths(i).ViaPoint;
     end
 end
 MusclePaths = rmfield(MusclePaths, 'idxPelvis');
