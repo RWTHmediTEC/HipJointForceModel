@@ -80,11 +80,11 @@ function data = Calculation(data)
 % Inputs
 BW              = data.S.BodyWeight;
 hipJointWidth   = data.S.Scale(1).HipJointWidth;
+side            = data.S.Side;
 MuscleList      = data.MuscleList;
 activeMuscles   = data.activeMuscles;
 MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
-side            = data.S.Side;
 
 %% Define Parameters
 G = -9.81;                         % weight force

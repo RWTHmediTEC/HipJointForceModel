@@ -8,17 +8,20 @@ addParameter(p, 'Bones', length(LE), valFctBones);
 addParameter(p, 'Joints', false, @islogical);
 addParameter(p, 'Muscles', {}, @(x) isstruct(x) || isempty(x));
 addParameter(p, 'MuscleList', {}, @iscell);
+addParameter(p, 'MusclePathModel', false);
 addParameter(p, 'Surfaces', {}, @iscell);
 addParameter(p, 'ShowWrapSurf', false, logParValidFunc);
 parse(p, varargin{:});
 
 NoB = p.Results.Bones;
-visJoints = p.Results.Joints;
-Muscles = p.Results.Muscles;
+visJoints       = p.Results.Joints;
+Muscles         = p.Results.Muscles;
 % if ~isempty(Muscles); Muscles=Muscles(:,1); end
-MuscleList = p.Results.MuscleList;
-Surfaces = p.Results.Surfaces;
-visWrapSurf = p.Results.ShowWrapSurf;
+MuscleList      = p.Results.MuscleList;
+MusclePathModel = p.Results.MusclePathModel;
+Surfaces        = p.Results.Surfaces;
+visWrapSurf     = p.Results.ShowWrapSurf;
+
 
 
 %% Visualization of the model
@@ -90,9 +93,12 @@ if ~isempty(Muscles)
         lineProps.MarkerEdgeColor = lineProps.Color;
         lineProps.MarkerFaceColor = lineProps.Color;
         if isempty(Muscles(m).Surface)
-            % draws muscles as lines (Straight and Via), as there are no
-            % surfaces to be drawn
-            drawPoint3d(axH, Muscles(m).Points, lineProps);
+            switch MusclePathModel
+                case 'StraightLine'
+                    drawPoint3d(axH, Muscles(m).Points([1,end],:), lineProps);
+                case {'ViaPoint', 'Wrapping'}
+                    drawPoint3d(axH, Muscles(m).Points, lineProps);
+            end
         elseif size(Muscles(m).Points,1) <= 2
             % draws wrapped muscles between Origin and Insertion
             Muscles(m).Surface.plotWrappingSystem(lineProps, axH);
@@ -108,6 +114,11 @@ if ~isempty(Muscles)
             end
             drawPoint3d(axH, Muscles(m).Points(1:pIdx,:), lineProps);
             drawPoint3d(axH, Muscles(m).Points(pIdx+1:end,:), lineProps);
+        end
+        if MusclePathModel
+            drawArrow3d(axH, ...
+                Muscles(m).(MusclePathModel)(1:3),...
+                Muscles(m).(MusclePathModel)(4:6)*25);
         end
     end
 end

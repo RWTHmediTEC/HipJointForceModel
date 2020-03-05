@@ -12,6 +12,7 @@ function [postures, default] = Posture()
 
 default = 1;
 postures = {'StandingUp' 'SU'};
+
 end
 
 %% Calculate the joint angles for positioning of the TLEM2
@@ -160,10 +161,10 @@ end
 momentF = cross(r, F);
 
 switch Side
-    case 'L'
-        momentW = cross([0 0  l], W);  % Moment of bodyweight force around hip rotation center
     case 'R'
         momentW = cross([0 0 -l], W); % Moment of bodyweight force around hip rotation center
+    case 'L'
+        momentW = cross([0 0  l], W); % Moment of bodyweight force around hip rotation center
 end
 
 % Calculate hip joint reaction force R

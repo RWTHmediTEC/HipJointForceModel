@@ -12,9 +12,8 @@ HJF models
 - Parameter / sensitivity study of the HJF models
 - Implement models for other ADLs
 Muscle path models
-- Implement via point and wrapping surfaces
-- Seperate muscle line model and HJF model
-- Store calculation of muscle vectors / moment arms in single function
+- Muscle moment arm calculation for Wrapping?
+- Scaling of wrapping surfaces?
 Muscle recruitment
 - Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
 Scaling laws
