@@ -15,8 +15,7 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+postures = {'OneLeggedStance', 'OLS'; 'LevelWalking', 'LW'};
 
 end
 
@@ -36,7 +35,7 @@ jointAngles = {[phi 0 0], [ny 0 0], 0, 0, -ny, 0};
 end
 
 %% Active muscles
-function [activeMuscles, enable] = Muscles(gui)
+function [activeMuscles, enable] = Muscles(~)
 % User is allowed to edit the default values
 enable = 'off';
 
@@ -73,23 +72,19 @@ activeMuscles = {...
     'GluteusMinimusPosterior2', 'fp';
     'Piriformis1',              'fp'};
 
-% Disable muscle path models which are not supported
-set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'on');
-set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'on');
 end
 
 %% Calculation of the hip joint force
 function data = Calculation(data)
 
 % Inputs
-LE            = data.S.LE;
-muscleList    = data.MuscleList;
-BW            = data.S.BodyWeight;
-hipJointWidth = data.S.Scale(1).HipJointWidth;
-activeMuscles = data.activeMuscles;
-musclePath    = data.MusclePathModel;
-side          = data.S.Side;
-view          = data.View;
+BW              = data.S.BodyWeight;
+hipJointWidth   = data.S.Scale(1).HipJointWidth;
+MuscleList      = data.MuscleList;
+activeMuscles   = data.activeMuscles;
+MusclePathModel = data.MusclePathModel;
+MusclePaths     = data.S.MusclePaths;
+side            = data.S.Side;
 
 %% Define Parameters
 G = -9.81;                         % weight force
@@ -109,56 +104,24 @@ d = 0;                             % !QUESTIONABLE! antero-posterior moment arm 
 % and relative physiological cross-sectional areas A
 
 % Number of active muscles
-NoAM = size(activeMuscles,1);
+NoAM = length(MusclePaths);
 
-% Get muscle origin points and muscle insertion points
-via(NoAM,1) = false;
-[r, r_] = deal(zeros(NoAM,3));
-for m = 1:NoAM
-    for n = 1:length(LE)
-        if ~isempty(LE(n).Muscle)
-            muscles = fieldnames(LE(n).Muscle);
-            if any(strcmp(muscles,activeMuscles(m,1)))
-                for t = 1:length(LE(n).Muscle.(activeMuscles{m,1}).Type)
-                    if strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Origin')
-                        r(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
-                    elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Via')
-                        if strcmp(musclePath, 'ViaPoint')
-                            via(m) = true;
-                        else
-                            continue;
-                        end
-                    elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Insertion')
-                        r_(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
-                    end
-                end
-            end
-        end
-    end
+% Get muscle origin points
+r=nan(NoAM,3);
+% Unit vectors s in the direction of the muscles [Iglic 1990, S.37, Equ.3]
+s=nan(NoAM,3);
+for i = 1:NoAM
+    r(i,:) = MusclePaths(i).(MusclePathModel)(1:3);
+    s(i,:) = MusclePaths(i).(MusclePathModel)(4:6);
 end
 
 A = zeros(NoAM,1);
 % Get physiological cross-sectional areas
 for m = 1:NoAM
     % Physiological cross-sectional areas of each fascicle
-    A_Idx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
-    A(m) = muscleList{A_Idx,5} / muscleList{A_Idx,4};
+    A_Idx = strcmp(MusclePaths(m).Name(1:end-1), MuscleList(:,1));
+    A(m) = MuscleList{A_Idx,5} / MuscleList{A_Idx,4};
 end
-
-% Unit vectors s in the direction of the muscles
-for m = 1:NoAM
-    if via(m) == true
-        % Find most distal via point of pelvis
-        [~, idxPelvis] = min(LE(1).Muscle.(activeMuscles{m,1}).Pos(:,2));
-        r(m,:) = LE(1).Muscle.(activeMuscles{m,1}).Pos(idxPelvis,:);
-        % Find most proximal via point of femur
-        [~, idxFemur] = max(LE(2).Muscle.(activeMuscles{m,1}).Pos(:,2));
-        r_(m,:) = LE(2).Muscle.(activeMuscles{m,1}).Pos(idxFemur,:);
-        % !!! Has to be adapted if extreme joint positions are considered
-    end
-end
-% Unit vectors s in the direction of the muscles [Iglic 1990, S.37, Equ.3]
-s = normalizeVector3d(r_ - r);
 
 % [Iglic 1990, S.37, Equ.2]
 f = cell2sym(activeMuscles(:,2));

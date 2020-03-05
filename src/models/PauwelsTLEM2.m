@@ -30,15 +30,12 @@ end
 %% Calculate the joint angles for positioning of the TLEM2
 function jointAngles = Position(~)
 
-% Inputs
-
-% Calculate the joint angles
 jointAngles = {[0 0 0], [0 0 0], 0, 0, 0, 0};
 
 end
 
 %% Active muscles
-function [activeMuscles, enable] = Muscles(gui)
+function [activeMuscles, enable] = Muscles(~)
 % User is allowed to edit the default values
 enable = 'on';
 
@@ -69,23 +66,19 @@ activeMuscles = {...
     'Piriformis1'
     'Sartorius1'};
 
-% Disable muscle path models which are not supported
-set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'on');
-set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'on');
 end
 
 %% Calculation of the hip joint force
 function data = Calculation(data)
 
 % Inputs
-LE            = data.S.LE;
-muscleList    = data.MuscleList;
-S             = data.S.BodyWeight;
-activeMuscles = data.activeMuscles;
-musclePath    = data.MusclePathModel;
-HJC           = data.S.LE(1).Joints.Hip.Pos;
-HJW           = data.S.Scale(1).HipJointWidth;
-Side          = data.S.Side;
+S               = data.S.BodyWeight;
+MuscleList      = data.MuscleList;
+MusclePathModel = data.MusclePathModel;
+MusclePaths     = data.S.MusclePaths;
+HJC             = data.S.LE(1).Joints.Hip.Pos;
+HJW             = data.S.Scale(1).HipJointWidth;
+Side            = data.S.Side;
 
 %% Define parameters
 G = -9.81; % Weight force
@@ -98,7 +91,7 @@ a=HJW*ratioLeverArm2HJW;
 
 % Moment arm of the muscle force M
 % Angle between the muscle force M and the vertical in the frontal plane
-[BO, alphaM] = combineMuscleForces(LE, muscleList, musclePath, HJC, activeMuscles);
+[BO, alphaM] = combineMuscleForces(MusclePaths, MusclePathModel, MuscleList, HJC);
 
 syms M % Magnitude of the muscle force
 % Calculation of the muscle force
@@ -141,63 +134,32 @@ a = hjc_R_16(2)-s5(2); % Frontal plane [Pauwels 1965, S.103]
 leverArm2HJW=a*10/HJW;
 end
 
-function [R_FP_MA, R_FP_Angle] = combineMuscleForces(LE, muscleList, musclePath, HJC, activeMuscles)
+function [R_FP_MA, R_FP_Angle] = combineMuscleForces(MusclePaths, MusclePathModel, MuscleList, HJC)
 % Combination of muscle forces in the frontal plane into one resulting
 % muscle force as desribed by Pauwels [Pauwels 1965, S.111] 
 
 % Number of active muscles
-NoAM = size(activeMuscles,1);
-
-% Get muscle origin points and muscle insertion points
-via(NoAM,1) = false;
-[origins, insertions] = deal(zeros(NoAM,3));
-for m = 1:NoAM
-    for n = 1:length(LE)
-        if ~isempty(LE(n).Muscle)
-            muscles = fieldnames(LE(n).Muscle);
-            if any(strcmp(muscles,activeMuscles(m,1)))
-                for t = 1:length(LE(n).Muscle.(activeMuscles{m,1}).Type)
-                    if strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Origin')
-                        origins(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
-                    elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Via')
-                        if strcmp(musclePath, 'ViaPoint')
-                            via(m) = true;
-                        else
-                            continue;
-                        end
-                    elseif strcmp(LE(n).Muscle.(activeMuscles{m,1}).Type(t), 'Insertion')
-                        insertions(m,:) = LE(n).Muscle.(activeMuscles{m,1}).Pos(t,:);
-                    end
-                end
-            end
-        end
-    end
-end
+NoAM = length(MusclePaths);
 
 PCSAs = zeros(NoAM,1);
 % Get physiological cross-sectional areas (PCSA)
 for m = 1:NoAM
     % Physiological cross-sectional areas of each fascicle
-    tempIdx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
-    PCSAs(m) = muscleList{tempIdx,5} / muscleList{tempIdx,4};
+    tempIdx = strcmp(MusclePaths(m).Name(1:end-1), MuscleList(:,1));
+    PCSAs(m) = MuscleList{tempIdx,5} / MuscleList{tempIdx,4};
 end
 
-% Unit vectors in the directions of the muscles
-for m = 1:NoAM
-    if via(m)
-        % Find most distal via point of pelvis
-        [~, idxPelvis] = min(LE(1).Muscle.(activeMuscles{m,1}).Pos(:,2));
-        origins(m,:) = LE(1).Muscle.(activeMuscles{m,1}).Pos(idxPelvis,:);
-        % Find most proximal via point of femur
-        [~, idxFemur] = max(LE(2).Muscle.(activeMuscles{m,1}).Pos(:,2));
-        insertions(m,:) = LE(2).Muscle.(activeMuscles{m,1}).Pos(idxFemur,:);
-    end
+% Lines of action (LoA)
+LoA_Origins = zeros(length(MusclePaths),3);
+LoA_Vectors = zeros(length(MusclePaths),3);
+for i = 1:NoAM
+    LoA_Origins(i,:) = MusclePaths(i).(MusclePathModel)(1:3);
+    LoA_Vectors(i,:) = MusclePaths(i).(MusclePathModel)(4:6);
 end
-muscleVectors = normalizeVector3d(insertions - origins);
 
 % Multiplicate the muscle unit vectors with the PCSAs and project them on
 % the frontal plane
-muscleForces = [origins(:,2:3) muscleVectors(:,2:3).*PCSAs];
+muscleForces = [LoA_Origins(:,2:3) LoA_Vectors(:,2:3).*PCSAs];
 % Calculate the resulting muscle force in the frontal plane
 while size(muscleForces,1)>1
     muscleForces(end-1,:) = resultingOf2Forces2d(muscleForces(end-1,:), muscleForces(end,:));

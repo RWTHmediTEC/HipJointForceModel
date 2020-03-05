@@ -7,6 +7,7 @@ tic;
 LE = data.S.LE;
 MuscleList = data.MuscleList;
 ActiveMuscles = data.activeMuscles;
+MusclePaths = repmat(struct('Name',[]),size(ActiveMuscles,1),1);
 switch data.S.Side; case 'R'; side = 1; case 'L'; side = -1; end
 % Find the Index of the active muscle in Muscle List
 for i = 1:size(ActiveMuscles,1)
@@ -14,8 +15,6 @@ for i = 1:size(ActiveMuscles,1)
 end
 mIdx = find(contains(MuscleList(:,1), tmpMuscles(:,1)));
 % Initalizing variables
-mPoints = {};
-Via = {};
 % check which Muscle Path is used
 switch data.MusclePathModel
     case 'StraightLine'
@@ -86,7 +85,7 @@ switch data.MusclePathModel
                                         qCyl = [theta height -side*abs(vector(1)) vector(2) arcLength];
                                         switch data.Posture
                                             case 'SU'
-                                                if contains(MusclePaths(i).Name{1},'Vastus')
+                                                if contains(MusclePaths(i).Name,'Vastus')
                                                     qCyl(1) = qCyl(1)-side*0.3;
                                                     qCyl(5) = qCyl(5)*2/3;
                                                 end
@@ -128,7 +127,7 @@ switch data.MusclePathModel
                                         % cylinder is made smaller for that muscle so that origin is on cylinder.
                                         % Furthermore point can't lay on cylinder, therefore radius is made
                                         % smaller by 0.00001
-                                        if isequal(MusclePaths(i).Name{:}(1:end-1),'GastrocnemiusLateralis')
+                                        if isequal(MusclePaths(i).Name(1:end-1),'GastrocnemiusLateralis')
                                             axisLine = createLine3d(cStart, cEnd);
                                             cRadius = distancePointLine3d(Origin, axisLine) - 0.00001;
                                         end
@@ -172,7 +171,6 @@ switch data.MusclePathModel
                             end % s changes
                         end % b changes
                     end
-                    mPoints = {};
                 end
                 % check if the muscle wrapps around the cylinder
                 if isequal(MuscleList{mIdx(m),6},'WS') && ~isempty(muscleWrappingSystem)
@@ -204,8 +202,8 @@ for i = 1:length(MusclePaths)
     if size(MusclePaths(i).Points,1) > 2 && isempty(MusclePaths(i).Surface)
         if MusclePaths(i).idxFemur && MusclePaths(i).idxPelvis % checks if muscle is located on femur and pelvis
             NormVia = normalizeVector3d( ...
-                        LE(2).Muscle.(MusclePaths(i).Name{:}).Pos(MusclePaths(i).idxFemur,:) - ...
-                        LE(1).Muscle.(MusclePaths(i).Name{:}).Pos(MusclePaths(i).idxPelvis,:));
+                        LE(2).Muscle.(MusclePaths(i).Name).Pos(MusclePaths(i).idxFemur,:) - ...
+                        LE(1).Muscle.(MusclePaths(i).Name).Pos(MusclePaths(i).idxPelvis,:));
         else 
             NormVia = normalizeVector3d(MusclePaths(i).Points(2,:) - MusclePaths(i).Points(1,:));
         end
@@ -223,8 +221,8 @@ for i = 1:length(MusclePaths)
         if ~isequal(MusclePaths(i).Points(1,:), MusclePaths(i).Surface.straightLineSegments{1}.startPoint')
             if MusclePaths(i).idxFemur && MusclePaths(i).idxPelvis % checks if muscle is located on femur and pelvis
                 NormWrap = normalizeVector3d( ...
-                            LE(2).Muscle.(MusclePaths(i).Name{:}).Pos(MusclePaths(i).idxFemur,:) - ...
-                            LE(1).Muscle.(MusclePaths(i).Name{:}).Pos(MusclePaths(i).idxPelvis,:));
+                            LE(2).Muscle.(MusclePaths(i).Name).Pos(MusclePaths(i).idxFemur,:) - ...
+                            LE(1).Muscle.(MusclePaths(i).Name).Pos(MusclePaths(i).idxPelvis,:));
             else
                 NormWrap = normalizeVector3d(MusclePaths(i).Points(2,:) - MusclePaths(i).Points(1,:));
             end
@@ -250,7 +248,6 @@ toc;
 
     function [points, thetaO, heightO, length, vector] = startingPoint3d(cyl, O, I, Center, Axis)
         %STARTINGPOINT3D creates starting point for geodesic element
-        
         line = createLine3d(O, I);
         points = intersectLineCylinder(line, cyl, 'checkBounds', false);
         rot = createRotationVector3d(Axis, [0 0 1]);
@@ -295,7 +292,7 @@ toc;
             end
         end % b changes
         mPoints = [Origin; Via; Insertion];
-        MusclePaths(i).Name = ActiveMuscles(i);
+        MusclePaths(i).Name = ActiveMuscles{i};
         MusclePaths(i).Points = mPoints;
         MusclePaths(i).Surface = {};
         MusclePaths(i).idxPelvis = idxPelvis;

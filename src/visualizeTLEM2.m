@@ -6,7 +6,7 @@ valFctBones = @(x) validateattributes(x, {'numeric'}, {'>=',1, '<=',length(LE)})
 logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
 addParameter(p, 'Bones', length(LE), valFctBones);
 addParameter(p, 'Joints', false, @islogical);
-addParameter(p, 'Muscles', {}); %  @(x) isstruct(x) || isempty(x)
+addParameter(p, 'Muscles', {}, @(x) isstruct(x) || isempty(x));
 addParameter(p, 'MuscleList', {}, @iscell);
 addParameter(p, 'Surfaces', {}, @iscell);
 addParameter(p, 'ShowWrapSurf', false, logParValidFunc);
@@ -77,21 +77,20 @@ end
 
 %% Visualize muscles initialisation
 if ~isempty(Muscles)
-    % again propreties for lines and markers
     lineProps.Marker = 'o';
     lineProps.Linestyle = '-';
     lineProps.MarkerSize = 2;
     for m = 1:length(Muscles)
-        lineProps.DisplayName = Muscles(m).Name{:}(1:end-1);
+        lineProps.DisplayName = Muscles(m).Name(1:end-1);
         for c = 1:size(MuscleList,1)
-            if isequal(Muscles(m).Name{:}(1:end-1),MuscleList{c,1})
+            if isequal(Muscles(m).Name(1:end-1),MuscleList{c,1})
                 lineProps.Color = MuscleList{c,2};
             end
         end
         lineProps.MarkerEdgeColor = lineProps.Color;
         lineProps.MarkerFaceColor = lineProps.Color;
         if isempty(Muscles(m).Surface)
-            % drawing muscles as lines (Straight and Via), as there are no
+            % draws muscles as lines (Straight and Via), as there are no
             % surfaces to be drawn
             drawPoint3d(axH, Muscles(m).Points, lineProps);
         elseif size(Muscles(m).Points,1) <= 2
@@ -112,7 +111,6 @@ if ~isempty(Muscles)
         end
     end
 end
-
 
 %% Visualize wrapping cylinders
 if visWrapSurf

@@ -402,6 +402,7 @@ gui.Home.Model.PushButton_ResetMuscle = uicontrol(...
     'Callback', @onPushButton_ResetMuscle);
 
 % Adjust layout
+set(gui.Home.Model.Layout_V, 'Height', [-2, -1])
 set(gui.Home.Model.Layout_V_Muscle, 'Height', [-10, -1])
 
 %% Box panel visualization
