@@ -17,7 +17,7 @@ mIdx = find(contains(MuscleList(:,1), tmpMuscles(:,1)));
 mPoints = {};
 Via = {};
 % check which Muscle Path is used
-switch data.MusclePath
+switch data.MusclePathModel
     case 'StraightLine'
         for i = 1:length(ActiveMuscles)
             for m = 1:length(mIdx) % loop through indexes of active muscles in muscle list

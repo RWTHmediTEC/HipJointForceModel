@@ -87,7 +87,7 @@ muscleList    = data.MuscleList;
 BW            = data.S.BodyWeight;
 hipJointWidth = data.S.Scale(1).HipJointWidth;
 activeMuscles = data.activeMuscles;
-musclePath    = data.MusclePath;
+musclePath    = data.MusclePathModel;
 side          = data.S.Side;
 view          = data.View;
 

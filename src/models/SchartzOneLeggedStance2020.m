@@ -68,17 +68,14 @@ end
 function data = Calculation(data)
 
 % Inputs
-LE            = data.S.LE;
-muscleList    = data.MuscleList;
-BW            = data.S.BodyWeight;
-PelvicTilt    = data.S.PelvicTilt;
-HipJointWidth = data.S.Scale(1).HipJointWidth;
-FemoralLength = data.S.Scale(2).FemoralLength;
-activeMuscles = data.activeMuscles;
-Side          = data.S.Side;
-View          = data.View;
-MusclePaths   = data.S.MusclePaths;
-MusclePath    = data.MusclePath;
+muscleList       = data.MuscleList;
+BW               = data.S.BodyWeight;
+HipJointWidth    = data.S.Scale(1).HipJointWidth;
+FemoralLength    = data.S.Scale(2).FemoralLength;
+activeMuscles    = data.activeMuscles;
+Side             = data.S.Side;
+MusclePaths      = data.S.MusclePaths;
+MusclePathModel  = data.MusclePathModel;
 
 %% Define Parameters
 G = -9.81;                         % Weight force
@@ -111,8 +108,8 @@ end
 r = zeros(length(MusclePaths),3);
 s = zeros(length(MusclePaths),3);
 for i = 1:length(MusclePaths)
-    r(i,:) = MusclePaths(i).(MusclePath)(1:3);
-    s(i,:) = MusclePaths(i).(MusclePath)(4:6);
+    r(i,:) = MusclePaths(i).(MusclePathModel)(1:3);
+    s(i,:) = MusclePaths(i).(MusclePathModel)(4:6);
 end
 
 % Iglic 1990 equation 2

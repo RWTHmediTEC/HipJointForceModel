@@ -10,7 +10,7 @@ if nargin == 0
     % Build structure which contains default data
     data.View = 'Femur';                     % View of the HJF: Pelvis; Femur
     data.FemoralTransformation = 'Skinning'; % Femoral transformation method: Scaling; Skinning
-    data.MusclePath = 'StraightLine';        % Muscle Path Model: StraightLine; ViaPoint; Wrapping
+    data.MusclePathModel = 'StraightLine';   % Muscle Path Model: StraightLine; ViaPoint; Wrapping
     % Cadaver
     TLEMversion = 'TLEM2_0';
     % Side of the hip joint: R:Right; L:Left

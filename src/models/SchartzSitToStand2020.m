@@ -15,15 +15,10 @@ postures = {'StandingUp' 'SU'};
 end
 
 %% Calculate the joint angles for positioning of the TLEM2
-function jointAngles = Position(data)
+function jointAngles = Position(~)
 
-% Inputs
-l = data.S.Scale(1).HipJointWidth/2;
-x0 = data.S.Scale(2).FemoralLength;
-
-% Calculate the joint angles
-b = 0.48 * l;
 jointAngles = {[0 0 -44], [0 0 44], 55, 50, -15, 0};
+
 end
 
 %% Active muscles
@@ -117,13 +112,13 @@ end
 function data = Calculation(data)
 
 % Inputs
-muscleList    = data.MuscleList;
-BW            = data.S.BodyWeight;
-HipJointWidth = data.S.Scale(1).HipJointWidth;
-activeMuscles = data.activeMuscles;
-Side          = data.S.Side;
-MusclePaths   = data.S.MusclePaths;
-MusclePath    = data.MusclePath;
+muscleList      = data.MuscleList;
+BW              = data.S.BodyWeight;
+HipJointWidth   = data.S.Scale(1).HipJointWidth;
+activeMuscles   = data.activeMuscles;
+Side            = data.S.Side;
+MusclePaths     = data.S.MusclePaths;
+MusclePathModel = data.MusclePathModel;
 
 %% Define Parameters
 g = -9.81;                         % Weight force
@@ -150,8 +145,8 @@ end
 r = zeros(length(MusclePaths),3);
 s = zeros(length(MusclePaths),3);
 for i = 1:length(MusclePaths)
-    r(i,:) = MusclePaths(i).(MusclePath)(1:3);
-    s(i,:) = MusclePaths(i).(MusclePath)(4:6);
+    r(i,:) = MusclePaths(i).(MusclePathModel)(1:3);
+    s(i,:) = MusclePaths(i).(MusclePathModel)(4:6);
 end
 
 % Iglic 1990 equation 2

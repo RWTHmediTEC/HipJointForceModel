@@ -157,7 +157,7 @@ gui.Home.Settings.Checkbox_ShowWrappingSurfaces = uicontrol(...
     'Enable', 'off',...
     'Callback', @onShowWrappingSurfaces);
 
-set(gui.Home.Settings.(['RadioButton_' data.MusclePath]), 'Value', 1)
+set(gui.Home.Settings.(['RadioButton_' data.MusclePathModel]), 'Value', 1)
 
 % % Adjust layout
 % set(gui.Home.Settings.Layout_V, 'Height', [-1, -1, -1])
@@ -751,21 +751,21 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 
     function onStraightLine(~, ~)
         % User has set the muscle path model to straight line
-        data.MusclePath = 'StraightLine';
+        data.MusclePathModel = 'StraightLine';
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onViaPoint(~, ~)
         % User has set the muscle path model to via point
-        data.MusclePath = 'ViaPoint';
+        data.MusclePathModel = 'ViaPoint';
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onWrapping(~, ~)
         % User has set the muscle path model to obstacle set
-        data.MusclePath = 'Wrapping';
+        data.MusclePathModel = 'Wrapping';
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1035,7 +1035,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         set(gui.Home.Settings.RadioButton_StraightLine, 'Value', 0);
         set(gui.Home.Settings.RadioButton_ViaPoint, 'Value', 0);
         set(gui.Home.Settings.RadioButton_Wrapping, 'Value', 0);
-        switch data.MusclePath
+        switch data.MusclePathModel
             case 'StraightLine'
                 gui.Home.Settings.RadioButton_StraightLine.Value=1;
                 gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value=0;
@@ -1083,7 +1083,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         gui.Home.Model.modelHandle = calculateTLEM2();
         [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
         % Set muscle path model to straight line
-        data.MusclePath = 'StraightLine';
+        data.MusclePathModel = 'StraightLine';
         updateMusclePath();
         % data = musclePathsTLEM2(data);
         [postures, default] = gui.Home.Model.modelHandle.Posture();
