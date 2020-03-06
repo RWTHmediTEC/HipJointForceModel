@@ -83,7 +83,6 @@ hipJointWidth = data.S.Scale(1).HipJointWidth;
 pelvicWidth   = data.S.Scale(1).PelvicWidth;
 pelvicHeight  = data.S.Scale(1).PelvicHeight;
 side          = data.S.Side;
-view          = data.View;
 
 %% Define Parameters
 G = -9.81;                         % Weight force [N/kg]

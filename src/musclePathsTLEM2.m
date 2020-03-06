@@ -16,9 +16,11 @@ MuscleBones=cell(size(MusclePaths));
 MusclePathModels=cell(size(MusclePaths));
 % Extract parameters from the MuscleList for the active muscles
 for i = 1:length(MusclePaths)
-    MuscleListIdx(i,1) = find(strcmp(MusclePaths(i).Name(1:end-1),MuscleList(:,1)));
-    if isempty(MuscleListIdx(i,1))
+    mlIdx = find(strcmp(MusclePaths(i).Name(1:end-1),MuscleList(:,1)));
+    if isempty(mlIdx)
         error('Muscle is not part of the muscle list of the cadaver!')
+    else
+        MuscleListIdx(i,1) = mlIdx;
     end
     MuscleBones{i,1} = MuscleList{MuscleListIdx(i),3};
     MusclePathModels{i,1} = MuscleList{MuscleListIdx(i),6};
