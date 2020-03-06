@@ -9,7 +9,7 @@ function data = createDataTLEM2(data, TLEMversion)
 if nargin == 0
     % Build structure which contains default data
     data.View = 'Femur';                     % View of the HJF: Pelvis; Femur
-    data.FemoralTransformation = 'Skinning'; % Femoral transformation method: Scaling; Skinning
+    data.FemoralTransformation = 'Scaling'; % Femoral transformation method: Scaling; Skinning
     data.MusclePathModel = 'StraightLine';   % Muscle Path Model: StraightLine; ViaPoint; Wrapping
     % Cadaver
     TLEMversion = 'TLEM2_0';

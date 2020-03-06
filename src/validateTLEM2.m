@@ -44,25 +44,26 @@ for s = 1:length(OL)
         data.S.Scale(2).NeckLength     = OL(s).NeckLength;
         data.S.Scale(2).CCD            = OL(s).CCD;
         
+        % Calculate HJF
         data = scaleTLEM2(data);
         data = globalizeTLEM2(data);
         data = gui.Home.Model.modelHandle.Calculation(data);
-        
-        % Scaling and skinning parameters
-        Results(s).BodyWeight     = OL(s).BodyWeight;
-        Results(s).HipJointWidth  = OL(s).HipJointWidth;
-        Results(s).PelvicWidth    = OL(s).PelvicWidth;
-        Results(s).PelvicHeight   = OL(s).PelvicHeight;
-        Results(s).PelvicDepth    = OL(s).PelvicDepth;
-        Results(s).FemoralLength  = OL(s).FemoralLength;
-        Results(s).FemoralVersion = OL(s).FemoralVersion;
-        Results(s).NeckLength     = OL(s).NeckLength;
-        Results(s).CCD            = OL(s).CCD;
-        
-        % Force parameters
+        delete(gui.Home.Visualization.Axis_Visualization.Children);
+        visualizeTLEM2(gui.Home.Visualization.Axis_Visualization, ...
+            data.S.LE, data.S.Side,...
+            'Muscles', data.S.MusclePaths,...
+            'MuscleList', data.MuscleList,...
+            'MusclePathModel',data.MusclePathModel,...
+            'Surfaces', data.SurfaceList,...
+            'ShowWrapSurf',gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value);
+        gui.IsUpdated = true;
+        gui = updateSide(data, gui);
+        gui = updateParameters(data, gui);
+        gui = updateResults(data, gui);
+        drawnow
         
         % Use simulated HJF in the OrthoLoad CS [Bergmann 2016] for the comparison
-        % Use definition 'ASR' [Wu 2002] instead of 'RAS' [Bergmann 2016].
+        % Use orientation 'ASR' instead of 'RAS'.
         R=transformVector3d(data.HJF.Femur.Bergmann2016.R, anatomicalOrientationTFM('RAS','ASR'));
         
         % OrthoLoad HJF is presented for the right side for all subjects. Left

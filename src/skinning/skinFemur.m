@@ -124,6 +124,8 @@ for m = 1:length(muscles)
         LE(2).Muscle.(muscles{m}).Pos(n,:) = LE(2).Muscle.(muscles{m}).Pos(n,:) + trans;
     end
 end
+% Surfaces
+% !!! Positions of the surface centers and axis have to be updated, too !!!
     
 data.S.LE(2) = LE(2);
 

@@ -420,8 +420,8 @@ gui.Home.Visualization.Panel_Visualization = uix.Panel(...
     'Parent', gui.Home.Visualization.Layout_V);
 
 gui.Home.Visualization.Axis_Visualization = axes(...
-    'Parent', gui.Home.Visualization.Panel_Visualization,...
-    'ClippingStyle', 'rectangle');
+    'Parent', gui.Home.Visualization.Panel_Visualization);
+
 
 data = scaleTLEM2(data);
 data = globalizeTLEM2(data);
@@ -497,7 +497,7 @@ gui.Home.Results.Panel_FrontalView = uix.Panel(...
     'Parent',gui.Home.Results.Layout_H_Top,...
     'Title', 'Frontal View');
 gui.Home.Results.Axis_FrontalView = axes(...
-    gui.Home.Results.Panel_FrontalView, 'ClippingStyle', 'rectangle');
+    gui.Home.Results.Panel_FrontalView);
 visualizeTLEM2(gui.Home.Results.Axis_FrontalView,...
     data.S.LE, data.S.Side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
@@ -509,7 +509,7 @@ gui.Home.Results.Panel_SagittalView = uix.Panel(...
     'Parent', gui.Home.Results.Layout_H_Top,...
     'Title', 'Sagittal View');
 gui.Home.Results.Axis_SagittalView = axes(...
-    gui.Home.Results.Panel_SagittalView, 'ClippingStyle', 'rectangle');
+    gui.Home.Results.Panel_SagittalView);
 visualizeTLEM2(gui.Home.Results.Axis_SagittalView, ...
     data.S.LE, data.S.Side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
@@ -526,7 +526,7 @@ gui.Home.Results.Panel_TransverseView = uix.Panel(...
     'Parent', gui.Home.Results.Layout_H_Top,...
     'Title', 'Transverse View');
 gui.Home.Results.Axis_TransverseView = axes(...
-    gui.Home.Results.Panel_TransverseView, 'ClippingStyle', 'rectangle');
+    gui.Home.Results.Panel_TransverseView);
 visualizeTLEM2(gui.Home.Results.Axis_TransverseView, ...
     data.S.LE, data.S.Side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
@@ -709,7 +709,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         data = createDataTLEM2(data, 'TLEM2_0');
         data = scaleTLEM2(data);
         data = musclePathsTLEM2(data);
-        updateParameters();
+        gui = updateParameters(data, gui);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -719,7 +719,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         data = createDataTLEM2(data, 'TLEM2_1');
         data = scaleTLEM2(data);
         data = musclePathsTLEM2(data);
-        updateParameters();
+        gui = updateParameters(data, gui);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -877,7 +877,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         data.S.BodyWeight = data.T.BodyWeight;
         data.S.PelvicTilt = data.T.PelvicTilt;
         data.S.Scale = data.T.Scale;
-        updateParameters();
+        gui = updateParameters(data, gui);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -964,14 +964,13 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             data.Results = validateTLEM2(data, gui);
             writetable(struct2table(data.Results), 'Results.xlsx')
             updateValidationTab();
+        else
+            % Calculation with inserted data
+            data = gui.Home.Model.modelHandle.Calculation(data);
+            gui.IsUpdated = true;
+            gui = updateResults(data, gui);
+            drawnow
         end
-
-        % Calculation with inserted data
-        data = gui.Home.Model.modelHandle.Calculation(data);
-        
-        gui.IsUpdated = true;
-        updateResults();
-        drawnow
     end
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
@@ -985,10 +984,10 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         updateHipJointForceView();
         updateFemoralTransformation();
         updateMusclePath();
-        updateSide();
+        gui = updateSide(data, gui);
         updateMuscleList();
         updateVisualization();
-        updateResults();
+        gui = updateResults(data, gui);
     end
 
 %% Box panel settings
@@ -1055,29 +1054,9 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 
 %% Box panel patient specific parameters
 
-    function updateSide()
-        set(gui.Home.Parameters.RadioButton_L, 'Value', 0);
-        set(gui.Home.Parameters.RadioButton_R, 'Value', 0);
-        switch data.S.Side
-            case 'L'
-                set(gui.Home.Parameters.RadioButton_L, 'Value', 1);
-            case 'R'
-                set(gui.Home.Parameters.RadioButton_R, 'Value', 1);
-        end
-    end
-
-    function updateParameters()
-        set(gui.Home.Parameters.EditText_BodyWeight,     'String', data.S.BodyWeight);
-        set(gui.Home.Parameters.EditText_HipJointWidth,  'String', data.S.Scale(1).HipJointWidth);
-        set(gui.Home.Parameters.EditText_PelvicTilt,     'String', data.S.PelvicTilt);
-        set(gui.Home.Parameters.EditText_PelvicWidth,    'String', data.S.Scale(1).PelvicWidth);
-        set(gui.Home.Parameters.EditText_PelvicHeight,   'String', data.S.Scale(1).PelvicHeight);
-        set(gui.Home.Parameters.EditText_PelvicDepth,    'String', data.S.Scale(1).PelvicDepth);
-        set(gui.Home.Parameters.EditText_FemoralLength,  'String', data.S.Scale(2).FemoralLength);        
-        set(gui.Home.Parameters.EditText_FemoralVersion, 'String', data.S.Scale(2).FemoralVersion);        
-        set(gui.Home.Parameters.EditText_CCD,            'String', data.S.Scale(2).CCD);        
-        set(gui.Home.Parameters.EditText_NeckLength,     'String', data.S.Scale(2).NeckLength);
-    end
+% see:
+%   src/gui/updateSide.m
+%   src/gui/updateParameters.m
 
 %% Box panel model
 
@@ -1121,69 +1100,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 
 %% Box panel results
 
-    function updateResults
-        delete([...
-            gui.Home.Results.Axis_FrontalView   .Children,...
-            gui.Home.Results.Axis_SagittalView  .Children,...
-            gui.Home.Results.Axis_TransverseView.Children])
-        
-        visualizeTLEM2(gui.Home.Results.Axis_FrontalView, ...
-            data.S.LE, data.S.Side,...
-            'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-        visualizeTLEM2(gui.Home.Results.Axis_SagittalView, ...
-            data.S.LE, data.S.Side,...
-            'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-        visualizeTLEM2(gui.Home.Results.Axis_TransverseView, ...
-            data.S.LE, data.S.Side,...
-            'Bones', find(strcmp({data.S.LE.Name}, data.View)));
-        
-        gui.Home.Results.Axis_FrontalView.View = [90 ,0];
-        gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
-        
-        switch data.S.Side
-            case 'R'
-                gui.Home.Results.Axis_SagittalView.View = [0, 90];
-            case 'L'
-                gui.Home.Results.Axis_SagittalView.View = [0, -90];
-        end
-        gui.Home.Results.Axis_SagittalView.CameraUpVector = [0, 1, 0];
-        
-        switch data.View
-            case 'Pelvis'
-                gui.Home.Results.Axis_TransverseView.View = [0, 0];
-                gui.Home.Results.Axis_TransverseView.CameraUpVector = [1, 0, 0];
-            case 'Femur'
-                gui.Home.Results.Axis_TransverseView.View = [0, 180];
-                gui.Home.Results.Axis_TransverseView.CameraUpVector = [-1, 0, 0];
-        end
-        
-        % Plot hip joint force vector
-        if gui.IsUpdated
-            R = data.HJF.(data.View).Wu2002.R;
-            rDir = normalizeVector3d(data.HJF.(data.View).Wu2002.R);
-            switch data.View
-                case 'Pelvis'
-                    Dist2HJC = 55;
-                case 'Femur'
-                    Dist2HJC = 75;
-            end
-            drawArrow3d(gui.Home.Results.Axis_FrontalView,    -rDir*Dist2HJC, rDir*55, 'r')
-            drawArrow3d(gui.Home.Results.Axis_SagittalView,   -rDir*Dist2HJC, rDir*55, 'r')
-            drawArrow3d(gui.Home.Results.Axis_TransverseView, -rDir*Dist2HJC, rDir*55, 'r')
-            
-            set(gui.Home.Results.Label_post_antHJFpercBW,  'String', round(R(1)));
-            set(gui.Home.Results.Label_inf_supHJFpercBW,   'String', round(R(2)));
-            set(gui.Home.Results.Label_med_latHJFpercBW,   'String', round(R(3)));
-            set(gui.Home.Results.Label_FrontalAngle,       'String', round(abs(atand(R(3)/R(2)))));
-            set(gui.Home.Results.Label_SagittalAngle,      'String', round(abs(atand(R(1)/R(2)))));
-            set(gui.Home.Results.Label_TransverseAngle,    'String', round(abs(atand(R(1)/R(3)))));
-            
-            % Disable push button
-            set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'g', 'Enable', 'off');
-        else
-            set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'y', 'Enable', 'on');
-        end
-    end
+% see:
+%   src/gui/updateResults.m
 
 %% Update validation tab
 

@@ -22,8 +22,6 @@ MusclePathModel = p.Results.MusclePathModel;
 Surfaces        = p.Results.Surfaces;
 visWrapSurf     = p.Results.ShowWrapSurf;
 
-
-
 %% Visualization of the model
 hold(axH,'on')
 patchProps.EdgeColor    = 'none';
@@ -145,7 +143,9 @@ if visWrapSurf
 end
 
 %%
-axis(axH, 'equal', 'tight');
 xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
+axH.ClippingStyle='rectangle';
+axH.Units='normalized';
+axis(axH, 'equal');
 
 end

@@ -17,6 +17,7 @@ Muscle path models
 Muscle recruitment
 - Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
 Scaling laws
+- Finish implementation of LBS for the femur: joint axes, surfaces, muscle attachments
 - Verify LBS for OrthoLoad subjects
 - Implement LBS for the pelvis bone
 
