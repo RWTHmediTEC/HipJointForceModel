@@ -23,9 +23,7 @@ for i = 1:length(MusclePaths)
         MuscleListIdx(i,1) = mlIdx;
     end
     MuscleBones{i,1} = MuscleList{MuscleListIdx(i),3};
-    if size(MuscleList,2) == 6
-        MusclePathModels{i,1} = MuscleList{MuscleListIdx(i),6};
-    end
+    MusclePathModels{i,1} = MuscleList{MuscleListIdx(i),6};
 end
 
 % Create MusclePaths struct for StraightLine and ViaPoint model

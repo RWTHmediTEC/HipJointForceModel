@@ -5,6 +5,8 @@ function data = createDataTLEM2(data, Cadaver)
 % extremity
 % [Winter 2009] 2009 - Winter - Biomechanics and Motor Control of Human 
 % Movement - Fourth Edition
+% [Destatis 2018] 2018 - Destatis - Mikrozensus 2017 - Fragen zur 
+% Gesundheit - Körpermaße der Bevölkerung
 
 if nargin == 0
     % Build structure which contains default data
@@ -15,35 +17,38 @@ if nargin == 0
     Cadaver = 'TLEM2_0';
     % Side of the hip joint: R:Right; L:Left
     data.T.Side = 'R';
-    % Patient's body weight [kg]
-    data.T.BodyWeight = 45;
-     % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
-    data.T.BodyHeight = 813/10/0.53;      
     % Pelvic Tilt [°]
     data.T.PelvicTilt = 0;
-    
 end
 
-data.TLEMversion = Cadaver;
+data.Cadaver = Cadaver;
 
 switch Cadaver
     case 'TLEM2_0'
         if ~exist('data\TLEM2_0.mat', 'file')
-            importDataTLEM2_0
+            importDataTLEM2_0;
         end
         load('TLEM2_0', 'LE', 'muscleList')
+        data.T.BodyWeight = 45; % Cadavers's body weight [kg] [Carbone 2015]
+        % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
+        data.T.BodyHeight = 813/10/0.53;
     case 'TLEM2_1'
         if ~exist('data\TLEM2_1.mat', 'file')
             if ~exist('data\TLEM2_0.mat', 'file')
-                importDataTLEM2_0
+                importDataTLEM2_0;
             end
             load('TLEM2_0', 'LE', 'muscleList')
             importDataTLEM2_1(LE, muscleList);
         end
         load('TLEM2_1', 'LE', 'muscleList')
+        data.T.BodyWeight = 45; % Cadavers's body weight [kg] [Carbone 2015]
+        % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
+        data.T.BodyHeight = 813/10/0.53; % [cm]
     case 'Dostal1981'
         [LE, Scale] = Dostal1981;
         muscleList = Johnston1979toDostal1981(Johnston1979, Dostal1981);
+        data.T.BodyWeight = 77; % Generic body weight [kg] [Destatis 2018]
+        data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
     otherwise
         error('No valid TLEM version')
 end
@@ -94,8 +99,8 @@ end
 % CCD            = Angle between neck axis and straight femur axis
 
 % Load controls [Bergmann2016]
-if exist(['femur' data.TLEMversion 'Controls'],'file')
-    load(['femur' data.TLEMversion 'Controls'], 'Controls')
+if exist(['femur' data.Cadaver 'Controls.mat'],'file')
+    load(['femur' data.Cadaver 'Controls.mat'], 'Controls')
     % Construct reference line to measure femoral version
     postConds = [...
         data.T.LE(2).Landmarks.MedialPosteriorCondyle.Pos;...

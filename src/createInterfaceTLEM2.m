@@ -75,7 +75,7 @@ gui.Home.Settings.RadioButton_Dostal1981 = uicontrol(...
     'String', 'Dostal1981',...
     'Callback', @onDostal1981);
 
-set(gui.Home.Settings.(['RadioButton_' data.TLEMversion]), 'Value', 1)
+set(gui.Home.Settings.(['RadioButton_' data.Cadaver]), 'Value', 1)
 
 % Panel Show Hip Joint Force for
 gui.Home.Settings.Panel_View = uix.Panel(...
@@ -712,9 +712,6 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
     function onTLEM2_0(~, ~)
         % User has chosen TLEM 2.0 version
         data = createDataTLEM2(data, 'TLEM2_0');
-        data = scaleTLEM2(data);
-        data = musclePathsTLEM2(data);
-        gui = updateParameters(data, gui);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -722,9 +719,6 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
     function onTLEM2_1(~, ~)
         % User has chosen TLEM 2.1 version
         data = createDataTLEM2(data, 'TLEM2_1');
-        data = scaleTLEM2(data);
-        data = musclePathsTLEM2(data);
-        gui = updateParameters(data, gui);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -732,9 +726,6 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
     function onDostal1981(~, ~)
         % User has chosen Dostal1981
         data = createDataTLEM2(data, 'Dostal1981');
-        data = scaleTLEM2(data);
-        data = musclePathsTLEM2(data);
-        gui = updateParameters(data, gui);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1012,7 +1003,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         set(gui.Home.Settings.RadioButton_TLEM2_0, 'Value', 0);
         set(gui.Home.Settings.RadioButton_TLEM2_1, 'Value', 0);
         set(gui.Home.Settings.RadioButton_Dostal1981, 'Value', 0);
-        switch data.TLEMversion
+        switch data.Cadaver
             case 'TLEM2_0'
                 set(gui.Home.Settings.RadioButton_TLEM2_0, 'Value', 1);
             case 'TLEM2_1'

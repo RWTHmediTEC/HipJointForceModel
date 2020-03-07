@@ -1,13 +1,14 @@
+function [LE, muscleList] = importDataTLEM2_0()
+
 % Import TLEM 2.0 data and save as TLEM2_0.mat in data
 % including structure LE (Lower Extremity) and muscleList
 
 
 %% Look for old data
 if exist('data\TLEM2_0.mat','file')
-    load('data\TLEM2_0.mat','LE','muscleList')
+    load('data\TLEM2_0.mat','LE')
     old_LE=LE;
-    old_muscleList=muscleList;
-    clearvars LE muscleList;
+    clearvars LE;
 end
 
 
@@ -291,3 +292,5 @@ end
 
 %% Save data
 save('data\TLEM2_0.mat', 'LE', 'muscleList')
+
+end

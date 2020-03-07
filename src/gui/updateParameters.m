@@ -1,6 +1,7 @@
 function gui = updateParameters(data, gui)
 
 set(gui.Home.Parameters.EditText_BodyWeight,     'String', data.S.BodyWeight);
+set(gui.Home.Parameters.EditText_BodyHeight,     'String', data.S.BodyHeight);
 set(gui.Home.Parameters.EditText_HipJointWidth,  'String', data.S.Scale(1).HipJointWidth);
 set(gui.Home.Parameters.EditText_PelvicTilt,     'String', data.S.PelvicTilt);
 set(gui.Home.Parameters.EditText_PelvicWidth,    'String', data.S.Scale(1).PelvicWidth);

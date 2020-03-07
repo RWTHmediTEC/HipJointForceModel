@@ -20,12 +20,12 @@ end
 
 % Load TLEMversion controls
 % mat files are created with data\Skinning\femurTLEM2ConstructControls.m
-load(['femur' data.TLEMversion 'Controls'], 'Controls')
+load(['femur' data.Cadaver 'Controls'], 'Controls')
 
 P = 1:size(Controls,1);
 
 % Create TLEMversion weights
-if ~exist(['femur' data.TLEMversion 'Weights.mat'], 'file')
+if ~exist(['femur' data.Cadaver 'Weights.mat'], 'file')
     disp('Skinning weights are calculated. This may take a few minutes ...')
     % Compute boundary conditions
     [bVertices,bConditions] = boundary_conditions(LE(2).Mesh.vertices, LE(2).Mesh.faces, Controls, P);
@@ -34,9 +34,9 @@ if ~exist(['femur' data.TLEMversion 'Weights.mat'], 'file')
     % Normalize weights
     Weights = Weights./repmat(sum(Weights,2), 1, size(Weights,2));
     
-    save(['data/Skinning/femur' data.TLEMversion 'Weights'], 'Weights')
+    save(['data/Skinning/femur' data.Cadaver 'Weights'], 'Weights')
 end
-load(['femur' data.TLEMversion 'Weights'], 'Weights')
+load(['femur' data.Cadaver 'Weights'], 'Weights')
 
 scaleFemur = eye(4);
 scaleFemur(2,2) = S.Scale(2).FemoralLength / T.Scale(2).FemoralLength;

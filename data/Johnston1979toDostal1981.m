@@ -9,10 +9,16 @@ end
 
 NoM = size(muscleListDostal,1);
 
+% Muscle names without the number at the end
 muscleListDostal(:,1) = cellfun(@(x) x(1:end-1), muscleListDostal(:,1),'uni',0);
+% A random color for each muscle
 muscleListDostal(:,2) = mat2cell(round(rand(NoM,3),4),ones(NoM,1));
+% The connected bones: pelvis (1), femur (2)
 muscleListDostal(:,3) = {[1 2]};
+% Number of fascicles 
 muscleListDostal(:,4) = {1};
+% The muscle model: Straight Line (S)
+muscleListDostal(:,6) = {'S'};
     
 
 end
