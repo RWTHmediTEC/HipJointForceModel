@@ -1,4 +1,4 @@
-function data = createDataTLEM2(data, TLEMversion)
+function data = createDataTLEM2(data, Cadaver)
 % References:
 % [Carbone 2015] 2015 - Carbone - TLEM 2.0 - A comprehensive  
 % musculoskeletal geometry dataset for subject-specific modeling of lower 
@@ -9,10 +9,10 @@ function data = createDataTLEM2(data, TLEMversion)
 if nargin == 0
     % Build structure which contains default data
     data.View = 'Femur';                     % View of the HJF: Pelvis; Femur
-    data.FemoralTransformation = 'Scaling'; % Femoral transformation method: Scaling; Skinning
+    data.FemoralTransformation = 'Scaling';  % Femoral transformation method: Scaling, Skinning
     data.MusclePathModel = 'StraightLine';   % Muscle Path Model: StraightLine; ViaPoint; Wrapping
     % Cadaver
-    TLEMversion = 'TLEM2_0';
+    Cadaver = 'TLEM2_0';
     % Side of the hip joint: R:Right; L:Left
     data.T.Side = 'R';
     % Patient's body weight [kg]
@@ -24,30 +24,32 @@ if nargin == 0
     
 end
 
-data.TLEMversion = TLEMversion;
+data.TLEMversion = Cadaver;
 
-switch TLEMversion
+switch Cadaver
     case 'TLEM2_0'
         if ~exist('data\TLEM2_0.mat', 'file')
             importDataTLEM2_0
         end
-        load('TLEM2_0', 'LE', 'muscleList', 'surfaceList')
+        load('TLEM2_0', 'LE', 'muscleList')
     case 'TLEM2_1'
         if ~exist('data\TLEM2_1.mat', 'file')
             if ~exist('data\TLEM2_0.mat', 'file')
                 importDataTLEM2_0
             end
-            load('TLEM2_0', 'LE', 'muscleList', 'surfaceList')
-            importDataTLEM2_1(LE, muscleList, surfaceList);
+            load('TLEM2_0', 'LE', 'muscleList')
+            importDataTLEM2_1(LE, muscleList);
         end
-        load('TLEM2_1', 'LE', 'muscleList', 'surfaceList')
+        load('TLEM2_1', 'LE', 'muscleList')
+    case 'Dostal1981'
+        [LE, Scale] = Dostal1981;
+        muscleList = Johnston1979toDostal1981(Johnston1979, Dostal1981);
     otherwise
         error('No valid TLEM version')
 end
 
 data.T.LE = LE;
 data.MuscleList = muscleList;
-data.SurfaceList = surfaceList;
 
 %% Scaling and skinning parameters
 % Pelvic parameters:
@@ -56,18 +58,31 @@ data.SurfaceList = surfaceList;
 % PelvicHeight   = Distance between HRC and ASIS along Y-Axis
 % PelvicDepth    = Distance between ASIS and PSIS along X-Axis
 
-% Pelvic parameters % !!! Use consistent landmarks (either TLEM or vertices) 
-data.T.Scale(1).HipJointWidth = 2 * (...
-    data.T.LE(1).Joints.Hip.Pos(3) -... 
-    min(data.T.LE(1).Mesh.vertices(:,3)));  % !!! No consideration of width of the pubic symphysis
-data.T.Scale(1).PelvicWidth  =...
-    data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(3) -...
-    data.T.LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos(3);
-data.T.Scale(1).PelvicHeight =...
-    data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(2);
-data.T.Scale(1).PelvicDepth =...
-    data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(1) -...
-    data.T.LE(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos(1);
+% Pelvic parameters % !!! Use consistent landmarks (either TLEM or vertices) !!!
+switch Cadaver
+    case{'TLEM2_0','TLEM2_1'}
+        % !!! No consideration of width of the pubic symphysis !!!
+        data.T.Scale(1).HipJointWidth = 2 * (...
+            data.T.LE(1).Joints.Hip.Pos(3) -...
+            min(data.T.LE(1).Mesh.vertices(:,3)));  
+    case 'Dostal1981'
+        data.T.Scale(1).HipJointWidth = abs(...
+            LE(1).Landmarks.RightHipJointCenter.Pos(3)-...
+            LE(1).Landmarks.LeftHipJointCenter.Pos(3));
+end
+data.T.Scale(1).PelvicWidth  = abs(...
+    data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(3) - ...
+    data.T.LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos(3));
+data.T.Scale(1).PelvicHeight = abs(...
+    data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(2));
+switch Cadaver
+    case{'TLEM2_0','TLEM2_1'}
+        data.T.Scale(1).PelvicDepth = abs(...
+            data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(1) - ...
+            data.T.LE(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos(1));
+    case 'Dostal1981'
+        data.T.Scale(1).PelvicDepth = Scale(1).PelvicDepth;
+end
 
 % Femoral parameters:
 % FemoralLength  = Distance between HRC and the midpoint between medial 
@@ -79,22 +94,33 @@ data.T.Scale(1).PelvicDepth =...
 % CCD            = Angle between neck axis and straight femur axis
 
 % Load controls [Bergmann2016]
-load(['femur' data.TLEMversion 'Controls'], 'Controls')
-% Construct reference line to measure femoral version
-postConds = [...
-    data.T.LE(2).Landmarks.MedialPosteriorCondyle.Pos;...
-    data.T.LE(2).Landmarks.LateralPosteriorCondyle.Pos];
-transversePlane = createPlane(Controls(3,:), Controls(2,:) - Controls(3,:));
-projPostCond = projPointOnPlane(postConds, transversePlane);
-projPostCondLine = createLine3d(projPostCond(1,:), projPostCond(2,:));
-projNeckPoints = projPointOnPlane(Controls(1:2,:), transversePlane);
-projNeckLine = createLine3d(projNeckPoints(1,:), projNeckPoints(2,:));
+if exist(['femur' data.TLEMversion 'Controls'],'file')
+    load(['femur' data.TLEMversion 'Controls'], 'Controls')
+    % Construct reference line to measure femoral version
+    postConds = [...
+        data.T.LE(2).Landmarks.MedialPosteriorCondyle.Pos;...
+        data.T.LE(2).Landmarks.LateralPosteriorCondyle.Pos];
+    transversePlane = createPlane(Controls(3,:), Controls(2,:) - Controls(3,:));
+    projPostCond = projPointOnPlane(postConds, transversePlane);
+    projPostCondLine = createLine3d(projPostCond(1,:), projPostCond(2,:));
+    projNeckPoints = projPointOnPlane(Controls(1:2,:), transversePlane);
+    projNeckLine = createLine3d(projNeckPoints(1,:), projNeckPoints(2,:));
+    
+    data.T.Scale(2).FemoralVersion = rad2deg(vectorAngle3d(projNeckLine(4:6), projPostCondLine(4:6)));
+    data.T.Scale(2).NeckLength = distancePoints3d(Controls(1,:), Controls(2,:));
+    data.T.Scale(2).CCD = rad2deg(vectorAngle3d(Controls(3,:) - Controls(2,:), Controls(1,:) - Controls(2,:)));
+else
+    data.T.Scale(2).FemoralVersion = nan;
+    data.T.Scale(2).NeckLength = nan;
+    data.T.Scale(2).CCD = nan;
+end
 
-% Femoral parameters
-data.T.Scale(2).FemoralLength = data.T.LE(2).Joints.Hip.Pos(2); % !!! Need to be changed for skinning in Bergmann CS
-data.T.Scale(2).FemoralVersion = rad2deg(vectorAngle3d(projNeckLine(4:6), projPostCondLine(4:6)));
-data.T.Scale(2).NeckLength = distancePoints3d(Controls(1,:), Controls(2,:));
-data.T.Scale(2).CCD = rad2deg(vectorAngle3d(Controls(3,:) - Controls(2,:), Controls(1,:) - Controls(2,:)));
+% !!! Need to be changed for skinning in Bergmann CS
+data.T.Scale(2).FemoralLength = distancePoints3d(midPoint3d(...
+    data.T.LE(2).Landmarks.MedialEpicondyle.Pos,... 
+    data.T.LE(2).Landmarks.LateralEpicondyle.Pos), ...
+    data.T.LE(2).Joints.Hip.Pos); 
+
 
 %% Save initally as (T)emplate and (S)ubject
 data.S.Side       = data.T.Side;

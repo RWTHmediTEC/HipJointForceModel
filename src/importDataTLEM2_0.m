@@ -102,7 +102,7 @@ mRaw(:,6:7) = [];
 % Muscles list
 muscleList(cellfun(@isempty, muscleList)) = [];
 % Create colormap
-cmap = rand(length(muscleList),3);
+cmap = round(rand(length(muscleList),3),4);
 muscleList(:,2) = num2cell(cmap,2);
 
 % Muscle bones 
@@ -173,18 +173,17 @@ sRaw(1:3,:) = [];
 % Erase spaces
 sRaw(:,1) = erase(sRaw(:,1),' ');
 
-surfaceList = sRaw;
 % Add surface data (center, axis and radius of the cylinder) to data struct        
 for s = 1:size(sRaw,1)    
     for b = 1:size(LE,2)
         if isequal(sRaw{s,2},LE(b).Name)
-            LE(b).Surface.(surfaceList{s}).Center = cell2mat(sRaw(s,3:5))*1000;
-            LE(b).Surface.(surfaceList{s}).Axis = cell2mat(sRaw(s,6:8));
-            LE(b).Surface.(surfaceList{s}).Radius = cell2mat(sRaw(s,9))*1000;
+            LE(b).Surface.(sRaw{s,1}).Center = cell2mat(sRaw(s,3:5))*1000;
+            LE(b).Surface.(sRaw{s,1}).Axis = cell2mat(sRaw(s,6:8));
+            LE(b).Surface.(sRaw{s,1}).Radius = cell2mat(sRaw(s,9))*1000;
         end
     end
 end
-% add muscles to surface they wrap over
+% Add muscles to surface they wrap over !!! Where does this info come from? !!!
 LE(1).Surface.GluteusMaximus.Muscles = 		{'GluteusMaximusInferior'; ...
 											'GluteusMaximusSuperior'};
 LE(2).Surface.Iliopsoas.Muscles = 			{'IliacusLateralis'; ...
@@ -232,7 +231,7 @@ for lm = 1:length(landmarksPelvis)
         knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{lm}).Pos);
     if tempDist > 3 % [mm]
         warning(['The landmark ' landmarksPelvis{lm} ' was more than 3 mm away' ...
-            ' from the nearest vertex and therefore not saved!'])
+            ' from the nearest vertex. Therefore no node was saved!'])
         LE(1).Landmarks.(landmarksPelvis{lm})=...
             rmfield(LE(1).Landmarks.(landmarksPelvis{lm}), 'Node');
     end
@@ -291,4 +290,4 @@ end
 
 
 %% Save data
-save('data\TLEM2_0.mat', 'LE', 'muscleList','surfaceList')
+save('data\TLEM2_0.mat', 'LE', 'muscleList')

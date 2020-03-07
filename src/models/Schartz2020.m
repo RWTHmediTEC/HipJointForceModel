@@ -105,8 +105,8 @@ activeMuscles = {...
 %     'VastusMedialisSuperior4'};
 
 % Disable muscle path models which are not supported
-set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'on');
-set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'on');
+gui.Home.Settings.RadioButton_ViaPoint.Enable='on';
+gui.Home.Settings.RadioButton_Wrapping.Enable='on';
 end
 
 %% Calculation of the hip joint force

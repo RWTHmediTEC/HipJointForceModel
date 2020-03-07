@@ -7,6 +7,11 @@ PSIS_R = LE(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos;
 PSIS_L =  LE(1).Landmarks.LeftPosteriorSuperiorIliacSpine.Pos;
 HJC = LE(1).Joints.Hip.Pos;
 
-TFM = createPelvisCS_TFM_Wu2002(ASIS_R, ASIS_L, PSIS_R, PSIS_L, HJC);
+if all(~isnan([ASIS_R, ASIS_L, PSIS_R, PSIS_L, HJC]))
+    TFM = createPelvisCS_TFM_Wu2002(ASIS_R, ASIS_L, PSIS_R, PSIS_L, HJC);
+else
+    TFM = eye(4);
+    warning('Landmarks missing! Returning eye(4)!')
+end
 
 end

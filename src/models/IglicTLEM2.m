@@ -35,7 +35,7 @@ jointAngles = {[phi 0 0], [ny 0 0], 0, 0, -ny, 0};
 end
 
 %% Active muscles
-function [activeMuscles, enable] = Muscles(~)
+function [activeMuscles, enable] = Muscles(gui)
 % User is allowed to edit the default values
 enable = 'off';
 
@@ -72,6 +72,9 @@ activeMuscles = {...
     'GluteusMinimusPosterior2', 'fp';
     'Piriformis1',              'fp'};
 
+% Disable muscle path models which are not supported
+gui.Home.Settings.RadioButton_ViaPoint.Enable='on';
+gui.Home.Settings.RadioButton_Wrapping.Enable='on';
 end
 
 %% Calculation of the hip joint force
@@ -98,7 +101,7 @@ W = [0, WB - WL, 0];               % 'WB - WL'
 b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
 c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
 a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
-d = 0;                             % !QUESTIONABLE! antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
+d = 0;                             % antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
 
 % Create matrices for muscle origin points r, muscle insertion points r'
 % and relative physiological cross-sectional areas A

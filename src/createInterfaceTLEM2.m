@@ -46,28 +46,34 @@ gui.Home.Settings.Layout_V = uix.VBox(...
     'Parent', gui.Home.Settings.BoxPanel,...
     'Spacing', 3);
 
-% Panel TLEMversion
-gui.Home.Settings.Panel_TLEMversion = uix.Panel(...
+% Panel Cadaver
+gui.Home.Settings.Panel_Cadaver = uix.Panel(...
     'Parent', gui.Home.Settings.Layout_V,...
-    'Title', 'Used TLEM Version');
+    'Title', 'Used cadaver');
 
-gui.Home.Settings.RadioButtonBox_TLEMversion = uix.VButtonBox(...
-    'Parent', gui.Home.Settings.Panel_TLEMversion,...
+gui.Home.Settings.RadioButtonBox_Cadaver = uix.VButtonBox(...
+    'Parent', gui.Home.Settings.Panel_Cadaver,...
     'Spacing', 3,...
     'HorizontalAlignment', 'left',...
     'ButtonSize', [80 20]);
 
 gui.Home.Settings.RadioButton_TLEM2_0 = uicontrol(...
-    'Parent', gui.Home.Settings.RadioButtonBox_TLEMversion,...
+    'Parent', gui.Home.Settings.RadioButtonBox_Cadaver,...
     'Style', 'radiobutton',...
     'String', 'TLEM 2.0',...
     'Callback', @onTLEM2_0);
 
 gui.Home.Settings.RadioButton_TLEM2_1 = uicontrol(...
-    'Parent', gui.Home.Settings.RadioButtonBox_TLEMversion,...
+    'Parent', gui.Home.Settings.RadioButtonBox_Cadaver,...
     'Style', 'radiobutton',...
     'String', 'TLEM 2.1',...
     'Callback', @onTLEM2_1);
+
+gui.Home.Settings.RadioButton_Dostal1981 = uicontrol(...
+    'Parent', gui.Home.Settings.RadioButtonBox_Cadaver,...
+    'Style', 'radiobutton',...
+    'String', 'Dostal1981',...
+    'Callback', @onDostal1981);
 
 set(gui.Home.Settings.(['RadioButton_' data.TLEMversion]), 'Value', 1)
 
@@ -390,7 +396,7 @@ gui.Home.Model.ListBox_MuscleList = uicontrol(...
     'BackgroundColor', 'w',...
     'String', data.MuscleList(:,1),...
     'Min', 1,...
-    'Max', length(data.MuscleList),...
+    'Max', size(data.MuscleList,1),...
     'Callback', @onListSelection_Muscles);
 updateMuscleList()
 
@@ -430,7 +436,6 @@ visualizeTLEM2(gui.Home.Visualization.Axis_Visualization, ...
     'Muscles', data.S.MusclePaths,...
     'MuscleList', data.MuscleList,...
     'MusclePathModel',data.MusclePathModel,...
-    'Surfaces', data.SurfaceList,...
     'ShowWrapSurf',gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value);
 
 gui.Home.Visualization.Axis_Visualization.View = [90, 0];
@@ -724,6 +729,16 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         updateHomeTab();
     end
 
+    function onDostal1981(~, ~)
+        % User has chosen Dostal1981
+        data = createDataTLEM2(data, 'Dostal1981');
+        data = scaleTLEM2(data);
+        data = musclePathsTLEM2(data);
+        gui = updateParameters(data, gui);
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
     function onPelvis(~, ~)
         % User has set view to pelvis
         data.View = 'Pelvis';
@@ -980,11 +995,12 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 %% Home tab
 
     function updateHomeTab()
-        updateTLEMversion();
+        updateCadaver();
         updateHipJointForceView();
         updateFemoralTransformation();
         updateMusclePath();
         gui = updateSide(data, gui);
+        gui = updateParameters(data, gui);
         updateMuscleList();
         updateVisualization();
         gui = updateResults(data, gui);
@@ -992,14 +1008,19 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 
 %% Box panel settings
 
-    function updateTLEMversion()
+    function updateCadaver()
         set(gui.Home.Settings.RadioButton_TLEM2_0, 'Value', 0);
         set(gui.Home.Settings.RadioButton_TLEM2_1, 'Value', 0);
+        set(gui.Home.Settings.RadioButton_Dostal1981, 'Value', 0);
         switch data.TLEMversion
             case 'TLEM2_0'
                 set(gui.Home.Settings.RadioButton_TLEM2_0, 'Value', 1);
             case 'TLEM2_1'
                 set(gui.Home.Settings.RadioButton_TLEM2_1, 'Value', 1);
+            case 'Dostal1981'
+                set(gui.Home.Settings.RadioButton_Dostal1981, 'Value', 1);
+            otherwise
+                error('Unknown cadaver!')
         end
     end
 
@@ -1034,9 +1055,9 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
     end
 
     function updateMusclePath()
-        set(gui.Home.Settings.RadioButton_StraightLine, 'Value', 0);
-        set(gui.Home.Settings.RadioButton_ViaPoint, 'Value', 0);
-        set(gui.Home.Settings.RadioButton_Wrapping, 'Value', 0);
+        gui.Home.Settings.RadioButton_StraightLine.Value=0;
+        gui.Home.Settings.RadioButton_ViaPoint.Value=0;
+        gui.Home.Settings.RadioButton_Wrapping.Value=0;
         switch data.MusclePathModel
             case 'StraightLine'
                 gui.Home.Settings.RadioButton_StraightLine.Value=1;
@@ -1076,6 +1097,8 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
     end
 
     function updateMuscleList()
+        gui.Home.Model.ListBox_MuscleList.String = data.MuscleList(:,1);
+        gui.Home.Model.ListBox_MuscleList.Max = size(data.MuscleList,1);
         % Get the indices of the muscles used in the current model
         mListValues = find(ismember(data.MuscleList(:,1), ...
             unique(cellfun(@(x)regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
@@ -1094,7 +1117,6 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             'Muscles', data.S.MusclePaths,...
             'MuscleList', data.MuscleList,...
             'MusclePathModel',data.MusclePathModel,...
-            'Surfaces', data.SurfaceList,...
             'ShowWrapSurf',gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value);
     end
 

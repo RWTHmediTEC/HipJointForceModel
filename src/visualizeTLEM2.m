@@ -9,7 +9,6 @@ addParameter(p, 'Joints', false, @islogical);
 addParameter(p, 'Muscles', {}, @(x) isstruct(x) || isempty(x));
 addParameter(p, 'MuscleList', {}, @iscell);
 addParameter(p, 'MusclePathModel', false);
-addParameter(p, 'Surfaces', {}, @iscell);
 addParameter(p, 'ShowWrapSurf', false, logParValidFunc);
 parse(p, varargin{:});
 
@@ -19,7 +18,6 @@ Muscles         = p.Results.Muscles;
 % if ~isempty(Muscles); Muscles=Muscles(:,1); end
 MuscleList      = p.Results.MuscleList;
 MusclePathModel = p.Results.MusclePathModel;
-Surfaces        = p.Results.Surfaces;
 visWrapSurf     = p.Results.ShowWrapSurf;
 
 %% Visualization of the model
@@ -34,16 +32,18 @@ patchProps.FaceLighting = 'gouraud';
 % NoB == 1 || NoB == 2 draws bone only pelvis (1) or femur (2). Transform 
 % bone back to its local bone CS (-> neutral postion). Used for Frontal, 
 % Sagittal and Transversal View in the Results panel.
-if NoB == 1
-    patch(axH, transformPoint3d(LE(NoB).Mesh, ...
-        createPelvisCS_TFM_Wu2002_TLEM2(LE)), patchProps);
-elseif  NoB == 2
-    patch(axH, transformPoint3d(LE(NoB).Mesh, ...
-        createFemurCS_TFM_Wu2002_TLEM2(LE, side)), patchProps);
-else
-    % Draws all the bones. Used for Visualization panel
-    for n = 1:NoB
-        patch(axH, LE(n).Mesh, patchProps);
+if isfield(LE,'Mesh')
+    if NoB == 1
+        patch(axH, transformPoint3d(LE(NoB).Mesh, ...
+            createPelvisCS_TFM_Wu2002_TLEM2(LE)), patchProps);
+    elseif  NoB == 2
+        patch(axH, transformPoint3d(LE(NoB).Mesh, ...
+            createFemurCS_TFM_Wu2002_TLEM2(LE, side)), patchProps);
+    else
+        % Draws all the bones. Used for Visualization panel
+        for n = 1:NoB
+            patch(axH, LE(n).Mesh, patchProps);
+        end
     end
 end
 
@@ -123,18 +123,19 @@ end
 
 %% Visualize wrapping cylinders
 if visWrapSurf
-    if ~isempty(Surfaces)
-        for s = 1:size(Surfaces,1) % run through all the surfaces
-            for b = 1:2 % run through pelvis and femur (only bones with wrapping
-                if isequal(Surfaces{s,2},LE(b).Name)
-                    cCenter = LE(b).Surface.(Surfaces{s,1}).Center;
-                    cAxis   = LE(b).Surface.(Surfaces{s,1}).Axis;
-                    radius = LE(b).Surface.(Surfaces{s,1}).Radius;
+    if isfield(LE,'Surface')
+        for b = 1:length(LE)
+            if ~isempty(LE(b).Surface)
+                surfaces = fieldnames(LE(b).Surface);
+                for s=1:length(surfaces)
+                    cCenter = LE(b).Surface.(surfaces{s}).Center;
+                    cAxis   = LE(b).Surface.(surfaces{s}).Axis;
+                    radius = LE(b).Surface.(surfaces{s}).Radius;
                     startPoint  = cCenter + cAxis * 160;
                     endPoint    = cCenter;
                     drawCylinder(axH, [startPoint, endPoint, radius], 'open', ...
                         'FaceColor', 'red', ...
-                        'FaceAlpha', 0.2, ...
+                        'FaceAlpha', 0.3, ...
                         'FaceLighting', 'gouraud');
                 end
             end

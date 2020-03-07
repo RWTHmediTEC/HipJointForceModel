@@ -75,8 +75,8 @@ activeMuscles = {...
     % [Pauwels 1965, S.110, Fig. 169].
 
 % Disable muscle path models which are not supported
-set(gui.Home.Settings.RadioButton_ViaPoint, 'enable', 'off');
-set(gui.Home.Settings.RadioButton_Wrapping, 'enable', 'off');
+gui.Home.Settings.RadioButton_ViaPoint.Enable='off';
+gui.Home.Settings.RadioButton_Wrapping.Enable='off';
 end
 
 %% Calculation of the hip joint force

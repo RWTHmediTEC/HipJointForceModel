@@ -1,4 +1,4 @@
-function importDataTLEM2_1(LE, muscleList, surfaceList)
+function importDataTLEM2_1(LE, muscleList)
 % !!! Update of muscleList needed? !!!
 
 % Update TLEM 2.0 to TLEM 2.1
@@ -26,14 +26,14 @@ LE(5).Joints.Subtalar.  Pos = [-0.006535063   -0.02434153    0.005824743 ] .* Sc
 LE(6).Joints.Subtalar.  Pos = [ 0              0             0           ] .* ScaleFactor;
 
 % Joint axes
-LE(2).Joints.Knee.      Axis = [0.09091897   0.06445389    0.9937703] .* ScaleFactor;
-LE(2).Joints.Patella.   Axis = [0.09663987  -0.009576934   0.9952733] .* ScaleFactor;
-LE(3).Joints.Knee.      Axis = [0.02081402   0.1209213     0.9924439] .* ScaleFactor;
-LE(3).Joints.Talocrural.Axis = [0.362799     0.1304906    -0.9226858] .* ScaleFactor;
-LE(4).Joints.Patella.   Axis = [0.09663987  -0.009576935   0.9952733] .* ScaleFactor;
-LE(5).Joints.Talocrural.Axis = [0.362799     0.1304906    -0.9226858] .* ScaleFactor;
-LE(5).Joints.Subtalar.  Axis = [0.8784254    0.4637787     0.1152306] .* ScaleFactor;
-LE(6).Joints.Subtalar.  Axis = [0.8784254    0.4637787     0.1152306] .* ScaleFactor;
+LE(2).Joints.Knee.      Axis = normalizeVector3d([0.09091897   0.06445389    0.9937703]) * -1;
+LE(2).Joints.Patella.   Axis = normalizeVector3d([0.09663987  -0.009576934   0.9952733]) * -1;
+LE(3).Joints.Knee.      Axis = normalizeVector3d([0.02081402   0.1209213     0.9924439]) * -1;
+LE(3).Joints.Talocrural.Axis = normalizeVector3d([0.362799     0.1304906    -0.9226858]);
+LE(4).Joints.Patella.   Axis = normalizeVector3d([0.09663987  -0.009576935   0.9952733]) * -1;
+LE(5).Joints.Talocrural.Axis = normalizeVector3d([0.362799     0.1304906    -0.9226858]);
+LE(5).Joints.Subtalar.  Axis = normalizeVector3d([0.8784254    0.4637787     0.1152306]);
+LE(6).Joints.Subtalar.  Axis = normalizeVector3d([0.8784254    0.4637787     0.1152306]);
 
 %% Update muscle elements
 % Pelvic muscle elements
@@ -132,6 +132,6 @@ for m = 1:length(Fascicles)
 end
 
 %% Save data
-save('data\TLEM2_1.mat', 'LE', 'muscleList', 'surfaceList')
+save('data\TLEM2_1.mat', 'LE', 'muscleList')
 
 end

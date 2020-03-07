@@ -20,10 +20,10 @@ for s = 1:length(OL)
         % Load body weight and HJF of OrthoLoad subjects
         % !!! Add the source of the mat files !!!
         load([OL(s).Subject '_' data.Posture '.mat'],'meanPFP')
-        OL(s).BodyWeight = meanPFP.Weight_N/g; % [N] to [kg]
+        OL(s).BodyWeight = meanPFP.Weight_N / g; % [N] to [kg]
         
         % The HJF of the OrthoLoad subjects is given in the OrthLoad CS [Bergmann 2016].
-        % Use definition 'ASR' [Wu 2002] instead of 'RAS' [Bergmann 2016].
+        % Use definition 'ASR' instead of 'RAS'.
         OL_rBW = transformVector3d(meanPFP.HJF_pBW,anatomicalOrientationTFM('RAS','ASR'));
         
         OL(s).R_pBW  = OL_rBW;
@@ -54,7 +54,6 @@ for s = 1:length(OL)
             'Muscles', data.S.MusclePaths,...
             'MuscleList', data.MuscleList,...
             'MusclePathModel',data.MusclePathModel,...
-            'Surfaces', data.SurfaceList,...
             'ShowWrapSurf',gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value);
         gui.IsUpdated = true;
         gui = updateSide(data, gui);
