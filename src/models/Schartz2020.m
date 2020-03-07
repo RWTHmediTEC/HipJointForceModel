@@ -23,7 +23,7 @@ jointAngles = {[0 0 -44], [0 0 44], 55, 50, -15, 0};
 end
 
 %% Active muscles
-function [activeMuscles, enable] = Muscles(gui)
+function [activeMuscles, enable] = Muscles(~)
 % User is allowed to edit the default values
 enable = 'on';
 % Default fascicles of the model
@@ -71,7 +71,7 @@ activeMuscles = {...
     'IliacusMid1';
     'IliacusMid2';
     'RectusFemoris1';
-    'RectusFemoris2'};
+    'RectusFemoris2';
 %     'SoleusLateralis1';
 %     'SoleusLateralis2';
 %     'SoleusLateralis3';
@@ -103,10 +103,7 @@ activeMuscles = {...
 %     'VastusMedialisSuperior2';
 %     'VastusMedialisSuperior3';
 %     'VastusMedialisSuperior4'};
-
-% Disable muscle path models which are not supported
-gui.Home.Settings.RadioButton_ViaPoint.Enable='on';
-gui.Home.Settings.RadioButton_Wrapping.Enable='on';
+    };
 end
 
 %% Calculation of the hip joint force

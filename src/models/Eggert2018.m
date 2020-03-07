@@ -64,7 +64,8 @@ activeMuscles = {...
     'GluteusMinimusMid2';
     'GluteusMinimusPosterior1';
     'GluteusMinimusPosterior2';
-    'Piriformis1'};
+    'Piriformis1'
+    };
 
 end
 

@@ -39,7 +39,7 @@ jointAngles = {[0 0 0], [0 0 0], 0, 0, 0, 0};
 end
 
 %% Active muscles
-function [activeMuscles, enable] = Muscles(gui)
+function [activeMuscles, enable] = Muscles(~)
 % User is allowed to edit the default values
 enable = 'off';
 
@@ -73,10 +73,6 @@ activeMuscles = {...
     % positional data for the origin and insertion of the Piriformis muscle 
     % is missing in [Fick 1850, S.105-106] and is not present in 
     % [Pauwels 1965, S.110, Fig. 169].
-
-% Disable muscle path models which are not supported
-gui.Home.Settings.RadioButton_ViaPoint.Enable='off';
-gui.Home.Settings.RadioButton_Wrapping.Enable='off';
 end
 
 %% Calculation of the hip joint force
