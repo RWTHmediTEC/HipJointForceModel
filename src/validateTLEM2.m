@@ -26,6 +26,8 @@ for s = 1:length(OL)
         % [Bergmann 2016]. Use definition 'ASR' instead of 'RAS'.
         OL(s).HJF_Bergmann2016 = transformVector3d(meanPFP.HJF_pBW,...
             anatomicalOrientationTFM('RAS','ASR'));
+        % Transform OrthoLoad HJF into the Wu2002 CS
+        OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
         
         data.S.Side                    = OL(s).Subject(end);
         data.S.BodyWeight              = OL(s).BodyWeight;
@@ -64,7 +66,6 @@ for s = 1:length(OL)
         HJF_Bergmann2016 = transformVector3d(data.HJF.Femur.Bergmann2016.R, ...
             anatomicalOrientationTFM('RAS','ASR'));
         
-        
         % OrthoLoad HJF is presented for the right side for all subjects.
         % Left sides were mirrored. Hence, for left sides the simulated HJF
         % is also mirrored.
@@ -75,6 +76,7 @@ for s = 1:length(OL)
         end
         
         Results(s).HJF_Wu2002          = HJF_Wu2002;
+        Results(s).OL_HJF_Wu2002       = OL(s).HJF_Wu2002;
         Results(s).HJF_Bergmann2016    = HJF_Bergmann2016;
         Results(s).OL_HJF_Bergmann2016 = OL(s).HJF_Bergmann2016;
     catch

@@ -1,7 +1,6 @@
 function importDataOrthoLoad()
 
-% Import OrthoLoad data and save as OrthoLoad.mat in data
-% including structure OL (OrthoLoad)
+% Import OrthoLoad data as OL (OrthoLoad) struct and save as OrthoLoad.mat 
 
 sides={'R','L'};
 
@@ -50,12 +49,42 @@ HJC_IL  = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), TFM);
 HJC_CL  = transformPoint3d(OL(s).LM.(['HJC_' Side_CL]), TFM);
 PSIS_IL = transformPoint3d(OL(s).LM.(['PSIS_' Side_IL]), TFM);
 
-OL(s).HipJointWidth = abs(HJC_IL(3) - HJC_CL(3)); % Hip joint width
-OL(s).PelvicWidth = abs(ASIS_IL(3) - ASIS_CL(3)); % Pelvic width
-OL(s).PelvicHeight = abs(ASIS_IL(2) - HJC_IL(2)); % Pelvic height
-OL(s).PelvicDepth = abs(ASIS_IL(1) - PSIS_IL(1)); % Pelvic depth
+OL(s).HipJointWidth = abs(HJC_IL(3) - HJC_CL(3));
+OL(s).PelvicWidth   = abs(ASIS_IL(3) - ASIS_CL(3));
+OL(s).PelvicHeight  = abs(ASIS_IL(2) - HJC_IL(2));
+OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
 
 % Femoral parameters
+try
+    % Create transformation into OrthoLoad CS [Bergmann 2016].
+    Bergman2016TFM = createFemurCS_TFM_Bergmann2016(...
+        OL(s).LM.(['MPC_' Side_IL]),...
+        OL(s).LM.(['LPC_' Side_IL]),...
+        OL(s).LM.(['P2_' Side_IL]),...
+        createLine3d(OL(s).LM.(['P1_' Side_IL]), OL(s).LM.(['HJC_' Side_IL])),...
+        createLine3d(OL(s).LM.(['P1_' Side_IL]), OL(s).LM.(['P2_' Side_IL])), ...
+        OL(s).LM.(['HJC_' Side_IL]), Side_IL);
+    % Transform landmarks for Wu2002 into the Bergmann2016 CS.
+    switch Side_IL
+        % OrthoLoad HJF is presented for the right side for all subjects.
+        % Left sides were mirrored. Hence, for left sides the landmarks are
+        % also mirrored.
+        case 'R'
+            mirrorTFM      = eye(4);
+        case 'L'
+            mirrorTFM      = eye(4);
+            mirrorTFM(1,1) = -1;
+    end
+    MEC_IL = transformPoint3d(OL(s).LM.(['MEC_' Side_IL]), mirrorTFM*Bergman2016TFM);
+    LEC_IL = transformPoint3d(OL(s).LM.(['LEC_' Side_IL]), mirrorTFM*Bergman2016TFM);
+    HJC_IL = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), mirrorTFM*Bergman2016TFM);
+    % Create transformation from Bergmann2016 to Wu2002.
+    OL(s).Wu2002TFM = createFemurCS_TFM_Wu2002(MEC_IL, LEC_IL, HJC_IL, Side_IL);
+catch
+    OL(s).Wu2002TFM = nan(4);
+    warning(['Landmarks of ' Subject{s} ' are missing! Returning nan(4)!'])
+end
+
 % Femoral length [Wu2002]
 midPointEC = midPoint3d(OL(s).LM.(['LEC_' Side_IL]), OL(s).LM.(['MEC_' Side_IL]));
 OL(s).FemoralLength = distancePoints3d(midPointEC, OL(s).LM.(['HJC_' Side_IL]));
