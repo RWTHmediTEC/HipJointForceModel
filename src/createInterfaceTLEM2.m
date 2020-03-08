@@ -23,7 +23,9 @@ gui.Home.Layout_V_Mid   = uix.VBox('Parent', gui.Home.Layout_H, 'Spacing', 3);
 gui.Home.Layout_V_Right = uix.VBox('Parent', gui.Home.Layout_H, 'Spacing', 3);
 
 % Create validation tab
-gui.Validation.Layout_Grid = uix.Grid('Parent', gui.Tabs, 'Spacing', 3);
+gui.Validation.Layout_V     = uix.VBox('Parent', gui.Tabs,                'Spacing', 3);
+gui.Validation.Layout_H_Top = uix.HBox('Parent', gui.Validation.Layout_V, 'Spacing', 3);
+gui.Validation.Layout_Grid  = uix.Grid('Parent', gui.Validation.Layout_V, 'Spacing', 3);
 
 gui.Tabs.TabNames = {'Home', 'Validation'};
 gui.Tabs.SelectedChild = 1;
@@ -183,7 +185,7 @@ gui.Home.Parameters.Panel_Side = uix.Panel(...
     'Parent', gui.Home.Parameters.Layout_V,...
     'Title', 'Side');
 
-gui.Home.Parameters.RadioButtonBox_Side = uix.VButtonBox(...
+gui.Home.Parameters.RadioButtonBox_Side = uix.HButtonBox(...
     'Parent', gui.Home.Parameters.Panel_Side,...
     'Spacing', 3,...
     'HorizontalAlignment', 'left',...
@@ -332,7 +334,7 @@ gui.Home.Parameters.PushButton_ResetParameters = uicontrol(...
     'Callback', @onPushButton_ResetParameters);
 
 % Adjust layout
-set(gui.Home.Parameters.Layout_V, 'Height', [-2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -0.6])
+set(gui.Home.Parameters.Layout_V, 'Height', [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -0.6])
 
 %% Box panel model
 gui.Home.Model.BoxPanel = uix.BoxPanel(...
@@ -631,13 +633,47 @@ set(gui.Home.Layout_V_Left,  'Height', [-8, -12])
 set(gui.Home.Layout_V_Right, 'Height', [-1, -2])
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
-%                              VALIDATION TAB                             %
+%                          VALIDATION TAB PANELS                          %
 %_________________________________________________________________________%
 
-%¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
-%                                  PANELS                                 %
-%_________________________________________________________________________%
+%% Box panel Settings
+gui.Validation.Settings.BoxPanel = uix.BoxPanel(...
+    'Parent', gui.Validation.Layout_H_Top,...
+    'Title', 'Settings',...
+    'FontWeight', 'bold');
 
+gui.Validation.Settings.Layout_H = uix.HBox(...
+    'Parent', gui.Validation.Settings.BoxPanel,...
+    'Spacing', 3);
+
+% Panel Femoral Coordinate System
+gui.Home.Settings.Panel_FemoralCS = uix.Panel(...
+    'Parent', gui.Validation.Settings.Layout_H,...
+    'Title', 'Femoral Coordinate System');
+
+gui.Home.Settings.RadioButtonBox_FemoralCS = uix.HButtonBox(...
+    'Parent', gui.Home.Settings.Panel_FemoralCS,...
+    'Spacing', 3,...
+    'HorizontalAlignment', 'left',...
+    'ButtonSize', [80 20]);
+
+gui.Home.Settings.RadioButton_Wu2002 = uicontrol(...
+    'Parent', gui.Home.Settings.RadioButtonBox_FemoralCS,...
+    'Style', 'radiobutton',...
+    'String', 'Wu2002',...
+    'Enable', 'off',...
+    'Callback', @onWu2002);
+
+gui.Home.Settings.RadioButton_Bergmann2016 = uicontrol(...
+    'Parent', gui.Home.Settings.RadioButtonBox_FemoralCS,...
+    'Style', 'radiobutton',...
+    'String', 'Bergmann2016',...
+    'Value', 1,...
+    'Callback', @onBergmann2016);
+
+gui.Validation.Settings.FemoralCS='Bergmann2016';
+
+%% Results Grid
 gui.Validation.Panel.post_antHJFpercBWsingle = uix.Panel(...
     'Parent',gui.Validation.Layout_Grid,...
     'Title', 'posterior anterior HJF [%BW]',...
@@ -703,8 +739,11 @@ structfun(@(x) set(x,'Box','on'),gui.Validation.Axes)
 
 set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [-1, -1])
 
+%% Adjust validation layout
+set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
+
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
-%                           CALLBACK FUNCTIONS                            %
+%                           HOME TAB CALLBACKS                            %
 %_________________________________________________________________________%
 
 %% Box panel settings
@@ -887,6 +926,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
     function onPushButton_ResetParameters(~, ~)
         data.S.Side = data.T.Side;
         data.S.BodyWeight = data.T.BodyWeight;
+        data.S.BodyHeight = data.T.BodyHeight;
         data.S.PelvicTilt = data.T.PelvicTilt;
         data.S.Scale = data.T.Scale;
         gui = updateParameters(data, gui);
@@ -945,7 +985,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
 
     function onPushButton_Top(~, ~)
         gui.Home.Visualization.Axis_Visualization.View = [0, 180];
-        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [1, 0, 0];
+        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [-1, 0, 0];
     end
 
     function onPushButton_Left(~, ~)
@@ -983,6 +1023,24 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             gui = updateResults(data, gui);
             drawnow
         end
+    end
+
+%¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
+%                         VALIDATION TAB CALLBACKS                        %
+%_________________________________________________________________________%
+
+%% Box panel settings
+
+    function onWu2002(~, ~)
+        % User has set femoral coordinate system to Wu2002
+        gui.Validation.Settings.FemoralCS = 'Wu2002';
+        updateValidationTab();
+    end
+
+    function onBergmann2016(~, ~)
+        % User has set view to femur
+        gui.Validation.Settings.FemoralCS = 'Bergmann2016';
+        updateValidationTab();
     end
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
@@ -1131,31 +1189,32 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
         structfun(@(x) set(x,'XTickLabel',{data.Results.Subject}), gui.Validation.Axes)
         structfun(@(x) set(x,'XLim',[0.5, length(data.Results) + 0.5]), gui.Validation.Axes)
         
-        invivo=reshape([data.Results.OL_R_pBW],[3,10])';
-        simulated=reshape([data.Results.R_pBW],[3,10])';
-        % Panel posterior anterior HJF [%BW]
+        % Invivo (i) and Simulated (s)
+        femoralCS=gui.Validation.Settings.FemoralCS;
+        iHJF    = reshape([data.Results.(['OL_HJF_' femoralCS])],[3,10])';
+        sHJF = reshape([data.Results.(['HJF_' femoralCS])],[3,10])';
+        iAngles = calculateHJFangles(iHJF);
+        sAngles = calculateHJFangles(sHJF);
         
+        % Panel posterior anterior HJF [%BW]
         plotValidationResults(gui.Validation.Axes.post_antHJFpercBWsingle,...
-            gui.Validation.Axes.post_antHJFpercBWBoxPlot,invivo(:,1),simulated(:,1))
+            gui.Validation.Axes.post_antHJFpercBWBoxPlot,iHJF(:,1),sHJF(:,1))
         % Panel inferior superior HJF [%BW]
         plotValidationResults(gui.Validation.Axes.inf_supHJFpercBWsingle,...
-            gui.Validation.Axes.inf_supHJFpercBWBoxPlot,invivo(:,2),simulated(:,2))
+            gui.Validation.Axes.inf_supHJFpercBWBoxPlot,iHJF(:,2),sHJF(:,2))
         % Panel medial lateral HJF [%BW]
         plotValidationResults(gui.Validation.Axes.med_latHJFpercBWsingle,...
-            gui.Validation.Axes.med_latHJFpercBWBoxPlot,invivo(:,3),simulated(:,3))
+            gui.Validation.Axes.med_latHJFpercBWBoxPlot,iHJF(:,3),sHJF(:,3))
         
         % Panel sagittal angle
         plotValidationResults(gui.Validation.Axes.SagittalAngleSingle,...
-            gui.Validation.Axes.SagittalAngleBoxPlot,...
-            [data.Results(:).OL_Theta]',[data.Results(:).rTheta]')
+            gui.Validation.Axes.SagittalAngleBoxPlot,iAngles(:,2),sAngles(:,2));
         % Panel frontal angle
         plotValidationResults(gui.Validation.Axes.FrontalAngleSingle,...
-            gui.Validation.Axes.FrontalAngleBoxPlot,...
-            [data.Results(:).OL_Phi]',[data.Results(:).rPhi]')
+            gui.Validation.Axes.FrontalAngleBoxPlot,iAngles(:,1),sAngles(:,1));
         % Panel transverse angle
         plotValidationResults(gui.Validation.Axes.TransverseAngleSingle,...
-            gui.Validation.Axes.TransverseAngleBoxPlot,...
-            [data.Results(:).OL_Alpha]',[data.Results(:).rAlpha]')
+            gui.Validation.Axes.TransverseAngleBoxPlot, iAngles(:,3),sAngles(:,3))
         
         function plotValidationResults(singleHandle, boxPlotHandle, invivo, simulated)
             markerProps.Marker = 'x';
@@ -1166,7 +1225,7 @@ set(gui.Validation.Layout_Grid, 'Widths', [-2, -1, -2, -1, -2, -1], 'Heights', [
             plot(singleHandle, [1,length(simulated)], [nanmedian(simulated),nanmedian(simulated)], 'color', 'b')
             plot(singleHandle, [1,length(invivo)],    [nanmedian(invivo),nanmedian(invivo)],       'color', 'g')
             title(singleHandle,['n = ' num2str(sum(~isnan(simulated)))])
-            boxplot(boxPlotHandle,[invivo, simulated],{'In-vivo','Simulated'},'notch','on')
+            boxplot(boxPlotHandle,[invivo, simulated],{'in vivo','simulated'},'notch','on')
             boxPlotHandle.YLim=singleHandle.YLim;
             boxPlotHandle.YTick=singleHandle.YTick;
             boxPlotHandle.YTickLabel=singleHandle.YTickLabel;

@@ -1,4 +1,4 @@
-function funcHandles = SchartzSitToStand2020
+function funcHandles = Schartz2020
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

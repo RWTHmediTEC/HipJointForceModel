@@ -36,7 +36,7 @@ end
 
 % Plot hip joint force vector
 if gui.IsUpdated
-    R = data.HJF.(data.View).Wu2002.R;
+    HJF = data.HJF.(data.View).Wu2002.R;
     rDir = normalizeVector3d(data.HJF.(data.View).Wu2002.R);
     switch data.View
         case 'Pelvis'
@@ -48,12 +48,13 @@ if gui.IsUpdated
     drawArrow3d(gui.Home.Results.Axis_SagittalView,   -rDir*Dist2HJC, rDir*55, 'r')
     drawArrow3d(gui.Home.Results.Axis_TransverseView, -rDir*Dist2HJC, rDir*55, 'r')
     
-    set(gui.Home.Results.Label_post_antHJFpercBW,  'String', round(R(1)));
-    set(gui.Home.Results.Label_inf_supHJFpercBW,   'String', round(R(2)));
-    set(gui.Home.Results.Label_med_latHJFpercBW,   'String', round(R(3)));
-    set(gui.Home.Results.Label_FrontalAngle,       'String', round(abs(atand(R(3)/R(2)))));
-    set(gui.Home.Results.Label_SagittalAngle,      'String', round(abs(atand(R(1)/R(2)))));
-    set(gui.Home.Results.Label_TransverseAngle,    'String', round(abs(atand(R(1)/R(3)))));
+    set(gui.Home.Results.Label_post_antHJFpercBW, 'String', round(HJF(1)));
+    set(gui.Home.Results.Label_inf_supHJFpercBW,  'String', round(HJF(2)));
+    set(gui.Home.Results.Label_med_latHJFpercBW,  'String', round(HJF(3)));
+    angles = calculateHJFangles(HJF);
+    set(gui.Home.Results.Label_FrontalAngle,    'String', round(angles(1)));
+    set(gui.Home.Results.Label_SagittalAngle,   'String', round(angles(2)));
+    set(gui.Home.Results.Label_TransverseAngle, 'String', round(angles(3)));
     
     % Disable push button
     set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'g', 'Enable', 'off');
