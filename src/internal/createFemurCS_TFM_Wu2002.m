@@ -15,6 +15,9 @@ TFM = inv([[inv([X; Y; Z]), HJC']; [0 0 0 1]]);
 switch side
     case 'L'
         TFM=createRotationOy(pi)*TFM; %#ok<MINV>
+    case 'R'
+    otherwise
+        error('Invalid side identifier!')
 end
 
 end

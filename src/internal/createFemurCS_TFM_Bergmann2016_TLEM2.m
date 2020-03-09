@@ -12,8 +12,8 @@ try
     HJC=LE(2).Joints.Hip.Pos;
     TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, ICN, NeckAxis, ShaftAxis, HJC, side);
 catch
-    warning('Missing data! Returning eye(4)!')
-    TFM = eye(4);
+    warning('Missing data! Returning nan(4)!')
+    TFM=nan(4);
 end
 
 end

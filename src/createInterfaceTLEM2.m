@@ -1191,6 +1191,8 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
                 gui.Validation.Settings.RadioButton_Wu2002.Value = 1;
             case 'Bergmann2016'
                 gui.Validation.Settings.RadioButton_Bergmann2016.Value = 1;
+            otherwise
+                error('Invalid femoral coordinate system!')
         end
     end
 
@@ -1235,12 +1237,12 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
             drawPoint(singleHandle, 1:length(simulated), simulated, 'color', 'b', markerProps,'Marker','x')
             plot(singleHandle, [1,length(simulated)], [nanmedian(simulated),nanmedian(simulated)], 'color', 'b')
             plot(singleHandle, [1,length(invivo)],    [nanmedian(invivo),nanmedian(invivo)],       'color', 'g')
-            title(singleHandle,['n = ' num2str(sum(~isnan(simulated)))])
+            title(singleHandle,['n = ' num2str(sum(~isnan(invivo) & ~isnan(simulated)))])
             boxplot(boxPlotHandle,[invivo, simulated],{'in vivo','simulated'},'notch','on')
             boxPlotHandle.YLim=singleHandle.YLim;
             boxPlotHandle.YTick=singleHandle.YTick;
             boxPlotHandle.YTickLabel=singleHandle.YTickLabel;
-            title(boxPlotHandle,['n = ' num2str(sum(~isnan(simulated)))])
+            title(boxPlotHandle,['n = ' num2str(sum(~isnan(invivo) & ~isnan(simulated)))])
         end
     end
 

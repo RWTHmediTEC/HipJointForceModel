@@ -13,8 +13,12 @@ Y = normalizeVector3d(crossProduct3d(StraightFemurAxis(4:6), PosteriorCondyleAxi
 X = normalizeVector3d(crossProduct3d(Y, Z));
 TFM = inv([[inv([X; Y; Z]), HJC']; [0 0 0 1]]);
 
-if strcmp(side, 'L')
-    TFM=createRotationOz(pi)*TFM; %#ok<MINV>
+switch side
+    case 'L'
+        TFM=createRotationOz(pi)*TFM; %#ok<MINV>
+    case 'R'
+    otherwise
+        error('Invalid side identifier!')
 end
 
 end

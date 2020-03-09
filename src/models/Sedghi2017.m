@@ -30,7 +30,7 @@ end
 function jointAngles = Position(~)
 
 % Only used for visualization
-[~, Scale] = Dostal1981('visu',0);
+[~, Scale] = Dostal1981();
 l_ref = 1/2 * Scale(1).HipJointWidth;
 x0 = Scale(2).FemoralLength;
 phi = 0.5;
@@ -47,24 +47,20 @@ function [activeMuscles, enable] = Muscles(~)
 % User is not allowed to edit the default values
 enable = 'off';
 
-% The division of the muscles in [Iglic 1990, S.37] is not compatible with
-% the TLEM2. Hence, GluteusMediusMid1 is not visualized. However, it is
-% used for calculation as described in [Iglic 1990, S.37].
-
 % Without further explanation, [Sedghi 2017] changed the PCSAs compared to 
 % [Iglic 1990, S.37, Tab.1] and excluded the Piriformis muscle.
 activeMuscles = {...
-    'GluteusMediusAnterior1',   'fa', 0.266 *3*0.2;...
-    'GluteusMinimusAnterior1',  'fa', 0.113 *3*0.2;...
-    'TensorFasciaeLatae1',      'fa', 0.120;...
-    'RectusFemoris1',           'fa', 0.400;...
+    'GluteusMediusAnterior1',   'fa', 3*0.2;...
+    'GluteusMinimusAnterior1',  'fa', 3*0.2;...
+    'TensorFasciaeLatae1',      'fa', 1;...
+    'RectusFemoris1',           'fa', 1;...
     
-    'GluteusMediusMid1',        'ft', 0.266 *3*0.6;... 
-    'GluteusMinimusMid1',       'ft', 0.113 *3*0.6;...
+    'GluteusMediusMid1',        'ft', 3*0.6;... 
+    'GluteusMinimusMid1',       'ft', 3*0.6;...
     
-    'GluteusMediusPosterior1',  'fp', 0.266 *3*0.2;...
-    'GluteusMinimusPosterior1', 'fp', 0.113 *3*0.2;...
-    %'Piriformis1',              'fp', 0.100;...
+    'GluteusMediusPosterior1',  'fp', 3*0.2;...
+    'GluteusMinimusPosterior1', 'fp', 3*0.2;...
+    %'Piriformis1',              'fp', 1;...
     };
 end
 
@@ -74,24 +70,28 @@ function data = Calculation(data)
 % Inputs
 BW            = data.S.BodyWeight;
 bodyHeight    = data.S.BodyHeight;
-activeMuscles = data.activeMuscles;
 hipJointWidth = data.S.Scale(1).HipJointWidth;
 pelvicWidth   = data.S.Scale(1).PelvicWidth;
 pelvicHeight  = data.S.Scale(1).PelvicHeight;
-side          = data.S.Side;
+Side          = data.S.Side;
+
+activeMuscles = data.activeMuscles;
+MuscleList      = data.MuscleList;
+MusclePathModel = data.MusclePathModel;
+MusclePaths     = data.S.MusclePaths;
 
 %% Define Parameters
-G = -9.81;                         % Weight force [N/kg]
-[HM,Scale] = Dostal1981('visu',0); % Import cadaver data of [Dostal 1981] 
+g = -9.81;                         % Weight force [N/kg]
+[HM,Scale] = Dostal1981();         % Import cadaver data of [Dostal 1981] 
 l = 1/2 * hipJointWidth;           % Half the distance between the two hip rotation centers
 x0 = (0.53-0.285)*bodyHeight*10;   % Femoral length ([cm] to [mm]) [Winter 2009, S.83, Fig.4.1]
-WB = BW * G;                       % total body weight [N]
+WB = BW * g;                       % total body weight [N]
 WL = 0.161 * WB;                   % weight of the supporting limb
 W = [0, WB - WL, 0];               % 'WB - WL'
 b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
 c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
 a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
-d = 0;                             % !QUESTIONABLE! antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
+d = 0;                             % antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
 phi = 0.5;                         % Pelvic bend [°]: rotation around the posterior-anterior axis
 ny = asind(b/x0);                  % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
 
@@ -103,7 +103,7 @@ sTFM(3,3,1) = (pelvicWidth-hipJointWidth)/(Scale(1).PelvicWidth-Scale(1).HipJoin
 % Rotate muscle attachments [Iglic 1990, S.37]
 TFM(:,:,1)=createRotationOx(deg2rad(phi))*sTFM(:,:,1);
 TFM(:,:,2)=createRotationOx(deg2rad(ny))*sTFM(:,:,2);
-switch side
+switch Side
     case 'L'
         lTFM=[1 0 0 0; 0 1 0 0; 0 0 -1 0; 0 0 0 1];
         TFM(:,:,1)=lTFM*TFM(:,:,1);
@@ -111,40 +111,37 @@ switch side
 end
 HM = transformTLEM2(HM, TFM);
 
-% Get muscle origin points and muscle insertion points
-NoAM = size(activeMuscles,1); % Number of active muscles
-[r, r_] = deal(nan(NoAM,3));
-for m = 1:NoAM
-    for b = 1:length(HM)
-        muscles = fieldnames(HM(b).Muscle);
-        if any(strcmp(muscles,activeMuscles(m,1)))
-            for t = 1:length(HM(b).Muscle.(activeMuscles{m,1}).Type)
-                if strcmp(HM(b).Muscle.(activeMuscles{m,1}).Type(t), 'Origin')
-                    r(m,:)  = HM(b).Muscle.(activeMuscles{m,1}).Pos(t,:);
-                elseif strcmp(HM(b).Muscle.(activeMuscles{m,1}).Type(t), 'Insertion')
-                    r_(m,:) = HM(b).Muscle.(activeMuscles{m,1}).Pos(t,:);
-                end
-            end
-        end
-    end
+% Number of active muscles
+NoAM = length(MusclePaths);
+
+% Get muscle origin points
+r=nan(NoAM,3);
+% Unit vectors s in the direction of the muscles [Iglic 1990, S.37, Equ.3]
+s=nan(NoAM,3);
+for i = 1:NoAM
+    r(i,:) = MusclePaths(i).(MusclePathModel)(1:3);
+    s(i,:) = MusclePaths(i).(MusclePathModel)(4:6);
 end
 
 % PCAS
-A = cell2mat(activeMuscles(:,3));
-
-% Unit vectors s in the direction of the muscles
-% [Iglic 1990, S.37, Equ.3]
-s = normalizeVector3d(r_ - r);
+A = zeros(NoAM,1);
+% Get physiological cross-sectional areas
+for m = 1:NoAM
+    % Physiological cross-sectional areas of each fascicle
+    A_Idx = strcmp(MusclePaths(m).Name(1:end-1), MuscleList(:,1));
+    A(m) = MuscleList{A_Idx,5} / MuscleList{A_Idx,4};
+end
+A=A.*cell2mat(activeMuscles(:,3));
 
 % [Iglic 1990, S.37, Equ.2]
 f = cell2sym(activeMuscles(:,2));
-assume(f >= 0); assume(f, 'clear');
+assume(f >= 0);
 F = f.*A.*s;
 
 % Moment of F around hip rotation center
 momentF = cross(r, F);
 
-if side == 'L'
+if Side == 'L'
     momentW = cross([d 0  a], W); % Moment 'WB - WL' around hip rotation center
 else
     momentW = cross([d 0 -a], W); % Moment 'WB - WL' around hip rotation center

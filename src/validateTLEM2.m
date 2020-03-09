@@ -39,8 +39,9 @@ for s = 1:length(OL)
                 OL(s).HJF_Wu2002(3)=-OL(s).HJF_Wu2002(3); % Left to right in 'ASR'
             case 'R'
                 OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
+            otherwise
+                error('Invalid side identifier!')
         end
-        
         
         data.S.Side                    = OL(s).Subject(end);
         data.S.BodyWeight              = OL(s).BodyWeight;
@@ -86,6 +87,9 @@ for s = 1:length(OL)
             case 'L'
                 HJF_Bergmann2016(3)=-HJF_Bergmann2016(3);
                 HJF_Wu2002(3)=-HJF_Wu2002(3);
+            case 'R'
+            otherwise
+                error('Invalid side identifier!')
         end
         
         Results(s).HJF_Wu2002          = HJF_Wu2002;
@@ -94,6 +98,8 @@ for s = 1:length(OL)
         Results(s).OL_HJF_Bergmann2016 = OL(s).HJF_Bergmann2016;
     catch
         % Otherwise fill up with nan
+        Results(s).HJF_Wu2002          = nan(1,3);
+        Results(s).OL_HJF_Wu2002       = nan(1,3);
         Results(s).HJF_Bergmann2016    = nan(1,3);
         Results(s).OL_HJF_Bergmann2016 = nan(1,3);
     end

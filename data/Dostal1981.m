@@ -1,14 +1,8 @@
-function varargout = Dostal1981(varargin)
+function [HM, Scale] = Dostal1981()
 % Reference:
-% [Dostal 1981] 1981 - Dostal A three-dimensional biomechanical model of hip musculature
+% [Dostal 1981] 1981 - Dostal A three-dimensional biomechanical model of 
+%   hip musculature
 % All values in [cm]!
-
-% Parsing
-p = inputParser;
-logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
-addParameter(p,'visualization',false,logParValidFunc);
-parse(p,varargin{:});
-visu = p.Results.visualization;
 
 % Segment names
 HM(1).Name='Pelvis';
@@ -167,65 +161,7 @@ Scale(1).PelvicWidth  = abs(... % 28.6; % Table 3
 Scale(1).PelvicHeight = abs(... % mean([23.0 23.4]); % Table 3
     HM(1).Landmarks.RightHipJointCenter.Pos(2)-...
     HM(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(2));
-Scale(1).PelvicDepth =  mean([16.5 16.3]); % Table 3
+Scale(1).PelvicDepth =  mean([16.5 16.3]*10); % Table 3 [cm] to [mm]
 Scale(2).FemoralLength = abs(HM(2).Landmarks.MedialEpicondyle.Pos(2));
-
-varargout{1}=HM;
-varargout{2}=Scale;
-varargout{3}=NaN;
-
-if visu
-    % ColorMap
-    cmap = hsv(length(fieldnames(HM(1).Muscle)));
-    
-    figH=figure('Color','w');
-    axH=axes(figH);
-    hold(axH,'on')
-    lineProps.Marker = 'o';
-    lineProps.MarkerSize = 5;
-    lineProps.Color = 'k';
-    lineProps.MarkerEdgeColor = lineProps.Color;
-    lineProps.MarkerFaceColor = lineProps.Color;
-    drawPoint3d(axH,HM(1).Landmarks.RightHipJointCenter.Pos,lineProps)
-    lineProps.MarkerSize = 2;
-
-    % Loop over bones with muscles
-    BwM = find(~arrayfun(@(x) isempty(x.Muscle), HM));
-    for b = BwM
-        Muscles = fieldnames(HM(b).Muscle);
-        % Loop over the muscles of the bone
-        for m = 1:length(Muscles)
-            % Check if the muscle originates from this bone
-            oIdx = strcmp(HM(b).Muscle.(Muscles{m}).Type, 'Origin');
-                Origin = HM(b).Muscle.(Muscles{m}).Pos(oIdx,:);
-                % Loop over the other bones exept the bone of Origin
-                for bb = BwM(BwM~=b)
-                    matchingMuscle = fieldnames(HM(bb).Muscle);
-                    if any(strcmp(Muscles(m), matchingMuscle))
-                        % Check if it is the bone of insertion
-                        iIdx = strcmp(HM(bb).Muscle.(Muscles{m}).Type, 'Insertion');
-                        if any(iIdx)
-                            Insertion = HM(bb).Muscle.(Muscles{m}).Pos(iIdx,:);
-                        end
-                    end
-                end
-                
-                % Combine Origin, Via points & Insertion
-                mPoints = [Origin; Insertion];
-                lineProps.DisplayName = Muscles{m};
-                lineProps.Color = cmap(m,:);
-                lineProps.MarkerEdgeColor = lineProps.Color;
-                lineProps.MarkerFaceColor = lineProps.Color;
-                drawPoint3d(axH, mPoints, lineProps);
-                drawLabels3d(axH, mPoints, [Muscles{m}([1,end]);Muscles{m}([1,end])], lineProps);
-        end
-    end
-    axis(axH, 'equal', 'tight'); 
-    grid(axH, 'minor');
-    xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
-    title(axH,'Data from [Dostal 1981]')
-    anatomicalViewButtons(axH,'ASR')
-    varargout{4}=axH;
-end
 
 end
