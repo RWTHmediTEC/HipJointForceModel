@@ -22,16 +22,10 @@ Scaling laws
 - Implement LBS for the pelvis bone
 
 TODO GUI:
-- Validation Tab: Add y unit [%BW] or [°] to axes
-- Validation Tab: Add option to switch between [Bergmann 2016] and [Wu 2002] femur bone CS
-- Home Tab: Settings: Option to visualize other cadaver data in visualization window
 
 VALIDATION:
 - Source of the OrthoLoad force data should be documented
 - Greater Trochanter of H4L is missing
-
-TOTEST:
-- Time consumption of single functions (tic toc)
 
 NOTES:
 - Review lines of action:

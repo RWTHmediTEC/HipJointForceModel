@@ -27,7 +27,20 @@ for s = 1:length(OL)
         OL(s).HJF_Bergmann2016 = transformVector3d(meanPFP.HJF_pBW,...
             anatomicalOrientationTFM('RAS','ASR'));
         % Transform OrthoLoad HJF into the Wu2002 CS
-        OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
+        switch OL(s).Subject(end)
+            case 'L'
+                % OrthoLoad HJF is presented for the right side for all 
+                % subjects. Left sides were mirrored. Hence, for left sides
+                % the OrthoLoad HJF has to be mirrored back for the 
+                % transformation into the Wu2002 CS.
+                meanPFP.HJF_pBW(1)=-meanPFP.HJF_pBW(1); % Right to left in 'RAS' 
+                OL(s).HJF_Wu2002 = transformVector3d(...
+                    meanPFP.HJF_pBW, OL(s).Wu2002TFM); % Transform to Wu2002 in 'ASR'
+                OL(s).HJF_Wu2002(3)=-OL(s).HJF_Wu2002(3); % Left to right in 'ASR'
+            case 'R'
+                OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
+        end
+        
         
         data.S.Side                    = OL(s).Subject(end);
         data.S.BodyWeight              = OL(s).BodyWeight;
@@ -60,7 +73,7 @@ for s = 1:length(OL)
         drawnow
         
         
-        HJF_Wu2002 = data.HJF.Femur.Wu2002.R;
+        HJF_Wu2002 = data.HJF.Femur.Wu2002.R; % In 'ASR'
         % Use the simulated HJF in the OrthoLoad CS [Bergmann 2016] for the 
         % comparison. Use the orientation 'ASR' instead of 'RAS'.
         HJF_Bergmann2016 = transformVector3d(data.HJF.Femur.Bergmann2016.R, ...

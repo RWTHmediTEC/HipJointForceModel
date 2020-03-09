@@ -19,8 +19,8 @@ CCD =         135;                                                       % CCD a
 
 for s = 1:length(Subject)
     
-OL(s).Subject = Subject{s};
-OL(s).Sex     = Sex{s};
+OL(s).Subject    = Subject{s};
+OL(s).Sex        = Sex{s};
 OL(s).BodyHeight = Height(s);
 
 Side_IL = Subject{s}(end);
@@ -45,11 +45,11 @@ TFM = createPelvisCS_TFM_Wu2002(OL(s).LM.ASIS_L, OL(s).LM.ASIS_R, OL(s).LM.PSIS_
 
 ASIS_IL = transformPoint3d(OL(s).LM.(['ASIS_' Side_IL]), TFM);
 ASIS_CL = transformPoint3d(OL(s).LM.(['ASIS_' Side_CL]), TFM);
-HJC_IL  = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), TFM);
-HJC_CL  = transformPoint3d(OL(s).LM.(['HJC_' Side_CL]), TFM);
+HJC_IL  = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]),  TFM);
+HJC_CL  = transformPoint3d(OL(s).LM.(['HJC_' Side_CL]),  TFM);
 PSIS_IL = transformPoint3d(OL(s).LM.(['PSIS_' Side_IL]), TFM);
 
-OL(s).HipJointWidth = abs(HJC_IL(3) - HJC_CL(3));
+OL(s).HipJointWidth = abs(HJC_IL(3)  - HJC_CL(3));
 OL(s).PelvicWidth   = abs(ASIS_IL(3) - ASIS_CL(3));
 OL(s).PelvicHeight  = abs(ASIS_IL(2) - HJC_IL(2));
 OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
@@ -65,19 +65,9 @@ try
         createLine3d(OL(s).LM.(['P1_' Side_IL]), OL(s).LM.(['P2_' Side_IL])), ...
         OL(s).LM.(['HJC_' Side_IL]), Side_IL);
     % Transform landmarks for Wu2002 into the Bergmann2016 CS.
-    switch Side_IL
-        % OrthoLoad HJF is presented for the right side for all subjects.
-        % Left sides were mirrored. Hence, for left sides the landmarks are
-        % also mirrored.
-        case 'R'
-            mirrorTFM      = eye(4);
-        case 'L'
-            mirrorTFM      = eye(4);
-            mirrorTFM(1,1) = -1;
-    end
-    MEC_IL = transformPoint3d(OL(s).LM.(['MEC_' Side_IL]), mirrorTFM*Bergman2016TFM);
-    LEC_IL = transformPoint3d(OL(s).LM.(['LEC_' Side_IL]), mirrorTFM*Bergman2016TFM);
-    HJC_IL = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), mirrorTFM*Bergman2016TFM);
+    MEC_IL = transformPoint3d(OL(s).LM.(['MEC_' Side_IL]), Bergman2016TFM);
+    LEC_IL = transformPoint3d(OL(s).LM.(['LEC_' Side_IL]), Bergman2016TFM);
+    HJC_IL = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), Bergman2016TFM);
     % Create transformation from Bergmann2016 to Wu2002.
     OL(s).Wu2002TFM = createFemurCS_TFM_Wu2002(MEC_IL, LEC_IL, HJC_IL, Side_IL);
 catch

@@ -1229,11 +1229,10 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
             gui.Validation.Axes.TransverseAngleBoxPlot, iAngles(:,3),sAngles(:,3))
         
         function plotValidationResults(singleHandle, boxPlotHandle, invivo, simulated)
-            markerProps.Marker = 'x';
             markerProps.Markersize = 7;
             hold(singleHandle,'on');
-            drawPoint(singleHandle, 1:length(invivo),    invivo,    'color', 'g', markerProps)
-            drawPoint(singleHandle, 1:length(simulated), simulated, 'color', 'b', markerProps)
+            drawPoint(singleHandle, 1:length(invivo),    invivo,    'color', 'g', markerProps,'Marker','o')
+            drawPoint(singleHandle, 1:length(simulated), simulated, 'color', 'b', markerProps,'Marker','x')
             plot(singleHandle, [1,length(simulated)], [nanmedian(simulated),nanmedian(simulated)], 'color', 'b')
             plot(singleHandle, [1,length(invivo)],    [nanmedian(invivo),nanmedian(invivo)],       'color', 'g')
             title(singleHandle,['n = ' num2str(sum(~isnan(simulated)))])
