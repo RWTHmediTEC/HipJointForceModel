@@ -73,7 +73,6 @@ for s = 1:length(OL)
         gui = updateResults(data, gui);
         drawnow
         
-        
         HJF_Wu2002 = data.HJF.Femur.Wu2002.R; % In 'ASR'
         % Use the simulated HJF in the OrthoLoad CS [Bergmann 2016] for the 
         % comparison. Use the orientation 'ASR' instead of 'RAS'.

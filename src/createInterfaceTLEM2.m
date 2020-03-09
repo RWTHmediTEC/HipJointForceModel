@@ -104,30 +104,36 @@ gui.Home.Settings.RadioButton_Femur = uicontrol(...
 
 set(gui.Home.Settings.(['RadioButton_' data.View]), 'Value', 1)
 
-% Panel femoral transformation
-gui.Home.Settings.Panel_FemoralTransformation = uix.Panel(...
+% Panel scaling law
+gui.Home.Settings.Panel_ScalingLaw = uix.Panel(...
     'Parent', gui.Home.Settings.Layout_V,...
-    'Title', 'Execute Femoral Transformation by');
+    'Title', 'Scaling Law');
 
-gui.Home.Settings.RadioButtonBox_FemoralTransformation = uix.VButtonBox(...
-    'Parent', gui.Home.Settings.Panel_FemoralTransformation,...
+gui.Home.Settings.RadioButtonBox_ScalingLaw = uix.VButtonBox(...
+    'Parent', gui.Home.Settings.Panel_ScalingLaw,...
     'Spacing', 3,...
     'HorizontalAlignment', 'left',...
     'ButtonSize', [200 20]);
 
-gui.Home.Settings.RadioButton_Scaling = uicontrol(...
-    'Parent', gui.Home.Settings.RadioButtonBox_FemoralTransformation,...
+gui.Home.Settings.RadioButton_NonuniformEggert2018 = uicontrol(...
+    'Parent', gui.Home.Settings.RadioButtonBox_ScalingLaw,...
     'Style', 'radiobutton',...
-    'String', 'Scaling',...
-    'Callback', @onScaling);
+    'String', 'Nonuniform Eggert2018',...
+    'Callback', @onNonuniformEggert2018);
+
+gui.Home.Settings.RadioButton_NonuniformSedghi2017 = uicontrol(...
+    'Parent', gui.Home.Settings.RadioButtonBox_ScalingLaw,...
+    'Style', 'radiobutton',...
+    'String', 'Nonuniform Sedghi2017',...
+    'Callback', @onNonuniformSedghi2017);
 
 gui.Home.Settings.RadioButton_Skinning = uicontrol(...
-    'Parent', gui.Home.Settings.RadioButtonBox_FemoralTransformation,...
+    'Parent', gui.Home.Settings.RadioButtonBox_ScalingLaw,...
     'Style', 'radiobutton',...
     'String', 'Linear Blend Skinning',...
     'Callback', @onSkinning);
 
-set(gui.Home.Settings.(['RadioButton_' data.FemoralTransformation]), 'Value', 1)
+set(gui.Home.Settings.(['RadioButton_' data.ScalingLaw]), 'Value', 1)
 
 % Panel muscle path design
 gui.Home.Settings.Panel_MusclePath = uix.Panel(...
@@ -788,16 +794,23 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
         updateHomeTab();
     end
 
-    function onScaling(~, ~)
-        % User has set femoral transformation to scaling
-        data.FemoralTransformation = 'Scaling';
+    function onNonuniformEggert2018(~, ~)
+        % User has set scaling law to NonuniformEggert2018
+        data.ScalingLaw = 'NonuniformEggert2018';
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onNonuniformSedghi2017(~, ~)
+        % User has set scaling law to NonuniformEggert2018
+        data.ScalingLaw = 'NonuniformSedghi2017';
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onSkinning(~, ~)
-        % User has set femoral transformation to skinning
-        data.FemoralTransformation = 'Skinning';
+        % User has set scaling law to skinning
+        data.ScalingLaw = 'Skinning';
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1053,7 +1066,7 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
     function updateHomeTab()
         updateCadaver();
         updateHipJointForceView();
-        updateFemoralTransformation();
+        updateScalingLaw();
         updateMusclePath();
         gui = updateSide(data, gui);
         gui = updateParameters(data, gui);
@@ -1091,16 +1104,23 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
         end
     end
 
-    function updateFemoralTransformation()
-        set(gui.Home.Settings.RadioButton_Scaling,  'Value', 0);
-        set(gui.Home.Settings.RadioButton_Skinning, 'Value', 0);
-        switch data.FemoralTransformation
-            case 'Scaling'
-                set(gui.Home.Settings.RadioButton_Scaling,  'Value', 1);
+    function updateScalingLaw()
+        set(gui.Home.Settings.RadioButton_NonuniformEggert2018,  'Value', 0);
+        set(gui.Home.Settings.RadioButton_NonuniformSedghi2017,  'Value', 0);
+        set(gui.Home.Settings.RadioButton_Skinning,              'Value', 0);
+        switch data.ScalingLaw
+            case 'NonuniformEggert2018'
+                set(gui.Home.Settings.RadioButton_NonuniformEggert2018,  'Value', 1);
                 set([gui.Home.Parameters.EditText_FemoralVersion,...
                      gui.Home.Parameters.EditText_CCD,...
                      gui.Home.Parameters.EditText_NeckLength],...
                      'Enable', 'off');
+            case 'NonuniformSedghi2017'
+                set(gui.Home.Settings.RadioButton_NonuniformSedghi2017,  'Value', 1);
+                set([gui.Home.Parameters.EditText_FemoralVersion,...
+                    gui.Home.Parameters.EditText_CCD,...
+                    gui.Home.Parameters.EditText_NeckLength],...
+                    'Enable', 'off');
             case 'Skinning'
                 set(gui.Home.Settings.RadioButton_Skinning, 'Value', 1);
                 set([gui.Home.Parameters.EditText_FemoralVersion,...

@@ -2,21 +2,45 @@ function data = scaleTLEM2(data)
 % Patient specific scaling of TLEM2 by pelvic width, pelvic height,
 % pelvic depth and femoral length
 
-%% Scaling parameters
-PW  = data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth;
-PH  = data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight;
-PD  = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
-FL  = data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength;
-
-%% Implementation of scaling matrices
+%% Create scaling matrices
 scaleTFM = repmat(eye(4), 1, 1, 6);
 
+%% Scale factors
+switch data.ScalingLaw
+    case {'NonuniformEggert2018','Skinning'}
+        PW = data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth;
+        PH = data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight;
+        PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
+        FL = data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength;
+        FW = 1;
+    case 'NonuniformSedghi2017'
+        % !!! Sedghi2017 may have used a different definition of the PelvicWidth !!!
+        PW = (data.S.Scale(1).PelvicWidth-data.S.Scale(1).HipJointWidth) / ...
+             (data.T.Scale(1).PelvicWidth-data.T.Scale(1).HipJointWidth);
+        PH = data.S.Scale(1).PelvicHeight / data.T.Scale(1).PelvicHeight;
+        PD = 1;
+        FemoralLength = (0.53-0.285)*data.S.BodyHeight*10; % [cm] to [mm] [Winter 2009, S.83, Fig.4.1]
+        FL = FemoralLength / data.T.Scale(2).FemoralLength;
+        % !!! Sedghi2017 used a different definition !!!
+        % Use Piriformis insertion as greater trochanter to adapt femoral width
+        FW = 1;
+    otherwise
+        error('Invalid scaling law!')
+end
+
 % Pelvis
-scaleTFM(1,1,1) = PD; scaleTFM(2,2,1) = PH; scaleTFM(3,3,1) = PW;
+scaleTFM(1,1,1) = PD; 
+scaleTFM(2,2,1) = PH; 
+scaleTFM(3,3,1) = PW;
 
 % Femur
-if strcmp(data.FemoralTransformation, 'Scaling')
-    scaleTFM(2,2,2) = FL;
+switch data.ScalingLaw
+    case {'NonuniformEggert2018','NonuniformSedghi2017'}
+        scaleTFM(2,2,2) = FL; 
+        scaleTFM(3,3,2) = FW;
+    case 'Skinning'
+    otherwise
+        error('Invalid scaling law!')
 end
 
 % Scaling of patella, tibia, talus and foot by femoral length
@@ -26,7 +50,7 @@ scaleTFM(2,2,3:6) = FL;
 data.S.LE = transformTLEM2(data.T.LE, scaleTFM);
 
 %% Femoral skinning
-if strcmp(data.FemoralTransformation, 'Skinning')
+if strcmp(data.ScalingLaw, 'Skinning')
     data = skinFemur(data);
 end
 

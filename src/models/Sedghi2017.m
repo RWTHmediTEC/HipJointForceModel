@@ -69,10 +69,7 @@ function data = Calculation(data)
 
 % Inputs
 BW            = data.S.BodyWeight;
-bodyHeight    = data.S.BodyHeight;
 hipJointWidth = data.S.Scale(1).HipJointWidth;
-pelvicWidth   = data.S.Scale(1).PelvicWidth;
-pelvicHeight  = data.S.Scale(1).PelvicHeight;
 Side          = data.S.Side;
 
 activeMuscles = data.activeMuscles;
@@ -82,9 +79,7 @@ MusclePaths     = data.S.MusclePaths;
 
 %% Define Parameters
 g = -9.81;                         % Weight force [N/kg]
-[HM,Scale] = Dostal1981();         % Import cadaver data of [Dostal 1981] 
 l = 1/2 * hipJointWidth;           % Half the distance between the two hip rotation centers
-x0 = (0.53-0.285)*bodyHeight*10;   % Femoral length ([cm] to [mm]) [Winter 2009, S.83, Fig.4.1]
 WB = BW * g;                       % total body weight [N]
 WL = 0.161 * WB;                   % weight of the supporting limb
 W = [0, WB - WL, 0];               % 'WB - WL'
@@ -92,24 +87,6 @@ b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1
 c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
 a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
 d = 0;                             % antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
-phi = 0.5;                         % Pelvic bend [°]: rotation around the posterior-anterior axis
-ny = asind(b/x0);                  % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
-
-% Scaling
-sTFM = repmat(eye(4), 1, 1, 2);
-sTFM(1,1,1) = pelvicHeight/Scale(1).PelvicHeight;
-sTFM(3,3,1) = (pelvicWidth-hipJointWidth)/(Scale(1).PelvicWidth-Scale(1).HipJointWidth);
-
-% Rotate muscle attachments [Iglic 1990, S.37]
-TFM(:,:,1)=createRotationOx(deg2rad(phi))*sTFM(:,:,1);
-TFM(:,:,2)=createRotationOx(deg2rad(ny))*sTFM(:,:,2);
-switch Side
-    case 'L'
-        lTFM=[1 0 0 0; 0 1 0 0; 0 0 -1 0; 0 0 0 1];
-        TFM(:,:,1)=lTFM*TFM(:,:,1);
-        TFM(:,:,2)=lTFM*TFM(:,:,2);
-end
-HM = transformTLEM2(HM, TFM);
 
 % Number of active muscles
 NoAM = length(MusclePaths);

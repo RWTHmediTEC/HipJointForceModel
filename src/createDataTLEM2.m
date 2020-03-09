@@ -11,11 +11,11 @@ function data = createDataTLEM2(data, Cadaver)
 if nargin == 0
     % Build structure which contains default data
     data.View = 'Femur';                     % View of the HJF: Pelvis; Femur
-    data.FemoralTransformation = 'Scaling';  % Femoral transformation method: Scaling, Skinning
+    data.ScalingLaw = 'NonuniformEggert2018';% Scaling law: NonuniformEggert2018, Skinning
     data.MusclePathModel = 'StraightLine';   % Muscle Path Model: StraightLine; ViaPoint; Wrapping
     % Cadaver
     Cadaver = 'TLEM2_0';
-    % Side of the hip joint: R:Right; L:Left
+    % Side of the hip joint: Right 'R'; Left 'L'
     data.T.Side = 'R';
     % Pelvic Tilt [°]
     data.T.PelvicTilt = 0;
@@ -56,17 +56,15 @@ end
 data.T.LE = LE;
 data.MuscleList = muscleList;
 
-%% Scaling and skinning parameters
+%% Bony paramters
+
+% !!! Use consistent definitions / landmarks !!!
+
 % Pelvic parameters:
 % HipJointWidth  = Distance between the hip joint centers
-% PelvicWidth    = Distance between the two ASISs along Z-Axis
-% PelvicHeight   = Distance between HRC and ASIS along Y-Axis
-% PelvicDepth    = Distance between ASIS and PSIS along X-Axis
-
-% Pelvic parameters % !!! Use consistent landmarks (either TLEM or vertices) !!!
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
-        % !!! No consideration of width of the pubic symphysis !!!
+        % !!! No consideration of the width of the pubic symphysis !!!
         data.T.Scale(1).HipJointWidth = 2 * (...
             data.T.LE(1).Joints.Hip.Pos(3) -...
             min(data.T.LE(1).Mesh.vertices(:,3)));  
@@ -75,11 +73,14 @@ switch Cadaver
             LE(1).Landmarks.RightHipJointCenter.Pos(3)-...
             LE(1).Landmarks.LeftHipJointCenter.Pos(3));
 end
+% PelvicWidth    = Distance between the two ASISs along Z-Axis in Wu2002
+% PelvicHeight   = Distance between HRC and ASIS along Y-Axis in Wu2002
 data.T.Scale(1).PelvicWidth  = abs(...
     data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(3) - ...
     data.T.LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos(3));
 data.T.Scale(1).PelvicHeight = abs(...
     data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(2));
+% PelvicDepth    = Distance between ASIS and PSIS along X-Axis in Wu2002
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         data.T.Scale(1).PelvicDepth = abs(...
@@ -91,7 +92,7 @@ end
 
 % Femoral parameters:
 % FemoralLength  = Distance between HRC and the midpoint between medial 
-%                  and lateral epicondyle along y-Axis
+%                  and lateral epicondyle
 % FemoralVersion = Angle between neck axis and condylar line projected 
 %                  on transverse plane 
 % NeckLength     = Distance between hip joint center projected on neck axis
@@ -120,11 +121,11 @@ else
     data.T.Scale(2).CCD = nan;
 end
 
-% !!! Need to be changed for skinning in Bergmann CS
+% !!! Need to be changed for skinning in Bergmann CS !!!
 data.T.Scale(2).FemoralLength = distancePoints3d(midPoint3d(...
     data.T.LE(2).Landmarks.MedialEpicondyle.Pos,... 
     data.T.LE(2).Landmarks.LateralEpicondyle.Pos), ...
-    data.T.LE(2).Joints.Hip.Pos); 
+    data.T.LE(2).Joints.Hip.Pos);
 
 
 %% Save initally as (T)emplate and (S)ubject
