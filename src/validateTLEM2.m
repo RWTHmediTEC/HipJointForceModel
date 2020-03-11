@@ -16,7 +16,7 @@ for s = 1:length(OL)
     % Save results in structure Results
     Results(s).Subject = OL(s).Subject;
     Results(s).Sex     = OL(s).Sex;
-%     try
+    try
         % Load body weight and HJF of OrthoLoad subjects
         % !!! Add the source of the mat files !!!
         load([OL(s).Subject '_' data.Posture '.mat'],'meanPFP')
@@ -95,13 +95,13 @@ for s = 1:length(OL)
         Results(s).OL_HJF_Wu2002       = OL(s).HJF_Wu2002;
         Results(s).HJF_Bergmann2016    = HJF_Bergmann2016;
         Results(s).OL_HJF_Bergmann2016 = OL(s).HJF_Bergmann2016;
-%     catch
-%         % Otherwise fill up with nan
-%         Results(s).HJF_Wu2002          = nan(1,3);
-%         Results(s).OL_HJF_Wu2002       = nan(1,3);
-%         Results(s).HJF_Bergmann2016    = nan(1,3);
-%         Results(s).OL_HJF_Bergmann2016 = nan(1,3);
-%         warning(['Validation with subject ' Results(s).Subject ' failed!'])
-%     end
+    catch
+        % Otherwise fill up with nan
+        Results(s).HJF_Wu2002          = nan(1,3);
+        Results(s).OL_HJF_Wu2002       = nan(1,3);
+        Results(s).HJF_Bergmann2016    = nan(1,3);
+        Results(s).OL_HJF_Bergmann2016 = nan(1,3);
+        warning(['Validation with subject ' Results(s).Subject ' failed!'])
+    end
     
 end

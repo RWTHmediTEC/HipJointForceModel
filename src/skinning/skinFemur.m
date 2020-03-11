@@ -132,7 +132,14 @@ for m = 1:length(muscles)
 end
 
 % Surfaces
-% !!! Positions of the surface centers and axis have to be updated, too !!!
+surfaces = fieldnames(LE(2).Surface);
+for s = 1:length(surfaces)
+    [LE(2).Surface.(surfaces{s}).Center,LE(2).Surface.(surfaces{s}).Axis] = ...
+        updateAxis(...
+        LE(2).Surface.(surfaces{s}).Center, ...
+        LE(2).Surface.(surfaces{s}).Axis, ...
+        data.T.LE(2).Mesh, LE(2).Mesh);
+end
 
 % Landmarks
 % Landmarks of the femur are on the surface of the mesh. Hence, use the
@@ -146,8 +153,31 @@ for lm = 1:length(landmarks)
 end
 % Except landmark P1 [Bergmann 2016] that is not on the surface.
 LE(2).Landmarks.P1.Pos = newControls(2,:);
-% !!! Positions of the landmarks have to be updated, too !!!
     
 data.S.LE(2) = LE(2);
 
+end
+
+function [sOrigin, sAxis] = updateAxis(origin, axis, tMesh, sMesh)
+
+% Get intersections of the template axis with the template mesh
+lIdx = lineToVertexIndices([origin, axis], tMesh);
+tLinePoints = tMesh.vertices(lIdx,:);
+% Create the template line with the template intersections
+tLine = createLine3d(tLinePoints(1,:),tLinePoints(2,:));
+tLine(4:6) = normalizeVector3d(tLine(4:6));
+% Position of the template origin on the template line
+tPos = linePosition3d(origin, tLine);
+% Distance between the template intersections
+tLength = distancePoints3d(tLinePoints(1,:),tLinePoints(2,:));
+
+% Repeat for the skinned mesh
+sLinePoints = sMesh.vertices(lIdx,:);
+sLine = createLine3d(sLinePoints(1,:),sLinePoints(2,:));
+sLine(4:6) = normalizeVector3d(sLine(4:6));
+sLength = distancePoints3d(sLinePoints(1,:),sLinePoints(2,:));
+
+% Calculate the origin and axis for the skinned mesh
+sOrigin = sLine(1:3) + sLength/tLength * tPos * sLine(4:6);
+sAxis = sLine(4:6);
 end
