@@ -283,11 +283,15 @@ end
 addpath('D:\Biomechanics\Hip\Code\AutomaticFemoralCoordinateSystem')
 [~, autoLMIdx] = automaticFemoralCS(LE(2).Mesh, 'r',...
     'definition', 'Bergmann2016', 'visu', true, 'verbose', true);
-autoLMfemur={'MedialPosteriorCondyle';'LateralPosteriorCondyle';'NeckAxis';'ShaftAxis'};
+autoLMfemur={'MedialPosteriorCondyle';'LateralPosteriorCondyle'};
 for lm = 1:size(autoLMfemur,1)
     LE(2).Landmarks.(autoLMfemur{lm}).Pos  = LE(2).Mesh.vertices(autoLMIdx.(autoLMfemur{lm})',:);
     LE(2).Landmarks.(autoLMfemur{lm}).Node = autoLMIdx.(autoLMfemur{lm})';
 end
+% Construction of P1 [Bergmann 2016]
+NeckAxis = createLine3d(LE(2).Mesh.vertices(autoLMIdx.NeckAxis(1),:),LE(2).Mesh.vertices(autoLMIdx.NeckAxis(2),:));
+ShaftAxis = createLine3d(LE(2).Mesh.vertices(autoLMIdx.ShaftAxis(1),:),LE(2).Mesh.vertices(autoLMIdx.ShaftAxis(2),:));
+[~, LE(2).Landmarks.P1.Pos, ~] = distanceLines3d(NeckAxis, ShaftAxis);
 
 
 %% Save data

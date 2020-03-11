@@ -5,12 +5,9 @@ try
     MPC = LE(2).Mesh.vertices(LE(2).Landmarks.MedialPosteriorCondyle.Node,:);
     LPC = LE(2).Mesh.vertices(LE(2).Landmarks.LateralPosteriorCondyle.Node,:);
     ICN = LE(2).Mesh.vertices(LE(2).Landmarks.IntercondylarNotch.Node,:);
-    NeckAxis = LE(2).Mesh.vertices(LE(2).Landmarks.NeckAxis.Node,:);
-    NeckAxis = createLine3d(NeckAxis(1,:),NeckAxis(2,:));
-    ShaftAxis = LE(2).Mesh.vertices(LE(2).Landmarks.ShaftAxis.Node,:);
-    ShaftAxis = createLine3d(ShaftAxis(1,:),ShaftAxis(2,:));
-    HJC=LE(2).Joints.Hip.Pos;
-    TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, ICN, NeckAxis, ShaftAxis, HJC, side);
+    P1 = LE(2).Landmarks.P1.Pos;
+    HJC = LE(2).Joints.Hip.Pos;
+    TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, P1, ICN, HJC, side);
 catch
     warning('Missing data! Returning nan(4)!')
     TFM=nan(4);

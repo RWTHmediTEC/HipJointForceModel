@@ -139,9 +139,13 @@ end
 % nearest node to get the new position of the landmark.
 landmarks = fieldnames(LE(2).Landmarks);
 for lm = 1:length(landmarks)
+    if isfield(LE(2).Landmarks.(landmarks{lm}), 'Node')
         LE(2).Landmarks.(landmarks{lm}).Pos = ...
             LE(2).Mesh.vertices(LE(2).Landmarks.(landmarks{lm}).Node,:);
+    end
 end
+% Except landmark P1 [Bergmann 2016] that is not on the surface.
+LE(2).Landmarks.P1.Pos = newControls(2,:);
 % !!! Positions of the landmarks have to be updated, too !!!
     
 data.S.LE(2) = LE(2);

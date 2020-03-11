@@ -1,8 +1,6 @@
-function TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, ICN, NeckAxis, ShaftAxis, HJC, side)
+function TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, P1, P2, HJC, side)
 
-%% Construction of P1
-[~, P1, ~] = distanceLines3d(NeckAxis, ShaftAxis);
-StraightFemurAxis=createLine3d(ICN, P1);
+StraightFemurAxis=createLine3d(P2, P1);
 
 %% inital transformation
 % Connection of the most posterior points of the condyles

@@ -4,7 +4,7 @@ addpath(genpath('..\..\..\HipJointReactionForceModel'))
 
 fileFolder=fullfile(fileparts([mfilename('fullpath'), '.m']));
 
-TLEMversion = 'TLEM2_1';
+TLEMversion = 'TLEM2_0';
 
 % Load original data
 switch TLEMversion
@@ -26,32 +26,22 @@ switch TLEMversion
         error('No valid TLEM version')
 end
 
-
-femur = LE(2).Mesh;
-HJC = LE(2).Joints.Hip.Pos;
-
-
 %% Construct controls
 load([fileFolder '\femur' TLEMversion 'Controls.mat'])
 
-% Replace automatic detected ICN with manual detected ICN
-ICN_Idx=LE(2).Landmarks.IntercondylarNotch.Node;
-GT_Idx=LE(2).Landmarks.GreaterTrochanter.Node;
-LT_Idx=LE(2).Landmarks.LesserTrochanter.Node;
-NeckAxis_Idx=LE(2).Landmarks.NeckAxis.Node;
-ShaftAxis_Idx=LE(2).Landmarks.ShaftAxis.Node;
-
-% Construction of P1 [Bergmann 2016]
-neckAxis = createLine3d(femur.vertices(NeckAxis_Idx(1),:), femur.vertices(NeckAxis_Idx(2),:));
-shaftAxis = createLine3d(femur.vertices(ShaftAxis_Idx(1),:), femur.vertices(ShaftAxis_Idx(2),:));
-[~, P1, ~] = distanceLines3d(neckAxis, shaftAxis);
+femur = LE(2).Mesh;
+HJC = LE(2).Joints.Hip.Pos;
+P1  = LE(2).Landmarks.P1.Pos;
+ICN = femur.vertices(LE(2).Landmarks.IntercondylarNotch.Node,:);
+GT  = femur.vertices(LE(2).Landmarks.GreaterTrochanter.Node,:);
+LT  = femur.vertices(LE(2).Landmarks.LesserTrochanter.Node,:);
 
 % Controls
-Controls(1,:) = projPointOnLine3d(HJC,neckAxis); % hip joint center projected on neck axis
-Controls(2,:) = P1; % straight femur axis (proximal point: P1) [Bergmann2016]
-Controls(3,:) = femur.vertices(ICN_Idx,:); % straight femur axis (distal point: P2) [Bergmann2016]
-Controls(4,:) = femur.vertices(GT_Idx,:);
-Controls(5,:) = femur.vertices(LT_Idx,:);
+Controls(1,:) = HJC; % Hip joint center
+Controls(2,:) = P1; % Straight femur axis (proximal point: P1) [Bergmann2016]
+Controls(3,:) = ICN; % Straight femur axis (distal point: P2) [Bergmann2016]
+Controls(4,:) = GT; % Greater Trochanter
+Controls(5,:) = LT; % Lesser Trochanter
 
 BE = [1,2; 2,3; 2,4; 2,5];
 
@@ -72,10 +62,6 @@ pointProps.MarkerSize = 7;
 pointProps.LineStyle = 'none';
 drawPoint3d(Controls, pointProps)
 
-mouseControl3d
-medicalViewButtons('ASR')
-
-drawLine3d(neckAxis, 'Color', 'r');
-drawLine3d(shaftAxis, 'Color', 'r');
+anatomicalViewButtons('ASR')
 
 save([fileFolder '\femur' TLEMversion 'Controls.mat'], 'Controls', 'BE')
