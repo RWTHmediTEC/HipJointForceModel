@@ -15,9 +15,9 @@ Muscle path models
 - Muscle moment arm calculation for Wrapping?
 - Scaling of wrapping surfaces?
 Muscle recruitment
-- Betrachtung der Muskelaktivitäten in die Muskelrekrutierung integrieren
+- Implement common muscle recruitment criteria
+- Use EMS studies (OrthoLoad) to select muscles of the models
 Scaling laws
-- Finish implementation of LBS for the femur: joint axes, surfaces, muscle attachments
 - Verify LBS for OrthoLoad subjects
 - Implement LBS for the pelvis bone
 

@@ -113,14 +113,24 @@ skinnedMesh.vertices = dualquatlbs(scaledVertices, DQ, Weights);
 %% Update struct LE of femur
 % Mesh
 LE(2).Mesh = skinnedMesh;
+
 % Joints
 LE(2).Joints.Hip.Pos = newControls(1,:);
-% !!! Positions of the knee joint and axis have to be updated, too !!!
+joints = fieldnames(LE(2).Joints);
+for s = 1:length(joints)
+    if isfield(LE(2).Joints.(joints{s}), 'Axis')
+        [LE(2).Joints.(joints{s}).Pos,LE(2).Joints.(joints{s}).Axis] = ...
+            updateAxis(...
+            LE(2).Joints.(joints{s}).Pos, ...
+            LE(2).Joints.(joints{s}).Axis, ...
+            data.T.LE(2).Mesh, LE(2).Mesh);
+    end
+end
 
 % Muscles
 % Calculate the translation of the nearest node to the muscle attachment 
-% position (MAP) between the original (template) femur and the skinned 
-% femur. Add this translation to the original MAP to get the skinned MAP.
+% position (MAP) between the template femur and the skinned femur. Add this
+% translation to the original MAP to get the skinned MAP.
 muscles = fieldnames(LE(2).Muscle);
 for m = 1:length(muscles)
     for n = 1:length(LE(2).Muscle.(muscles{m}).Type)
