@@ -112,7 +112,9 @@ A=A.*cell2mat(activeMuscles(:,3));
 
 % [Iglic 1990, S.37, Equ.2]
 f = cell2sym(activeMuscles(:,2));
-assume(f >= 0);
+% The assumption 'f >= 0' should be included, but then the solver 
+% sometimes will not find a solution.
+assume(f >= 0); assume(f, 'clear'); 
 F = f.*A.*s;
 
 % Moment of F around hip rotation center

@@ -15,8 +15,8 @@ switch data.ScalingLaw
         FW = 1;
     case 'NonuniformSedghi2017'
         % !!! Sedghi2017 may have used a different definition of the PelvicWidth !!!
-        PW = (data.S.Scale(1).PelvicWidth-data.S.Scale(1).HipJointWidth) / ...
-             (data.T.Scale(1).PelvicWidth-data.T.Scale(1).HipJointWidth);
+        PW = (data.S.Scale(1).PelvicWidth - data.S.Scale(1).HipJointWidth) / ...
+             (data.T.Scale(1).PelvicWidth - data.T.Scale(1).HipJointWidth);
         PH = data.S.Scale(1).PelvicHeight / data.T.Scale(1).PelvicHeight;
         PD = 1;
         FemoralLength = (0.53-0.285)*data.S.BodyHeight*10; % [cm] to [mm] [Winter 2009, S.83, Fig.4.1]

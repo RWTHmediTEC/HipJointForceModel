@@ -123,7 +123,7 @@ LE(3).Muscle.TensorFasciaeLatae1.Pos = [0.01568,0.32738,0.03194] * ScaleFactor;
 LE(4).Muscle.RectusFemoris1.Pos = [0.00290,0.01391,- 0.00732] * ScaleFactor;
 LE(4).Muscle.RectusFemoris2.Pos = [0.00397,0.01249, 0.00462] * ScaleFactor;
 
-%% Update closest node to femoral muscle origins, insertions and via points
+%% Update nearest node to femoral muscle origins, insertions and via points
 
 femurNS = createns(LE(2).Mesh.vertices);
 Fascicles = fieldnames(LE(2).Muscle);

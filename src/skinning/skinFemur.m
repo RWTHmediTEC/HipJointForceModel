@@ -116,16 +116,33 @@ LE(2).Mesh = skinnedMesh;
 % Joints
 LE(2).Joints.Hip.Pos = newControls(1,:);
 % !!! Positions of the knee joint and axis have to be updated, too !!!
+
 % Muscles
+% Calculate the translation of the nearest node to the muscle attachment 
+% position (MAP) between the original (template) femur and the skinned 
+% femur. Add this translation to the original MAP to get the skinned MAP.
 muscles = fieldnames(LE(2).Muscle);
 for m = 1:length(muscles)
     for n = 1:length(LE(2).Muscle.(muscles{m}).Type)
-        trans = LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:) - data.T.LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:);
+        trans = LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:) ...
+            - data.T.LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:);
         LE(2).Muscle.(muscles{m}).Pos(n,:) = LE(2).Muscle.(muscles{m}).Pos(n,:) + trans;
+
     end
 end
+
 % Surfaces
 % !!! Positions of the surface centers and axis have to be updated, too !!!
+
+% Landmarks
+% Landmarks of the femur are on the surface of the mesh. Hence, use the
+% nearest node to get the new position of the landmark.
+landmarks = fieldnames(LE(2).Landmarks);
+for lm = 1:length(landmarks)
+        LE(2).Landmarks.(landmarks{lm}).Pos = ...
+            LE(2).Mesh.vertices(LE(2).Landmarks.(landmarks{lm}).Node,:);
+end
+% !!! Positions of the landmarks have to be updated, too !!!
     
 data.S.LE(2) = LE(2);
 

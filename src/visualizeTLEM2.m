@@ -9,16 +9,17 @@ addParameter(p, 'Joints', false, @islogical);
 addParameter(p, 'Muscles', {}, @(x) isstruct(x) || isempty(x));
 addParameter(p, 'MuscleList', {}, @iscell);
 addParameter(p, 'MusclePathModel', false);
-addParameter(p, 'ShowWrapSurf', false, logParValidFunc);
+addParameter(p, 'Surfaces', false, logParValidFunc);
+addParameter(p, 'Landmarks', false, logParValidFunc);
 parse(p, varargin{:});
 
 NoB = p.Results.Bones;
 visJoints       = p.Results.Joints;
 Muscles         = p.Results.Muscles;
-% if ~isempty(Muscles); Muscles=Muscles(:,1); end
 MuscleList      = p.Results.MuscleList;
 MusclePathModel = p.Results.MusclePathModel;
-visWrapSurf     = p.Results.ShowWrapSurf;
+visSurfaces     = p.Results.Surfaces;
+visLandmarks    = p.Results.Landmarks;
 
 %% Visualization of the model
 hold(axH,'on')
@@ -113,6 +114,7 @@ if ~isempty(Muscles)
             drawPoint3d(axH, Muscles(m).Points(1:pIdx,:), lineProps);
             drawPoint3d(axH, Muscles(m).Points(pIdx+1:end,:), lineProps);
         end
+        % Draw vectors for the lines of action
         if MusclePathModel
             drawArrow3d(axH, ...
                 Muscles(m).(MusclePathModel)(1:3),...
@@ -122,7 +124,7 @@ if ~isempty(Muscles)
 end
 
 %% Visualize wrapping cylinders
-if visWrapSurf
+if visSurfaces
     if isfield(LE,'Surface')
         for b = 1:length(LE)
             if ~isempty(LE(b).Surface)
@@ -137,6 +139,25 @@ if visWrapSurf
                         'FaceColor', 'red', ...
                         'FaceAlpha', 0.3, ...
                         'FaceLighting', 'gouraud');
+                end
+            end
+        end
+    end
+end
+
+%% Landmarks
+if visLandmarks
+    if isfield(LE,'Landmarks')
+        landmarkProps.Marker='o';
+        landmarkProps.LineStyle='none';
+        landmarkProps.MarkerEdgeColor='k';
+        landmarkProps.MarkerFaceColor='k';
+        for b = 1:length(LE)
+            if ~isempty(LE(b).Landmarks)
+                landmarks = fieldnames(LE(b).Landmarks);
+                for lm=1:length(landmarks)
+                    drawPoint3d(axH, LE(b).Landmarks.(landmarks{lm}).Pos, ...
+                        landmarkProps, 'DisplayName', landmarks{lm});
                 end
             end
         end
