@@ -1,4 +1,4 @@
-function funcHandles = PauwelsTLEM2
+function funcHandles = Pauwels
 % The model by Pauwels with patient-specific adaption using the TLEM2 
 % cadaver data instead of Fick's cadaver data and the data of Braune and 
 % Fischer

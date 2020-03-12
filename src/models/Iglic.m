@@ -1,4 +1,4 @@
-function funcHandles = IglicTLEM2
+function funcHandles = Iglic
 % The model of [Iglic 1990] using the TLEM2 cadaver data instead of
 % Dostal's cadaver data. Some adaptions were necessary to solve the model
 % that questions the validity of the [Iglic 1990] model. See below for 

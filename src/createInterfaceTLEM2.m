@@ -1183,8 +1183,8 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
         gui.Home.Model.modelHandle = calculateTLEM2();
         [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
         % Set muscle path model to straight line
-        data.MusclePathModel = 'StraightLine';
-        updateMusclePath();
+        % data.MusclePathModel = 'StraightLine';
+        % updateMusclePath();
         % data = musclePathsTLEM2(data);
         [postures, default] = gui.Home.Model.modelHandle.Posture();
         data.Posture = postures{default, 2};
