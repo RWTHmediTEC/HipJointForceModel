@@ -80,7 +80,7 @@ HJW             = data.S.Scale(1).HipJointWidth;
 Side            = data.S.Side;
 
 %% Define parameters
-G = -9.81; % Weight force
+G = -data.g; % Weight force
 
 % Partial body weight and its lever arm in percent of the full body weight
 % and the hip joint width

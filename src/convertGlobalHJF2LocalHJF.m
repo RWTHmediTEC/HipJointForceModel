@@ -1,7 +1,7 @@
 function data = convertGlobalHJF2LocalHJF(R, data)
 
 % Convert R from [N] to [%BW]
-R = R / abs(data.S.BodyWeight*9.81) * 100;
+R = R / abs(data.S.BodyWeight * data.g) * 100;
 
 data.HJF.Global.R=R;
 

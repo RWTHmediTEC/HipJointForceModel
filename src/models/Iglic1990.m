@@ -80,7 +80,7 @@ MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
 
 %% Define Parameters
-G = -9.81;                         % Weight force
+G = -data.g;                       % Weight force
 l = HipJointWidth/2;               % Half of the hip joint width
 WB = BW * G;                       % total body weight
 WL = 0.161 * WB;                   % weight of the supporting limb

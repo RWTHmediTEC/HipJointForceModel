@@ -119,7 +119,7 @@ MusclePaths     = data.S.MusclePaths;
 MusclePathModel = data.MusclePathModel;
 
 %% Define Parameters
-g = -9.81;                         % Weight force
+g = -data.g;                       % Weight force
 Wb = BW * g;                       % Resultant force of total bodyweight
 Wl = 0.161 * Wb;                   % Resultant force of the supporting limb
 W = [0, (Wb - 2*Wl)/2, 0];         % Resultant bodyweight force

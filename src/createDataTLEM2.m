@@ -8,13 +8,18 @@ function data = createDataTLEM2(data, Cadaver)
 % [Destatis 2018] 2018 - Destatis - Mikrozensus 2017 - Fragen zur 
 % Gesundheit - Körpermaße der Bevölkerung
 
+% Build structure which contains default data
 if nargin == 0
-    % Build structure which contains default data
-    data.View = 'Femur';                     % View of the HJF: Pelvis; Femur
-    data.ScalingLaw = 'NonuniformEggert2018';% Scaling law: NonuniformEggert2018, NonuniformSedghi2017, Skinning
-    data.MusclePathModel = 'StraightLine';   % Muscle Path Model: StraightLine; ViaPoint; Wrapping
+    % g-Force
+    data.g = 9.81;
     % Cadaver
     Cadaver = 'TLEM2_0';
+    % View of the HJF: Pelvis; Femur
+    data.View = 'Femur';
+    % Scaling law: NonuniformEggert2018, NonuniformSedghi2017, Skinning
+    data.ScalingLaw = 'NonuniformEggert2018';
+    % Muscle Path Model: StraightLine, ViaPoint, Wrapping
+    data.MusclePathModel = 'StraightLine';
     % Side of the hip joint: Right 'R'; Left 'L'
     data.T.Side = 'R';
     % Pelvic Tilt [°]

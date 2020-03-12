@@ -82,7 +82,7 @@ MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
 
 %% Define Parameters
-g = -9.81;                         % weight force
+g = -data.g;                       % weight force
 
 % Subject-specific values
 l = hipJointWidth/2;               % Half the distance between the two hip rotation centers

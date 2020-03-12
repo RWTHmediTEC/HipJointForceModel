@@ -82,7 +82,7 @@ function data = Calculation(data)
 Side              = data.S.Side;
 
 %% Define parameters
-G = -9.81; % Weight force
+G = -data.g; % Weight force
 
 [~, S5, abc] = derivationFromBrauneAndFischer189X; 
 

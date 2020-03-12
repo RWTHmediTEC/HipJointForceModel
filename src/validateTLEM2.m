@@ -10,8 +10,6 @@ end
 
 Results = repmat(struct('Subject', []), length(OL),1);
 
-g=9.81;
-
 for s = 1:length(OL)
     % Save results in structure Results
     Results(s).Subject = OL(s).Subject;
@@ -20,7 +18,7 @@ for s = 1:length(OL)
         % Load body weight and HJF of OrthoLoad subjects
         % !!! Add the source of the mat files !!!
         load([OL(s).Subject '_' data.Posture '.mat'],'meanPFP')
-        OL(s).BodyWeight = meanPFP.Weight_N / g; % [N] to [kg]
+        OL(s).BodyWeight = meanPFP.Weight_N / data.g; % [N] to [kg]
         
         % The HJF of the OrthoLoad subjects is given in the OrthLoad CS 
         % [Bergmann 2016]. Use definition 'ASR' instead of 'RAS'.
