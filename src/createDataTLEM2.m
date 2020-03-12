@@ -11,7 +11,7 @@ function data = createDataTLEM2(data, Cadaver)
 if nargin == 0
     % Build structure which contains default data
     data.View = 'Femur';                     % View of the HJF: Pelvis; Femur
-    data.ScalingLaw = 'NonuniformEggert2018';% Scaling law: NonuniformEggert2018, Skinning
+    data.ScalingLaw = 'NonuniformEggert2018';% Scaling law: NonuniformEggert2018, NonuniformSedghi2017, Skinning
     data.MusclePathModel = 'StraightLine';   % Muscle Path Model: StraightLine; ViaPoint; Wrapping
     % Cadaver
     Cadaver = 'TLEM2_0';
@@ -58,9 +58,12 @@ data.MuscleList = muscleList;
 
 %% Bony paramters
 
-% !!! Use consistent definitions / landmarks !!!
-
 % Pelvic parameters:
+% !!! The landmarks should be transformed into the pelvic bone coordinate 
+% systems [Wu 2002] to use consistent parameter definitions. However, this 
+% is not possible for some of the cadavers due to missing landmark 
+% information !!!
+
 % HipJointWidth  = Distance between the hip joint centers
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
@@ -73,14 +76,14 @@ switch Cadaver
             LE(1).Landmarks.RightHipJointCenter.Pos(3)-...
             LE(1).Landmarks.LeftHipJointCenter.Pos(3));
 end
-% PelvicWidth    = Distance between the two ASISs along Z-Axis in Wu2002
-% PelvicHeight   = Distance between HRC and ASIS along Y-Axis in Wu2002
+% PelvicWidth    = Distance between the two ASISs along Z-Axis
+% PelvicHeight   = Distance between HRC and ASIS along Y-Axis
 data.T.Scale(1).PelvicWidth  = abs(...
     data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(3) - ...
     data.T.LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos(3));
 data.T.Scale(1).PelvicHeight = abs(...
     data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(2));
-% PelvicDepth    = Distance between ASIS and PSIS along X-Axis in Wu2002
+% PelvicDepth    = Distance between ASIS and PSIS along X-Axis
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         data.T.Scale(1).PelvicDepth = abs(...
@@ -90,16 +93,27 @@ switch Cadaver
         data.T.Scale(1).PelvicDepth = Scale(1).PelvicDepth;
 end
 
-% Femoral parameters:
-% FemoralLength  = Distance between HRC and the midpoint between medial 
-%                  and lateral epicondyle
-% FemoralVersion = Angle between neck axis and condylar line projected 
-%                  on transverse plane 
-% NeckLength     = Distance between hip joint center projected on neck axis
-%                  and point where the neck axis and straight femur axis cross
-% CCD            = Angle between neck axis and straight femur axis
+% Femoral parameters
+% Transform the landmarks into the femoral coordinate system [Wu 2002]
+% Cadaver should always be a right side: 'R'
+fTFM = createFemurCS_TFM_Wu2002(...
+    data.T.LE(2).Landmarks.MedialEpicondyle.Pos, ...
+    data.T.LE(2).Landmarks.LateralEpicondyle.Pos, ...
+    data.T.LE(2).Joints.Hip.Pos, 'R');
+% FemoralLength: Distance between the midpoint between medial and lateral 
+% epicondyle and the HJC.
+data.T.Scale(2).FemoralLength = distancePoints3d(transformPoint3d(midPoint3d(...
+    data.T.LE(2).Landmarks.MedialEpicondyle.Pos,... 
+    data.T.LE(2).Landmarks.LateralEpicondyle.Pos), fTFM), ...
+    transformPoint3d(data.T.LE(2).Joints.Hip.Pos, fTFM));
+% FemoralWidth: Distance between the HJC and the greater trochanter along 
+% the Z-Axis. Use Piriformis insertion as greater trochanter.
+HJC2PiriformisInsertion = transformPoint3d(...
+    data.T.LE(2).Muscle.Piriformis1.Pos, fTFM) - ...
+    transformPoint3d(data.T.LE(2).Joints.Hip.Pos, fTFM);
+data.T.Scale(2).FemoralWidth = abs(HJC2PiriformisInsertion(3));
 
-% Load controls [Bergmann2016]
+% Load controls for skinning [Bergmann 2016]
 if exist(['femur' data.Cadaver 'Controls.mat'],'file')
     load(['femur' data.Cadaver 'Controls.mat'], 'Controls')
     % Construct reference line to measure femoral version
@@ -111,21 +125,18 @@ if exist(['femur' data.Cadaver 'Controls.mat'],'file')
     projPostCondLine = createLine3d(projPostCond(1,:), projPostCond(2,:));
     projNeckPoints = projPointOnPlane(Controls(1:2,:), transversePlane);
     projNeckLine = createLine3d(projNeckPoints(1,:), projNeckPoints(2,:));
-    
+    % FemoralVersion: Angle between neck axis and condylar line projected on transverse plane 
     data.T.Scale(2).FemoralVersion = rad2deg(vectorAngle3d(projNeckLine(4:6), projPostCondLine(4:6)));
+    % NeckLength: Distance between the hip joint center projected on the neck
+    % axis and the point where the neck axis and the straight femur axis cross
     data.T.Scale(2).NeckLength = distancePoints3d(Controls(1,:), Controls(2,:));
+    % CCD: Angle between the neck axis and the straight femur axis
     data.T.Scale(2).CCD = rad2deg(vectorAngle3d(Controls(3,:) - Controls(2,:), Controls(1,:) - Controls(2,:)));
 else
     data.T.Scale(2).FemoralVersion = nan;
     data.T.Scale(2).NeckLength = nan;
     data.T.Scale(2).CCD = nan;
 end
-
-% !!! Need to be changed for skinning in Bergmann CS !!!
-data.T.Scale(2).FemoralLength = distancePoints3d(midPoint3d(...
-    data.T.LE(2).Landmarks.MedialEpicondyle.Pos,... 
-    data.T.LE(2).Landmarks.LateralEpicondyle.Pos), ...
-    data.T.LE(2).Joints.Hip.Pos);
 
 
 %% Save initally as (T)emplate and (S)ubject

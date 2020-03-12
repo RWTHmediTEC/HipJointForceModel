@@ -8,6 +8,7 @@ set(gui.Home.Parameters.EditText_PelvicWidth,    'String', data.S.Scale(1).Pelvi
 set(gui.Home.Parameters.EditText_PelvicHeight,   'String', data.S.Scale(1).PelvicHeight);
 set(gui.Home.Parameters.EditText_PelvicDepth,    'String', data.S.Scale(1).PelvicDepth);
 set(gui.Home.Parameters.EditText_FemoralLength,  'String', data.S.Scale(2).FemoralLength);
+set(gui.Home.Parameters.EditText_FemoralWidth,   'String', data.S.Scale(2).FemoralWidth);
 set(gui.Home.Parameters.EditText_FemoralVersion, 'String', data.S.Scale(2).FemoralVersion);
 set(gui.Home.Parameters.EditText_CCD,            'String', data.S.Scale(2).CCD);
 set(gui.Home.Parameters.EditText_NeckLength,     'String', data.S.Scale(2).NeckLength);

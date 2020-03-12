@@ -52,6 +52,7 @@ for s = 1:length(OL)
         data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
         data.S.Scale(1).PelvicDepth    = OL(s).PelvicDepth;
         data.S.Scale(2).FemoralLength  = OL(s).FemoralLength;
+        data.S.Scale(2).FemoralWidth   = OL(s).FemoralWidth;
         data.S.Scale(2).FemoralVersion = OL(s).FemoralVersion;
         data.S.Scale(2).NeckLength     = OL(s).NeckLength;
         data.S.Scale(2).CCD            = OL(s).CCD;

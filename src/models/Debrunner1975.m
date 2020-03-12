@@ -72,7 +72,7 @@ MostMedial        = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MostMedial
 MostLateral       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MostLateralIlium.Node,:);
 
 %% Define Parameters
-
+g = 9.18;
 d6 = HipJointWidth/2; % Half the distance between the two hip joint centers
 d5 = 1.28 * d6; % Lever arm of G5 around the hip joint center
 G5 = 5/6 * BodyWeight; % Partial body weight weighing on the hip joint
@@ -121,7 +121,7 @@ disp(['Difference between T and T_TLEM: ' num2str(T-T_TLEM)])
 M_TLEM_direction = (T_TLEM - A_TLEM)/norm(T_TLEM - A_TLEM);
 syms M_TLEM_magnitude % Magnitude of the muscle force M
 M = M_TLEM_direction * M_TLEM_magnitude;
-G5_Force = [0, -9.81 * G5, 0];
+G5_Force = [0, G5 * -g, 0];
 
 if Side == 'L'
     momentG5 = cross([0 0 d5], G5_Force);  % Moment of bodyweight force around hip rotation center
@@ -133,9 +133,9 @@ end
 
 syms RxSym RySym RzSym
 % Calculate the hip joint force
-check = G5_Force(1) + M(1) + RxSym; % Force equilibrium in the direction of X
-eq2 = G5_Force(2) + M(2) + RySym; % Force equilibrium in the direction of Y
-eq3 = G5_Force(3) + M(3) + RzSym; % Force equilibrium in the direction of Z
+check   = G5_Force(1) + M(1) + RxSym; % Force equilibrium in the direction of X
+eq2     = G5_Force(2) + M(2) + RySym; % Force equilibrium in the direction of Y
+eq3     = G5_Force(3) + M(3) + RzSym; % Force equilibrium in the direction of Z
 
 Results = solve(check, eq1, eq2, eq3);
 

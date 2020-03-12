@@ -21,9 +21,8 @@ switch data.ScalingLaw
         PD = 1;
         FemoralLength = (0.53-0.285)*data.S.BodyHeight*10; % [cm] to [mm] [Winter 2009, S.83, Fig.4.1]
         FL = FemoralLength / data.T.Scale(2).FemoralLength;
-        % !!! Sedghi2017 used a different definition !!!
-        % Use Piriformis insertion as greater trochanter to adapt femoral width
-        FW = 1;
+        % !!! Sedghi2017 used a slightly different definition !!!
+        FW = data.S.Scale(2).FemoralWidth / data.T.Scale(2).FemoralWidth;
     otherwise
         error('Invalid scaling law!')
 end
@@ -60,7 +59,7 @@ boneCS_TFM = repmat(eye(4), 1, 1, 6);
 % Pelvis
 boneCS_TFM(:,:,1) = createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE);
 % Femur. Should be always the right side 'R' before scaling.
-boneCS_TFM(:,:,2) = createFemurCS_TFM_Wu2002_TLEM2(data.S.LE,'R');
+boneCS_TFM(:,:,2) = createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R');
 
 data.S.LE = transformTLEM2(data.S.LE, boneCS_TFM);
 end

@@ -41,13 +41,14 @@ end
 % See createDataTLEM2.m for the exact definitions
 
 % Pelvic parameters
-TFM = createPelvisCS_TFM_Wu2002(OL(s).LM.ASIS_L, OL(s).LM.ASIS_R, OL(s).LM.PSIS_L, OL(s).LM.PSIS_R);
+% Tranform the landmarks into the pelvic coordinate system (CS) [Wu 2002]
+pTFM = createPelvisCS_TFM_Wu2002(OL(s).LM.ASIS_L, OL(s).LM.ASIS_R, OL(s).LM.PSIS_L, OL(s).LM.PSIS_R);
 
-ASIS_IL = transformPoint3d(OL(s).LM.(['ASIS_' Side_IL]), TFM);
-ASIS_CL = transformPoint3d(OL(s).LM.(['ASIS_' Side_CL]), TFM);
-HJC_IL  = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]),  TFM);
-HJC_CL  = transformPoint3d(OL(s).LM.(['HJC_' Side_CL]),  TFM);
-PSIS_IL = transformPoint3d(OL(s).LM.(['PSIS_' Side_IL]), TFM);
+ASIS_IL = transformPoint3d(OL(s).LM.(['ASIS_' Side_IL]), pTFM);
+ASIS_CL = transformPoint3d(OL(s).LM.(['ASIS_' Side_CL]), pTFM);
+HJC_IL  = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]),  pTFM);
+HJC_CL  = transformPoint3d(OL(s).LM.(['HJC_' Side_CL]),  pTFM);
+PSIS_IL = transformPoint3d(OL(s).LM.(['PSIS_' Side_IL]), pTFM);
 
 OL(s).HipJointWidth = abs(HJC_IL(3)  - HJC_CL(3));
 OL(s).PelvicWidth   = abs(ASIS_IL(3) - ASIS_CL(3));
@@ -55,6 +56,30 @@ OL(s).PelvicHeight  = abs(ASIS_IL(2) - HJC_IL(2));
 OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
 
 % Femoral parameters
+% Transform the landmarks into the femoral CS [Wu 2002]
+fTFM = createFemurCS_TFM_Wu2002(...
+    OL(s).LM.(['MEC_' Side_IL]), ...
+    OL(s).LM.(['LEC_' Side_IL]), ...
+    OL(s).LM.(['HJC_' Side_IL]), Side_IL);
+% FemoralLength
+midPointEC = midPoint3d(OL(s).LM.(['LEC_' Side_IL]), OL(s).LM.(['MEC_' Side_IL]));
+OL(s).FemoralLength = distancePoints3d(...
+    transformPoint3d(midPointEC, fTFM), ...
+    transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), fTFM));
+% FemoralWidth: Distance between the HJC and the greater trochanter along
+% the Z-Axis.
+try
+    HJC2GreaterTrochanter = ...
+        transformPoint3d(OL(s).LM.(['GT_' Side_IL]), fTFM) - ...
+        transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), fTFM);
+    OL(s).FemoralWidth = abs(HJC2GreaterTrochanter(3));
+catch
+    OL(s).FemoralWidth = nan;
+    warning(['Landmarks  of ' Subject{s} ' are missing! Returning: FemoralWidth = nan'])
+end
+
+% Transformation for the hip joint force from OrthoLoad CS [Bergmann 2016]
+% to [Wu 2002] CS
 try
     % Create transformation into OrthoLoad CS [Bergmann 2016].
     Bergman2016TFM = createFemurCS_TFM_Bergmann2016(...
@@ -63,20 +88,17 @@ try
         OL(s).LM.(['P1_' Side_IL]), ...
         OL(s).LM.(['P2_' Side_IL]), ...
         OL(s).LM.(['HJC_' Side_IL]), Side_IL);
-    % Transform landmarks for Wu2002 into the Bergmann2016 CS.
+    % Transform landmarks for [Wu 2002] into the [Bergmann 2016].
     MEC_IL = transformPoint3d(OL(s).LM.(['MEC_' Side_IL]), Bergman2016TFM);
     LEC_IL = transformPoint3d(OL(s).LM.(['LEC_' Side_IL]), Bergman2016TFM);
     HJC_IL = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), Bergman2016TFM);
-    % Create transformation from Bergmann2016 to Wu2002.
+    % Create transformation from [Bergmann 2016] to [Wu 2002].
     OL(s).Wu2002TFM = createFemurCS_TFM_Wu2002(MEC_IL, LEC_IL, HJC_IL, Side_IL);
 catch
     OL(s).Wu2002TFM = nan(4);
-    warning(['Landmarks of ' Subject{s} ' are missing! Returning nan(4)!'])
+    warning(['Landmarks of ' Subject{s} ' are missing! Returning: Wu2002TFM = nan(4)!'])
 end
 
-% Femoral length [Wu2002]
-midPointEC = midPoint3d(OL(s).LM.(['LEC_' Side_IL]), OL(s).LM.(['MEC_' Side_IL]));
-OL(s).FemoralLength = distancePoints3d(midPointEC, OL(s).LM.(['HJC_' Side_IL]));
 
 %% Add skinning parameters 
 % NeckLength, FemoralVersion and CCD angle [CCD]
