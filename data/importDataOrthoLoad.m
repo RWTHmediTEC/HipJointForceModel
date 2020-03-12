@@ -41,7 +41,7 @@ end
 % See createDataTLEM2.m for the exact definitions
 
 % Pelvic parameters
-% Tranform the landmarks into the pelvic coordinate system (CS) [Wu 2002]
+% Transform the landmarks into the pelvic coordinate system (CS) [Wu 2002]
 pTFM = createPelvisCS_TFM_Wu2002(OL(s).LM.ASIS_L, OL(s).LM.ASIS_R, OL(s).LM.PSIS_L, OL(s).LM.PSIS_R);
 
 ASIS_IL = transformPoint3d(OL(s).LM.(['ASIS_' Side_IL]), pTFM);
@@ -99,6 +99,17 @@ catch
     warning(['Landmarks of ' Subject{s} ' are missing! Returning: Wu2002TFM = nan(4)!'])
 end
 
+% Write selected landmarks of the femur as excel File:
+fLandmarks={'HJC','P1','P2','MPC','LPC','MEC','LEC','GT','LT'};
+excelLM(s).Subject=OL(s).Subject;
+for lm=1:length(fLandmarks)
+    if isfield(OL(s).LM, [fLandmarks{lm} '_' Side_IL])
+        excelLM(s).([fLandmarks{lm}])=OL(s).LM.([fLandmarks{lm} '_' Side_IL]);
+    else
+        excelLM(s).([fLandmarks{lm}])=[nan nan nan];
+    end
+end
+
 
 %% Add skinning parameters 
 % NeckLength, FemoralVersion and CCD angle [CCD]
@@ -107,6 +118,8 @@ OL(s).FemoralVersion = alphaZ(s);
 OL(s).CCD = CCD;
 
 end
+
+writetable(struct2table(excelLM),'data\OrthoLoadFemurLandmarks.xlsx','WriteVariableNames',false,'Range','B3')
 
 %% Save data
 save('data\OrthoLoad.mat', 'OL')

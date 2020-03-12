@@ -16,3 +16,4 @@ vtkMRMLMarkupsFiducialNode_20,-144.606,-29.834,1545.72,0,0,0,1,1,0,1,P1_L,,
 vtkMRMLMarkupsFiducialNode_20,-111.592,-35.125,1149.962,0,0,0,1,1,0,1,P2_L,,
 vtkMRMLMarkupsFiducialNode_20,-139.596,-68.834,1166.21521,0,0,0,1,1,0,1,LPC_L,,
 vtkMRMLMarkupsFiducialNode_20,-92.345,-77.867,1168.247925,0,0,0,1,1,0,1,MPC_L,,
+vtkMRMLMarkupsFiducialNode_20,-109.957,-34.855,1522.489,0,0,0,1,1,0,1,LT_L,,vtkMRMLScalarVolumeNode1

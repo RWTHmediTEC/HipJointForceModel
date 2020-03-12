@@ -25,7 +25,6 @@ TODO GUI:
 
 VALIDATION:
 - Source of the OrthoLoad force data should be documented
-- Greater Trochanter of H4L is missing
 
 NOTES:
 - Review lines of action:
