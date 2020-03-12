@@ -9,11 +9,12 @@ Subject = {'H1L' 'H2R' 'H3L' 'H4L' 'H5L' 'H6R' 'H7R' 'H8L' 'H9L' 'H10R'};
 Sex     = {'m'   'm'   'm'   'm'   'f'   'm'   'm'   'm'   'm'   'f'};
 Height  = [178   172   168   178   168   176   179   178   181   162];
 OL = repmat(struct('Subject', [], 'Sex', []), length(Subject),1);
+excelLM = repmat(struct('Subject',[]), length(Subject),1);
 
 %% Hardcoding of implant parameters from '2016 - Bergmann - Standardized Loads Acting in Hip Implants'
 NeckLength = [ 55.6  59.3  56.6  63.3  55.6 55.6  63.3 59.3  59.3 59.6];
-alphaX =     [ 2.3   4.1   4.0   7.5   4.0  5.8   6.3  4.6   4.6  1.7];
-alphaY =     [-2.3   0.6  -3.0  -1.7  -2.3 -1.7  -1.7 -1.7   0.6 -1.2];
+% alphaX =     [ 2.3   4.1   4.0   7.5   4.0  5.8   6.3  4.6   4.6  1.7];
+% alphaY =     [-2.3   0.6  -3.0  -1.7  -2.3 -1.7  -1.7 -1.7   0.6 -1.2];
 alphaZ =     [-15.0 -13.8 -13.8 -18.9 -2.3 -31.0 -2.4 -15.5 -2.3 -9.7];  % Femoral version
 CCD =         135;                                                       % CCD angle is always 135°
 
