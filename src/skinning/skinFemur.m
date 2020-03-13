@@ -2,6 +2,8 @@ function data = skinFemur(data)
 % Linear blend skinning (LBS) of femur changing femoral length, femoral 
 % version, CCD angle and neck length
 
+visu = 0;
+
 LE      = data.T.LE;
 T.Scale = data.T.Scale;
 S.Scale = data.S.Scale;
@@ -13,6 +15,7 @@ if isequal(S.Scale(2).FemoralLength,  T.Scale(2).FemoralLength) &&...
    isequal(S.Scale(2).NeckLength,     T.Scale(2).NeckLength)
     return
 else
+    femoralLength  = S.Scale(2).FemoralLength;
     femoralVersion = S.Scale(2).FemoralVersion;
     CCD            = S.Scale(2).CCD;
     neckLength     = S.Scale(2).NeckLength;
@@ -21,14 +24,16 @@ end
 % Load TLEMversion controls
 % mat files are created with data\Skinning\femurTLEM2ConstructControls.m
 load(['femur' data.Cadaver 'Controls'], 'Controls')
+tC = cell2mat(struct2cell(Controls));
+C = Controls;
 
-P = 1:size(Controls,1);
+P = 1:length(fieldnames(Controls));
 
 % Create TLEMversion weights
 if ~exist(['femur' data.Cadaver 'Weights.mat'], 'file')
     disp('Skinning weights are calculated. This may take a few minutes ...')
     % Compute boundary conditions
-    [bVertices,bConditions] = boundary_conditions(LE(2).Mesh.vertices, LE(2).Mesh.faces, Controls, P);
+    [bVertices,bConditions] = boundary_conditions(LE(2).Mesh.vertices, LE(2).Mesh.faces, tC, P);
     % Compute weights
     Weights = biharmonic_bounded(LE(2).Mesh.vertices, LE(2).Mesh.faces, bVertices, bConditions, 'OptType', 'quad');
     % Normalize weights
@@ -38,62 +43,90 @@ if ~exist(['femur' data.Cadaver 'Weights.mat'], 'file')
 end
 load(['femur' data.Cadaver 'Weights'], 'Weights')
 
-scaleFemur = eye(4);
-scaleFemur(2,2) = S.Scale(2).FemoralLength / T.Scale(2).FemoralLength;
-newControls = transformPoint3d(Controls, scaleFemur);
+if visu
+    patchProps.EdgeColor = 'none'; %#ok<*UNRCH>
+    patchProps.FaceColor = [223, 206, 161]/255;
+    patchProps.FaceAlpha = 0.5;
+    patchProps.FaceLighting = 'gouraud';
+    visualizeMeshes(LE(2).Mesh,patchProps)
+    pointProps.MarkerFaceColor='r';
+    pointProps.MarkerEdgeColor='none';
+    pointProps.Marker='o';
+    structfun(@(x) drawPoint3d(x,pointProps),C);
+end
 
 % Femoral version
-% Change position of control point by a rotation around the straight femur axis
-ROT = createRotation3dLineAngle([newControls(3,:), newControls(3,:) - newControls(2,:)],...
-    deg2rad(femoralVersion + T.Scale(2).FemoralVersion));
-newControls(1,:) = transformPoint3d(newControls(1,:), ROT);
+% Change position of HJC by a rotation around the shaft axis
+ROT = createRotation3dLineAngle([C.ICN, C.ICN - C.P1],...
+    deg2rad(femoralVersion - T.Scale(2).FemoralVersion));
+C.HJC = transformPoint3d(C.HJC, ROT);
+
+if visu
+    pointProps.MarkerFaceColor='g';
+    structfun(@(x) drawPoint3d(x,pointProps),C);
+end
 
 % CCD
-tempCCD = rad2deg(vectorAngle3d(newControls(3,:) - newControls(2,:), newControls(1,:) - newControls(2,:)));
-tempHeight = sind(tempCCD - 90) * distancePoints3d(newControls(1,:), newControls(2,:));
-tempOffset = cosd(tempCCD - 90) * distancePoints3d(newControls(1,:), newControls(2,:));
+tempCCD = rad2deg(vectorAngle3d(C.ICN - C.P1, C.HJC - C.P1));
+tempHeight = sind(tempCCD - 90) * distancePoints3d(C.HJC, C.P1);
+tempOffset = cosd(tempCCD - 90) * distancePoints3d(C.HJC, C.P1);
 HeightAdjust = tand(CCD - 90) * tempOffset - tempHeight;
-newControls(1,:) = newControls(1,:) + HeightAdjust * normalizeVector3d(newControls(2,:) - newControls(3,:));
+C.HJC = C.HJC + HeightAdjust * normalizeVector3d(C.P1 - C.ICN);
 
 % Neck Length
-neckLengthAdjust = neckLength - distancePoints3d(newControls(1,:), newControls(2,:));
-newControls(1,:) = newControls(1,:) + neckLengthAdjust *...
-    normalizeVector3d(newControls(1,:) - newControls(2,:));
+neckLengthAdjust = neckLength - distancePoints3d(C.HJC, C.P1);
+C.HJC = C.HJC + neckLengthAdjust * normalizeVector3d(C.HJC - C.P1);
+
+if visu
+    pointProps.MarkerFaceColor='b';
+    structfun(@(x) drawPoint3d(x,pointProps),C);
+end
 
 % Femoral Length
-% !!! Move newControls(3,:) in proximal direction, along the straight femur 
-%     axis to adapt the length !!!
+% Construct the mechanical axis
+ECmidPoint = midPoint3d(C.MEC, C.LEC);
+mechAxis = createLine3d(C.HJC,ECmidPoint);
+mechAxis(4:6) = normalizeVector3d(mechAxis(4:6));
+mechAxisAdjust = linePosition3d(ECmidPoint, mechAxis) - femoralLength;
+% Adjust femoral length by moving the epicondyles along the mechanical axis
+% in inferior direction
+C.MEC = C.MEC + mechAxisAdjust * -mechAxis(4:6);
+C.LEC = C.LEC + mechAxisAdjust * -mechAxis(4:6);
 
-% Construct reference lines to measure femoral version 
-postConds = transformPoint3d([...
-    LE(2).Mesh.vertices(data.T.LE(2).Landmarks.MedialPosteriorCondyle.Node,:);...
-    LE(2).Mesh.vertices(data.T.LE(2).Landmarks.LateralPosteriorCondyle.Node,:)],...
-    scaleFemur);
-transversePlane = createPlane(newControls(3,:), newControls(2,:) - newControls(3,:));
-projPostCond = projPointOnPlane(postConds, transversePlane);
-% Posterior condyle line projected onto the transverse plane
-projPostCondLine = createLine3d(projPostCond(1,:), projPostCond(2,:));
-projNeckPoints = projPointOnPlane(newControls(1:2,:), transversePlane);
-projNeckLine = createLine3d(projNeckPoints(1,:), projNeckPoints(2,:));
+newECmidPoint = mechAxis(1:3) + femoralLength * mechAxis(4:6);
+shaftAxis = createLine3d(C.ICN,C.P1);
+shaftAxis(4:6) = normalizeVector3d(shaftAxis(4:6));
+shaftAxisAdjust = ...
+    linePosition3d(newECmidPoint, shaftAxis) - ...
+    linePosition3d(ECmidPoint, shaftAxis);
+% Move ICN, MPC, and LPC along the straight femur axis
+C.ICN = C.ICN + shaftAxisAdjust * shaftAxis(4:6);
+C.MPC = C.MPC + shaftAxisAdjust * shaftAxis(4:6);
+C.LPC = C.LPC + shaftAxisAdjust * shaftAxis(4:6);
 
-% % Check if femoral version is correct
-% assert(ismembertol(abs(femoralVersion),...
-%     rad2deg(vectorAngle3d(projNeckLine(4:6), projPostCondLine(4:6))), 'DataScale', 10)) % !!! Set tolerance
-% % Check if CCD angle is correct
-% assert(ismembertol(CCD,...
-%     rad2deg(vectorAngle3d(newControls(3,:) - newControls(2,:), newControls(1,:) - newControls(2,:)))))
-% % Check if neck length is correct
-% assert(ismembertol(neckLength, distancePoints3d(newControls(1,:), newControls(2,:))))
-% % Check if femoral length is correct
-% assert(ismembertol(S.Scale(2).FemoralLength, distancePoints3d(newControls(1,:), newControls(3,:))))
+if visu
+    pointProps.MarkerFaceColor='m';
+    structfun(@(x) drawPoint3d(x,pointProps),C);
+    anatomicalViewButtons('ASR')
+end
 
-% Calculate skinning transformations
-[T, AX, AN, Sm, O] = skinning_transformations(Controls, P, [], newControls);
+%% Check if femoral version is correct
+assert(ismembertol(femoralVersion,...
+    measureFemoralVersionBergmann2016(C.HJC, C.P1, C.ICN, C.MPC, C.LPC),'Datascale',10))
+% Check if CCD angle is correct
+assert(ismembertol(CCD, rad2deg(vectorAngle3d(C.ICN - C.P1, C.HJC - C.P1))))
+% Check if neck length is correct
+assert(ismembertol(neckLength, distancePoints3d(C.HJC,C.P1)))
+% Check if femoral length is correct
+assert(ismembertol(distancePoints3d(midPoint3d(C.MEC,C.LEC),C.HJC),femoralLength))
+
+%% Calculate skinning transformations
+[T, AX, AN, Sm, O] = skinning_transformations(tC, P, [], cell2mat(struct2cell(C)));
 
 % Number of handles
 m = numel(P); % + size(BE,1);
 % Dimension (2 or 3)
-dim = size(Controls,2);
+dim = size(tC,2);
 % Extract scale
 TR = zeros(dim,dim+1,m);
 TR(1:dim,1:dim,:) = Sm;
@@ -115,7 +148,7 @@ skinnedMesh.vertices = dualquatlbs(scaledVertices, DQ, Weights);
 LE(2).Mesh = skinnedMesh;
 
 % Joints
-LE(2).Joints.Hip.Pos = newControls(1,:);
+LE(2).Joints.Hip.Pos = C.HJC;
 joints = fieldnames(LE(2).Joints);
 for s = 1:length(joints)
     if isfield(LE(2).Joints.(joints{s}), 'Axis')
@@ -162,7 +195,7 @@ for lm = 1:length(landmarks)
     end
 end
 % Except landmark P1 [Bergmann 2016] that is not on the surface.
-LE(2).Landmarks.P1.Pos = newControls(2,:);
+LE(2).Landmarks.P1.Pos = C.P1;
     
 data.S.LE(2) = LE(2);
 

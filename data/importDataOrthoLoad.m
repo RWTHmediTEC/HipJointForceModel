@@ -115,7 +115,7 @@ end
 %% Add skinning parameters 
 % NeckLength, FemoralVersion and CCD angle [CCD]
 OL(s).NeckLength = NeckLength(s);
-OL(s).FemoralVersion = alphaZ(s);
+OL(s).FemoralVersion = -alphaZ(s);
 OL(s).CCD = CCD;
 
 end

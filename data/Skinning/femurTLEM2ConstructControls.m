@@ -27,23 +27,19 @@ switch TLEMversion
 end
 
 %% Construct controls
-load([fileFolder '\femur' TLEMversion 'Controls.mat'])
-
 femur = LE(2).Mesh;
-HJC = LE(2).Joints.Hip.Pos;
-P1  = LE(2).Landmarks.P1.Pos;
-ICN = femur.vertices(LE(2).Landmarks.IntercondylarNotch.Node,:);
+HJC = LE(2).Joints.Hip.Pos; % Hip joint center
+P1  = LE(2).Landmarks.P1.Pos; % Straight femur axis (proximal point: P1) [Bergmann2016]
+ICN = femur.vertices(LE(2).Landmarks.IntercondylarNotch.Node,:); % Straight femur axis (distal point: P2) [Bergmann2016]
+MEC = LE(2).Landmarks.MedialEpicondyle.Pos; 
+LEC = LE(2).Landmarks.LateralEpicondyle.Pos;
+MPC = femur.vertices(LE(2).Landmarks.MedialPosteriorCondyle.Node,:);
+LPC = femur.vertices(LE(2).Landmarks.LateralPosteriorCondyle.Node,:);
 GT  = femur.vertices(LE(2).Landmarks.GreaterTrochanter.Node,:);
 LT  = femur.vertices(LE(2).Landmarks.LesserTrochanter.Node,:);
 
-% Controls
-Controls(1,:) = HJC; % Hip joint center
-Controls(2,:) = P1; % Straight femur axis (proximal point: P1) [Bergmann2016]
-Controls(3,:) = ICN; % Straight femur axis (distal point: P2) [Bergmann2016]
-Controls(4,:) = GT; % Greater Trochanter
-Controls(5,:) = LT; % Lesser Trochanter
-
-BE = [1,2; 2,3; 2,4; 2,5];
+Controls=struct('HJC',HJC, 'P1',P1, 'ICN',ICN, 'MEC',MEC, 'LEC',LEC, ...
+    'MPC',MPC, 'LPC',LPC, 'GT',GT, 'LT',LT);
 
 patchProps.EdgeColor = 'none';
 patchProps.FaceColor = [223, 206, 161]/255;
@@ -51,17 +47,13 @@ patchProps.FaceAlpha = 0.5;
 patchProps.FaceLighting = 'gouraud';
 visualizeMeshes(femur, patchProps)
 
-for b = 1:size(BE,1)
-    drawEdge3d(Controls(BE(b,1),:), Controls(BE(b,2),:), 'Color', 'k');
-end
-
 pointProps.Marker = 'o';
 pointProps.MarkerFaceColor = 'k';
 pointProps.MarkerEdgeColor = 'y';
 pointProps.MarkerSize = 7;
 pointProps.LineStyle = 'none';
-drawPoint3d(Controls, pointProps)
+structfun(@(x) drawPoint3d(x,pointProps),Controls);
 
 anatomicalViewButtons('ASR')
 
-save([fileFolder '\femur' TLEMversion 'Controls.mat'], 'Controls', 'BE')
+save([fileFolder '\femur' TLEMversion 'Controls.mat'], 'Controls')

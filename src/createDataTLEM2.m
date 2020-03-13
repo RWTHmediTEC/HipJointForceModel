@@ -118,25 +118,17 @@ HJC2PiriformisInsertion = transformPoint3d(...
     transformPoint3d(data.T.LE(2).Joints.Hip.Pos, fTFM);
 data.T.Scale(2).FemoralWidth = abs(HJC2PiriformisInsertion(3));
 
-% Load controls for skinning [Bergmann 2016]
+% Load controls for skinning
 if exist(['femur' data.Cadaver 'Controls.mat'],'file')
     load(['femur' data.Cadaver 'Controls.mat'], 'Controls')
-    % Construct reference line to measure femoral version
-    postConds = [...
-        data.T.LE(2).Landmarks.MedialPosteriorCondyle.Pos;...
-        data.T.LE(2).Landmarks.LateralPosteriorCondyle.Pos];
-    transversePlane = createPlane(Controls(3,:), Controls(2,:) - Controls(3,:));
-    projPostCond = projPointOnPlane(postConds, transversePlane);
-    projPostCondLine = createLine3d(projPostCond(1,:), projPostCond(2,:));
-    projNeckPoints = projPointOnPlane(Controls(1:2,:), transversePlane);
-    projNeckLine = createLine3d(projNeckPoints(1,:), projNeckPoints(2,:));
-    % FemoralVersion: Angle between neck axis and condylar line projected on transverse plane 
-    data.T.Scale(2).FemoralVersion = rad2deg(vectorAngle3d(projNeckLine(4:6), projPostCondLine(4:6)));
-    % NeckLength: Distance between the hip joint center projected on the neck
-    % axis and the point where the neck axis and the straight femur axis cross
-    data.T.Scale(2).NeckLength = distancePoints3d(Controls(1,:), Controls(2,:));
+    C = Controls;
+    data.T.Scale(2).FemoralVersion = measureFemoralVersionBergmann2016(...
+        C.HJC, C.P1, C.ICN, C.MPC, C.LPC);
+    % NeckLength: Distance between the hip joint center and the point where
+    %             the neck axis and the straight femur axis cross
+    data.T.Scale(2).NeckLength = distancePoints3d(C.HJC, C.P1);
     % CCD: Angle between the neck axis and the straight femur axis
-    data.T.Scale(2).CCD = rad2deg(vectorAngle3d(Controls(3,:) - Controls(2,:), Controls(1,:) - Controls(2,:)));
+    data.T.Scale(2).CCD = rad2deg(vectorAngle3d(C.ICN - C.P1, C.HJC - C.P1));
 else
     data.T.Scale(2).FemoralVersion = nan;
     data.T.Scale(2).NeckLength = nan;
