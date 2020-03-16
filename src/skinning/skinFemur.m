@@ -85,17 +85,17 @@ end
 % Femoral Length
 % Construct the mechanical axis
 ECmidPoint = midPoint3d(C.MEC, C.LEC);
-mechAxis = createLine3d(C.HJC,ECmidPoint);
-mechAxis(4:6) = normalizeVector3d(mechAxis(4:6));
+mechAxis = normalizeLine3d(createLine3d(C.HJC,ECmidPoint));
 mechAxisAdjust = linePosition3d(ECmidPoint, mechAxis) - femoralLength;
 % Adjust femoral length by moving the epicondyles along the mechanical axis
 % in inferior direction
 C.MEC = C.MEC + mechAxisAdjust * -mechAxis(4:6);
 C.LEC = C.LEC + mechAxisAdjust * -mechAxis(4:6);
-
+% Calculate the new epicondylar midpoint
 newECmidPoint = mechAxis(1:3) + femoralLength * mechAxis(4:6);
-shaftAxis = createLine3d(C.ICN,C.P1);
-shaftAxis(4:6) = normalizeVector3d(shaftAxis(4:6));
+shaftAxis = normalizeLine3d(createLine3d(C.ICN,C.P1));
+% Project the old and new epicondylar midpoint on the straight femur axis
+% and calculate the difference along the straight femur axis.
 shaftAxisAdjust = ...
     linePosition3d(newECmidPoint, shaftAxis) - ...
     linePosition3d(ECmidPoint, shaftAxis);

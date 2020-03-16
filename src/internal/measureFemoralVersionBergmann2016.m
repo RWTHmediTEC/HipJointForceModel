@@ -4,13 +4,11 @@ function femoralVersion = measureFemoralVersionBergmann2016(HJC, P1, P2, MPC, LP
 transversePlane = createPlane(P2, P1 - P2);
 projPostCond = projPointOnPlane([MPC; LPC], transversePlane);
 % Posterior condyle line projected onto the transverse plane
-projPostCondLine = createLine3d(projPostCond(1,:), projPostCond(2,:));
-projPostCondLine(4:6)=normalizeVector3d(projPostCondLine(4:6));
+projPostCondLine = normalizeLine3d(createLine3d(projPostCond(1,:), projPostCond(2,:)));
 
 projNeckPoints = projPointOnPlane([HJC; P1], transversePlane);
 % Neck line projected onto the transverse plane
-projNeckLine = createLine3d(projNeckPoints(1,:), projNeckPoints(2,:));
-projNeckLine(4:6)=normalizeVector3d(projNeckLine(4:6));
+projNeckLine = normalizeLine3d(createLine3d(projNeckPoints(1,:), projNeckPoints(2,:)));
 
 % Test if lines are parallel
 if isParallel3d(projPostCondLine(4:6), projNeckLine(4:6),1e-12)
