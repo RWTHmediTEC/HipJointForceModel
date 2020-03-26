@@ -2,7 +2,7 @@
 # CoordinateSystem = 0
 # columns = id,x,y,z,ow,ox,oy,oz,vis,sel,lock,label,desc,associatedNodeID
 vtkMRMLMarkupsFiducialNode_7,-85.3486,17.4875,1517.26,0,0,0,1,1,0,1,HJC_L,,vtkMRMLScalarVolumeNode1
-vtkMRMLMarkupsFiducialNode_7,71.52,19.673,1519.744,0,0,0,1,1,0,1,HJC_R,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_7,71.52,19.673,1519.7438596654188,0,0,0,1,1,0,1,HJC_R,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_7,-45.0914,-88.6647,1611.57,0,0,0,1,1,0,1,PSIS_L,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_7,49.4593,-82.7411,1612.48,0,0,0,1,1,0,1,PSIS_R,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_7,-114.759,69.3789,1593.04,0,0,0,1,1,0,1,ASIS_L,,vtkMRMLScalarVolumeNode1
@@ -15,3 +15,9 @@ vtkMRMLMarkupsFiducialNode_7,121.602,-0.247923,1513.87,0,0,0,1,1,0,1,GT_R,,vtkMR
 vtkMRMLMarkupsFiducialNode_7,79.4249,9.72551,1444.89,0,0,0,1,1,0,1,LT_R,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_7,108.681,18.408,1477.079,0,0,0,1,1,0,1,P1_R,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_7,75.978,28.396,1058.891,0,0,0,1,1,0,1,P2_R,,
+vtkMRMLMarkupsFiducialNode_7,100.452,18.588,1486.704711914063,0,0,0,1,1,0,1,LNA_R,,
+vtkMRMLMarkupsFiducialNode_7,109.19,17.121,1487.618286132813,0,0,0,1,1,0,1,PSA_R,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_7,102.534,33.943,1349.745849609375,0,0,0,1,1,0,1,DSA_R,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_7,111.3458251953125,-4.006288528442383,1075.171,0,0,0,1,1,0,1,LPC_R,,
+vtkMRMLMarkupsFiducialNode_7,57.061,-17.55,1074.365600585938,0,0,0,1,1,0,1,MPC_R,,
+vtkMRMLMarkupsFiducialNode_7,68.446,21.257,1524.120361328125,0,0,0,1,1,0,1,MNA_R,,vtkMRMLScalarVolumeNode1

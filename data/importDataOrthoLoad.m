@@ -1,4 +1,11 @@
-function importDataOrthoLoad()
+function importDataOrthoLoad(varargin)
+
+%% Input parsing
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p, 'WriteExcel', false, logParValidFunc);
+parse(p, varargin{:});
+writeExcel = p.Results.WriteExcel;
 
 % Import OrthoLoad data as OL (OrthoLoad) struct and save as OrthoLoad.mat 
 
@@ -100,15 +107,24 @@ catch
     warning(['Landmarks of ' Subject{s} ' are missing! Returning: Wu2002TFM = nan(4)!'])
 end
 
+if writeExcel
 % Write selected landmarks of the femur as excel File:
-fLandmarks={'HJC','P1','P2','MPC','LPC','MEC','LEC','GT','LT'};
+fLandmarks = {'PSA','DSA','MNA','LNA','MEC','LEC','MPC','LPC','HJC','P1','P2','GT','LT'};
 excelLM(s).Subject=OL(s).Subject;
 for lm=1:length(fLandmarks)
     if isfield(OL(s).LM, [fLandmarks{lm} '_' Side_IL])
-        excelLM(s).([fLandmarks{lm}])=OL(s).LM.([fLandmarks{lm} '_' Side_IL]);
+        excelLM(s).([fLandmarks{lm}]) = OL(s).LM.([fLandmarks{lm} '_' Side_IL]) .* [-1 -1 1];
     else
-        excelLM(s).([fLandmarks{lm}])=[nan nan nan];
+        excelLM(s).([fLandmarks{lm}]) = [nan nan nan];
     end
+end
+% Reconstruct P1
+NeckAxis = createLine3d(OL(s).LM.(['MNA_' Side_IL]),OL(s).LM.(['LNA_' Side_IL]));
+ShaftAxis = createLine3d(OL(s).LM.(['PSA_' Side_IL]),OL(s).LM.(['DSA_' Side_IL]));
+[~, P1_NA, P1_SA] = distanceLines3d(NeckAxis, ShaftAxis);
+excelLM(s).P1_Fischer = midPoint3d(P1_NA,P1_SA) .* [-1 -1 1];
+excelLM(s).Distance_P1_Damm_Fischer = ...
+    distancePoints3d(OL(s).LM.(['P1_' Side_IL]), midPoint3d(P1_NA,P1_SA));
 end
 
 
@@ -120,8 +136,10 @@ OL(s).CCD = CCD;
 
 end
 
-writetable(struct2table(excelLM),'data\OrthoLoadFemurLandmarks.xlsx','WriteVariableNames',false,'Range','B3')
-
+if writeExcel
+    writetable(struct2table(excelLM),'data\OrthoLoad\Landmarks\OrthoLoadFemurLandmarks.xlsx',...
+        'WriteVariableNames',false,'Range','B4')
+end
 %% Save data
 save('data\OrthoLoad.mat', 'OL')
 
