@@ -66,10 +66,10 @@ HipJointWidth     = data.S.Scale(1).HipJointWidth;
 Side              = data.S.Side;
 GreaterTrochanter = data.S.LE(2).Mesh.vertices(data.S.LE(2).Landmarks.GreaterTrochanter.Node,:);
 HipJointCenter    = data.S.LE(1).Joints.Hip.Pos;
-AcetabularRoof    = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.AcetabularRoof  .Node,:);
-MostCranial       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MostCranialIlium.Node,:);
-MostMedial        = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MostMedialIlium .Node,:);
-MostLateral       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MostLateralIlium.Node,:);
+AcetabularRoof    = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.AcetabularRoof_R.Node,:);
+MostCranial       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.SuperiorIliacCrest_R.Node,:);
+MostMedial        = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.MedialIlium_R.Node,:);
+MostLateral       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.IliacTubercle_R.Node,:);
 
 %% Define Parameters
 g = 9.18;

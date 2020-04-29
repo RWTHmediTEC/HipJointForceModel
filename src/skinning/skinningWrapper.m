@@ -1,4 +1,4 @@
-function skinnedMesh = skinFemur(templateName, newControls)
+function skinnedMesh = skinningWrapper(templateName, newControls)
 % Wrapper for linear blend skinning (LBS)
 
 % Load TLEMversion controls
