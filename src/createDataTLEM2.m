@@ -119,9 +119,9 @@ HJC2PiriformisInsertion = transformPoint3d(...
 data.T.Scale(2).FemoralWidth = abs(HJC2PiriformisInsertion(3));
 
 % Load controls for skinning
-if exist(['femur' data.Cadaver 'Controls.mat'],'file')
-    load(['femur' data.Cadaver 'Controls.mat'], 'Controls')
-    C = Controls;
+if exist(['skinFemur' data.Cadaver '.mat'],'file')
+    load(['skinFemur' data.Cadaver '.mat'], 'controls')
+    C = controls;
     data.T.Scale(2).FemoralVersion = measureFemoralVersionBergmann2016(...
         C.HJC, C.P1, C.ICN, C.MPC, C.LPC);
     % NeckLength: Distance between the hip joint center and the point where
@@ -130,6 +130,7 @@ if exist(['femur' data.Cadaver 'Controls.mat'],'file')
     % CCD: Angle between the neck axis and the straight femur axis
     data.T.Scale(2).CCD = rad2deg(vectorAngle3d(C.ICN - C.P1, C.HJC - C.P1));
 else
+    warning(['No surface data of the femur available for ' data.Cadaver '!'])
     data.T.Scale(2).FemoralVersion = nan;
     data.T.Scale(2).NeckLength = nan;
     data.T.Scale(2).CCD = nan;

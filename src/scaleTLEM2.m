@@ -21,7 +21,7 @@ switch data.ScalingLaw
         PD = 1;
         FemoralLength = (0.53-0.285)*data.S.BodyHeight*10; % [cm] to [mm] [Winter 2009, S.83, Fig.4.1]
         FL = FemoralLength / data.T.Scale(2).FemoralLength;
-        % !!! Sedghi2017 used a slightly different definition !!!
+        % !!! Sedghi2017 used a slightly different definition than the one implemented here !!!
         FW = data.S.Scale(2).FemoralWidth / data.T.Scale(2).FemoralWidth;
     otherwise
         error('Invalid scaling law!')
