@@ -1,4 +1,4 @@
-function data = skinFemur(data)
+function data = skinFemurLEM(data)
 % Linear blend skinning (LBS) of femur changing femoral length, femoral 
 % version, CCD angle and neck length
 
@@ -21,27 +21,10 @@ else
     neckLength     = S.Scale(2).NeckLength;
 end
 
-% Load TLEMversion controls
+% Load controls
 % mat files are created with data\Skinning\femurTLEM2ConstructControls.m
-load(['femur' data.Cadaver 'Controls'], 'Controls')
-tC = cell2mat(struct2cell(Controls));
-C = Controls;
-
-P = 1:length(fieldnames(Controls));
-
-% Create TLEMversion weights
-if ~exist(['femur' data.Cadaver 'Weights.mat'], 'file')
-    disp('Skinning weights are calculated. This may take a few minutes ...')
-    % Compute boundary conditions
-    [bVertices,bConditions] = boundary_conditions(LE(2).Mesh.vertices, LE(2).Mesh.faces, tC, P);
-    % Compute weights
-    Weights = biharmonic_bounded(LE(2).Mesh.vertices, LE(2).Mesh.faces, bVertices, bConditions, 'OptType', 'quad');
-    % Normalize weights
-    Weights = Weights./repmat(sum(Weights,2), 1, size(Weights,2));
-    
-    save(['data/Skinning/femur' data.Cadaver 'Weights'], 'Weights')
-end
-load(['femur' data.Cadaver 'Weights'], 'Weights')
+load(['skinFemur' data.Cadaver '.mat'], 'controls')
+C = controls;
 
 if visu
     patchProps.EdgeColor = 'none'; %#ok<*UNRCH>
@@ -120,28 +103,8 @@ assert(ismembertol(neckLength, distancePoints3d(C.HJC,C.P1)))
 % Check if femoral length is correct
 assert(ismembertol(distancePoints3d(midPoint3d(C.MEC,C.LEC),C.HJC),femoralLength))
 
-%% Calculate skinning transformations
-[T, AX, AN, Sm, O] = skinning_transformations(tC, P, [], cell2mat(struct2cell(C)));
-
-% Number of handles
-m = numel(P); % + size(BE,1);
-% Dimension (2 or 3)
-dim = size(tC,2);
-% Extract scale
-TR = zeros(dim,dim+1,m);
-TR(1:dim,1:dim,:) = Sm;
-Sm = reshape(Sm,[dim dim*m])';
-TR(1:dim,dim+1,:) = permute(O-stacktimes(Sm,O),[2 3 1]);
-% Perform scale as linear blend skinning, before translations and rotations
-skinnedMesh = LE(2).Mesh;
-[scaledVertices] = lbs(skinnedMesh.vertices, TR, Weights);
-Q = axisangle2quat(AX,AN);
-% quattrans2udq expect 3D translations, so pad with zeros
-T = [T zeros(size(T,1),1)];
-% Convert quaternions and translations into dualquaternions
-DQ = quattrans2udq(Q,T);
-% Dual quaternions linear blend skinning deformation
-skinnedMesh.vertices = dualquatlbs(scaledVertices, DQ, Weights);
+% Skinning
+skinnedMesh = skinFemur(data.Cadaver, C);
 
 %% Update struct LE of femur
 % Mesh

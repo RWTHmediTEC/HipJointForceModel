@@ -50,7 +50,7 @@ data.S.LE = transformTLEM2(data.T.LE, scaleTFM);
 
 %% Femoral skinning
 if strcmp(data.ScalingLaw, 'Skinning')
-    data = skinFemur(data);
+    data = skinFemurLEM(data);
 end
 
 %% Correct bone coordinate systems
