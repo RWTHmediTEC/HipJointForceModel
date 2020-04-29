@@ -81,7 +81,7 @@ end
 if ~isempty(Muscles)
     lineProps.Marker = 'o';
     lineProps.Linestyle = '-';
-    lineProps.MarkerSize = 2;
+    lineProps.MarkerSize = 1;
     for m = 1:length(Muscles)
         lineProps.DisplayName = Muscles(m).Name(1:end-1);
         for c = 1:size(MuscleList,1)
@@ -167,8 +167,12 @@ end
 
 %%
 xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
-axH.ClippingStyle='rectangle';
-axH.Units='normalized';
-axis(axH, 'equal');
+%axH.Units='normalized';
+if NoB>2
+    axis(axH, 'equal')
+    % mouseControl3d(axH)
+else
+    axis(axH, 'equal','tight');
+end
 
 end

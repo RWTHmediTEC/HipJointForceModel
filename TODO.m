@@ -21,6 +21,8 @@ Scaling laws
 - Verify LBS for OrthoLoad subjects
 - Implement LBS for the pelvis bone
 
+- Add caching for skinning weights
+
 TODO GUI:
 
 VALIDATION:

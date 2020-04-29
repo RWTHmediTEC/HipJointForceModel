@@ -4,7 +4,7 @@ addpath(genpath('..\..\..\HipJointReactionForceModel'))
 
 fileFolder=fullfile(fileparts([mfilename('fullpath'), '.m']));
 
-TLEMversion = 'TLEM2_0';
+TLEMversion = 'TLEM2_1';
 
 % Load original data
 switch TLEMversion
