@@ -1,8 +1,13 @@
-function data = skinFemurLEM(data)
+function data = skinFemurLEM(data,varargin)
 % Linear blend skinning (LBS) of femur changing femoral length, femoral 
 % version, CCD angle and neck length
 
-visu = 0;
+% Parsing
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p,'visualization',0,logParValidFunc);
+parse(p,varargin{:});
+visu = p.Results.visualization;
 
 LE      = data.T.LE;
 T.Scale = data.T.Scale;
@@ -32,7 +37,7 @@ if visu
     patchProps.FaceAlpha = 0.5;
     patchProps.FaceLighting = 'gouraud';
     visualizeMeshes(LE(2).Mesh,patchProps)
-    pointProps.MarkerFaceColor='r';
+    pointProps.MarkerFaceColor='y';
     pointProps.MarkerEdgeColor='none';
     pointProps.Marker='o';
     structfun(@(x) drawPoint3d(x,pointProps),C);
@@ -104,7 +109,7 @@ assert(ismembertol(neckLength, distancePoints3d(C.HJC,C.P1)))
 assert(ismembertol(distancePoints3d(midPoint3d(C.MEC,C.LEC),C.HJC),femoralLength))
 
 % Skinning
-skinnedMesh = skinFemur(data.Cadaver, C);
+skinnedMesh = skinningWrapper(data.Cadaver, C);
 
 %% Update struct LE of femur
 % Mesh
