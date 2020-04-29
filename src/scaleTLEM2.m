@@ -7,7 +7,7 @@ scaleTFM = repmat(eye(4), 1, 1, 6);
 
 %% Scale factors
 switch data.ScalingLaw
-    case {'NonuniformEggert2018','Skinning'}
+    case {'NonuniformEggert2018','SkinningFischer2018'}
         PW = data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth;
         PH = data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight;
         PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
@@ -37,7 +37,7 @@ switch data.ScalingLaw
     case {'NonuniformEggert2018','NonuniformSedghi2017'}
         scaleTFM(2,2,2) = FL; 
         scaleTFM(3,3,2) = FW;
-    case 'Skinning'
+    case 'SkinningFischer2018'
     otherwise
         error('Invalid scaling law!')
 end
@@ -49,7 +49,7 @@ scaleTFM(2,2,3:6) = FL;
 data.S.LE = transformTLEM2(data.T.LE, scaleTFM);
 
 %% Femoral skinning
-if strcmp(data.ScalingLaw, 'Skinning')
+if strcmp(data.ScalingLaw, 'SkinningFischer2018')
     data = skinFemurLEM(data);
 end
 

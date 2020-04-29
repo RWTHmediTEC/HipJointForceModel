@@ -8,7 +8,7 @@ TODO:
 		- OptimalFiberLength (Lopt)
 
 HJF models
-- Implement further one-leg stance models
+- Implement other one-leg stance models
 - Parameter / sensitivity study of the HJF models
 - Implement models for other ADLs
 Muscle path models
