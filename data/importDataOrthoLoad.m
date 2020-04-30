@@ -88,43 +88,38 @@ end
 
 % Transformation for the hip joint force from OrthoLoad CS [Bergmann 2016]
 % to [Wu 2002] CS
-try
-    % Create transformation into OrthoLoad CS [Bergmann 2016].
-    Bergman2016TFM = createFemurCS_TFM_Bergmann2016(...
-        OL(s).LM.(['MPC_' Side_IL]),...
-        OL(s).LM.(['LPC_' Side_IL]),...
-        OL(s).LM.(['P1_' Side_IL]), ...
-        OL(s).LM.(['P2_' Side_IL]), ...
-        OL(s).LM.(['HJC_' Side_IL]), Side_IL);
-    % Transform landmarks for [Wu 2002] into the [Bergmann 2016].
-    MEC_IL = transformPoint3d(OL(s).LM.(['MEC_' Side_IL]), Bergman2016TFM);
-    LEC_IL = transformPoint3d(OL(s).LM.(['LEC_' Side_IL]), Bergman2016TFM);
-    HJC_IL = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), Bergman2016TFM);
-    % Create transformation from [Bergmann 2016] to [Wu 2002].
-    OL(s).Wu2002TFM = createFemurCS_TFM_Wu2002(MEC_IL, LEC_IL, HJC_IL, Side_IL);
-catch
-    OL(s).Wu2002TFM = nan(4);
-    warning(['Landmarks of ' Subject{s} ' are missing! Returning: Wu2002TFM = nan(4)!'])
-end
+% Create transformation into OrthoLoad CS [Bergmann 2016].
+Bergman2016TFM = createFemurCS_TFM_Bergmann2016(...
+    OL(s).LM.(['MPC_' Side_IL]),...
+    OL(s).LM.(['LPC_' Side_IL]),...
+    OL(s).LM.(['P1_' Side_IL]), ...
+    OL(s).LM.(['P2_' Side_IL]), ...
+    OL(s).LM.(['HJC_' Side_IL]), Side_IL);
+% Transform landmarks for [Wu 2002] into the [Bergmann 2016].
+MEC_IL = transformPoint3d(OL(s).LM.(['MEC_' Side_IL]), Bergman2016TFM);
+LEC_IL = transformPoint3d(OL(s).LM.(['LEC_' Side_IL]), Bergman2016TFM);
+HJC_IL = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), Bergman2016TFM);
+% Create transformation from [Bergmann 2016] to [Wu 2002].
+OL(s).Wu2002TFM = createFemurCS_TFM_Wu2002(MEC_IL, LEC_IL, HJC_IL, Side_IL);
 
 if writeExcel
-% Write selected landmarks of the femur as excel File:
-fLandmarks = {'PSA','DSA','MNA','LNA','MEC','LEC','MPC','LPC','HJC','P1','P2','GT','LT'};
-excelLM(s).Subject=OL(s).Subject;
-for lm=1:length(fLandmarks)
-    if isfield(OL(s).LM, [fLandmarks{lm} '_' Side_IL])
-        excelLM(s).([fLandmarks{lm}]) = OL(s).LM.([fLandmarks{lm} '_' Side_IL]) .* [-1 -1 1];
-    else
-        excelLM(s).([fLandmarks{lm}]) = [nan nan nan];
+    % Write selected landmarks of the femur as excel file:
+    femurLM = {'PSA','DSA','MNA','LNA','MEC','LEC','MPC','LPC','HJC','P1','P2','GT','LT'};
+    excelLM(s).Subject=OL(s).Subject;
+    for lm=1:length(femurLM)
+        if isfield(OL(s).LM, [femurLM{lm} '_' Side_IL])
+            excelLM(s).([femurLM{lm}]) = OL(s).LM.([femurLM{lm} '_' Side_IL]) .* [-1 -1 1];
+        else
+            excelLM(s).([femurLM{lm}]) = [nan nan nan];
+        end
     end
-end
-% Reconstruct P1
-NeckAxis = createLine3d(OL(s).LM.(['MNA_' Side_IL]),OL(s).LM.(['LNA_' Side_IL]));
-ShaftAxis = createLine3d(OL(s).LM.(['PSA_' Side_IL]),OL(s).LM.(['DSA_' Side_IL]));
-[~, P1_NA, P1_SA] = distanceLines3d(NeckAxis, ShaftAxis);
-excelLM(s).P1_Fischer = midPoint3d(P1_NA,P1_SA) .* [-1 -1 1];
-excelLM(s).Distance_P1_Damm_Fischer = ...
-    distancePoints3d(OL(s).LM.(['P1_' Side_IL]), midPoint3d(P1_NA,P1_SA));
+    % Reconstruct P1
+    NeckAxis = createLine3d(OL(s).LM.(['MNA_' Side_IL]),OL(s).LM.(['LNA_' Side_IL]));
+    ShaftAxis = createLine3d(OL(s).LM.(['PSA_' Side_IL]),OL(s).LM.(['DSA_' Side_IL]));
+    [~, P1_NA, P1_SA] = distanceLines3d(NeckAxis, ShaftAxis);
+    excelLM(s).P1_Fischer = midPoint3d(P1_NA,P1_SA) .* [-1 -1 1];
+    excelLM(s).Distance_P1_Damm_Fischer = ...
+        distancePoints3d(OL(s).LM.(['P1_' Side_IL]), midPoint3d(P1_NA,P1_SA));
 end
 
 

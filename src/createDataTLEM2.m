@@ -9,7 +9,7 @@ function data = createDataTLEM2(data, Cadaver)
 % Gesundheit - Körpermaße der Bevölkerung
 
 % Build structure which contains default data
-if nargin == 0
+if nargin == 0 || isempty(data)
     % g-Force
     data.g = 9.81;
     % Cadaver
@@ -37,6 +37,7 @@ switch Cadaver
         data.T.BodyWeight = 45; % Cadavers's body weight [kg] [Carbone 2015]
         % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
         data.T.BodyHeight = 813/10/0.53;
+        data.SurfaceData=true;
     case 'TLEM2_1'
         if ~exist('data\TLEM2_1.mat', 'file')
             if ~exist('data\TLEM2_0.mat', 'file')
@@ -49,11 +50,13 @@ switch Cadaver
         data.T.BodyWeight = 45; % Cadavers's body weight [kg] [Carbone 2015]
         % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
         data.T.BodyHeight = 813/10/0.53; % [cm]
+        data.SurfaceData=true;
     case 'Dostal1981'
         [LE, Scale] = Dostal1981;
         muscleList = Johnston1979toDostal1981(Johnston1979, Dostal1981);
         data.T.BodyWeight = 77; % Generic body weight [kg] [Destatis 2018]
         data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
+        data.SurfaceData=false;
     otherwise
         error('No valid TLEM version')
 end
@@ -61,9 +64,36 @@ end
 data.T.LE = LE;
 data.MuscleList = muscleList;
 
-%% Bony paramters
+%% Bony landmarks & paramters
+if data.SurfaceData
+    % Pelvic landmarks
+    data.T.Scale(1).Landmarks = struct(...
+        'HJC',LE(1).Joints.Hip.Pos,...
+        'IIT',LE(1).Mesh.vertices(LE(1).Landmarks.InferiorIschialTuberosity_R.Node,:), ...
+        'PIT',LE(1).Mesh.vertices(LE(1).Landmarks.PosteriorIschialTuberosity_R.Node,:), ...
+        'IS',LE(1).Mesh.vertices(LE(1).Landmarks.RightIschialSpine.Node,:), ...
+        'PIIS',LE(1).Mesh.vertices(LE(1).Landmarks.PosteriorInferiorIliacSpine_R.Node,:), ...
+        'PSIS',LE(1).Mesh.vertices(LE(1).Landmarks.RightPosteriorSuperiorIliacSpine.Node,:), ...
+        'SIC',LE(1).Mesh.vertices(LE(1).Landmarks.SuperiorIliacCrest_R.Node,:), ...
+        'IT',LE(1).Mesh.vertices(LE(1).Landmarks.IliacTubercle_R.Node,:), ...
+        'ASIS',LE(1).Mesh.vertices(LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Node,:),...
+        'AIIS',LE(1).Mesh.vertices(LE(1).Landmarks.RightAnteriorInferiorIliacSpine.Node,:),...
+        'PT',LE(1).Mesh.vertices(LE(1).Landmarks.RightPubicTubercle.Node,:),...
+        'MP',LE(1).Mesh.vertices(LE(1).Landmarks.MedialPubis_R.Node,:));
+    % Femoral landmarks
+    data.T.Scale(2).Landmarks = struct(...
+        'HJC',LE(2).Joints.Hip.Pos,... % Hip joint center
+        'P1',LE(2).Landmarks.P1.Pos,... % Straight femur axis (proximal point: P1) [Bergmann2016]
+        'ICN',LE(2).Mesh.vertices(LE(2).Landmarks.IntercondylarNotch.Node,:),... % Straight femur axis (distal point: P2) [Bergmann2016]
+        'MEC',LE(2).Landmarks.MedialEpicondyle.Pos,...
+        'LEC',LE(2).Landmarks.LateralEpicondyle.Pos,...
+        'MPC',LE(2).Mesh.vertices(LE(2).Landmarks.MedialPosteriorCondyle.Node,:),...
+        'LPC',LE(2).Mesh.vertices(LE(2).Landmarks.LateralPosteriorCondyle.Node,:),...
+        'GT',LE(2).Mesh.vertices(LE(2).Landmarks.SuperiorGreaterTrochanter.Node,:),...
+        'LT',LE(2).Mesh.vertices(LE(2).Landmarks.LesserTrochanter.Node,:));
+end
 
-% Pelvic parameters:
+%% Pelvic parameters:
 % !!! The landmarks should be transformed into the pelvic bone coordinate 
 % systems [Wu 2002] to use consistent parameter definitions. However, this 
 % is not possible for some of the cadavers due to missing landmark 
@@ -98,7 +128,7 @@ switch Cadaver
         data.T.Scale(1).PelvicDepth = Scale(1).PelvicDepth;
 end
 
-% Femoral parameters
+%% Femoral parameters
 % Transform the landmarks into the femoral coordinate system [Wu 2002]
 % Cadaver should always be a right side: 'R'
 fTFM = createFemurCS_TFM_Wu2002(...
@@ -113,31 +143,34 @@ data.T.Scale(2).FemoralLength = distancePoints3d(transformPoint3d(midPoint3d(...
     transformPoint3d(data.T.LE(2).Joints.Hip.Pos, fTFM));
 % FemoralWidth: Distance between the HJC and the greater trochanter along 
 % the Z-Axis. Use Piriformis insertion as greater trochanter.
-HJC2PiriformisInsertion = transformPoint3d(...
-    data.T.LE(2).Muscle.Piriformis1.Pos, fTFM) - ...
+HJC2PiriformisInsertion = ...
+    transformPoint3d(data.T.LE(2).Muscle.Piriformis1.Pos, fTFM) - ...
     transformPoint3d(data.T.LE(2).Joints.Hip.Pos, fTFM);
 data.T.Scale(2).FemoralWidth = abs(HJC2PiriformisInsertion(3));
 
-% Load controls for skinning
-if exist(['skinFemur' data.Cadaver '.mat'],'file')
-    load(['skinFemur' data.Cadaver '.mat'], 'controls')
-    C = controls;
+if data.SurfaceData
     data.T.Scale(2).FemoralVersion = measureFemoralVersionBergmann2016(...
-        C.HJC, C.P1, C.ICN, C.MPC, C.LPC);
+        data.T.Scale(2).Landmarks.HJC, ...
+        data.T.Scale(2).Landmarks.P1, ...
+        data.T.Scale(2).Landmarks.ICN, ...
+        data.T.Scale(2).Landmarks.MPC, ...
+        data.T.Scale(2).Landmarks.LPC);
     % NeckLength: Distance between the hip joint center and the point where
     %             the neck axis and the straight femur axis cross
-    data.T.Scale(2).NeckLength = distancePoints3d(C.HJC, C.P1);
+    data.T.Scale(2).NeckLength = distancePoints3d(...
+        data.T.Scale(2).Landmarks.HJC, data.T.Scale(2).Landmarks.P1);
     % CCD: Angle between the neck axis and the straight femur axis
-    data.T.Scale(2).CCD = rad2deg(vectorAngle3d(C.ICN - C.P1, C.HJC - C.P1));
+    data.T.Scale(2).CCD = rad2deg(vectorAngle3d(...
+        data.T.Scale(2).Landmarks.ICN - data.T.Scale(2).Landmarks.P1, ...
+        data.T.Scale(2).Landmarks.HJC - data.T.Scale(2).Landmarks.P1));
 else
-    warning(['No surface data of the femur available for ' data.Cadaver '!'])
     data.T.Scale(2).FemoralVersion = nan;
     data.T.Scale(2).NeckLength = nan;
     data.T.Scale(2).CCD = nan;
 end
 
 
-%% Save initally as (T)emplate and (S)ubject
+%% Save initally as (T)emplate (Cadaver) and (S)ubject (Patient)
 data.S.Side       = data.T.Side;
 data.S.BodyWeight = data.T.BodyWeight;
 data.S.BodyHeight = data.T.BodyHeight;

@@ -21,13 +21,13 @@ for s = 1:length(OL)
         OL(s).BodyWeight = meanPFP.Weight_N / data.g; % [N] to [kg]
         
         % The HJF of the OrthoLoad subjects is given in the OrthLoad CS 
-        % [Bergmann 2016]. Use definition 'ASR' instead of 'RAS'.
+        % [Bergmann 2016]. Use the orientation 'ASR' instead of 'RAS'.
         OL(s).HJF_Bergmann2016 = transformVector3d(meanPFP.HJF_pBW,...
             anatomicalOrientationTFM('RAS','ASR'));
         % Transform OrthoLoad HJF into the Wu2002 CS
         switch OL(s).Subject(end)
             case 'L'
-                % OrthoLoad HJF is presented for the right side for all 
+                % The OrthoLoad HJF is presented for the right side for all 
                 % subjects. Left sides were mirrored. Hence, for left sides
                 % the OrthoLoad HJF has to be mirrored back for the 
                 % transformation into the Wu2002 CS.
@@ -41,21 +41,25 @@ for s = 1:length(OL)
                 error('Invalid side identifier!')
         end
         
+        % Biometric
         data.S.Side                    = OL(s).Subject(end);
         data.S.BodyWeight              = OL(s).BodyWeight;
         data.S.BodyHeight              = OL(s).BodyHeight;
+        % Functional
         data.S.PelvicTilt              = 0; % Not available for OrthoLoad subjects
+        % Pelvis anatomy
         data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
         data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
         data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
         data.S.Scale(1).PelvicDepth    = OL(s).PelvicDepth;
+        % Femur anatomy
         data.S.Scale(2).FemoralLength  = OL(s).FemoralLength;
         data.S.Scale(2).FemoralWidth   = OL(s).FemoralWidth;
         data.S.Scale(2).FemoralVersion = OL(s).FemoralVersion;
         data.S.Scale(2).NeckLength     = OL(s).NeckLength;
         data.S.Scale(2).CCD            = OL(s).CCD;
         
-        % Calculate HJF
+        %% Calculate HJF
         data = scaleTLEM2(data);
         data = globalizeTLEM2(data);
         data = gui.Home.Model.modelHandle.Calculation(data);

@@ -1,6 +1,5 @@
 function data = skinFemurLEM(data,varargin)
-% Linear blend skinning (LBS) of femur changing femoral length, femoral 
-% version, CCD angle and neck length
+% Linear blend skinning (LBS) of the femur
 
 % Parsing
 p = inputParser;
@@ -9,9 +8,116 @@ addParameter(p,'visualization',0,logParValidFunc);
 parse(p,varargin{:});
 visu = p.Results.visualization;
 
+boneIdx = 2; % Femur
+weightsFile = [data.T.LE(boneIdx).Name 'Weights' data.Cadaver '.mat'];
+
+% Load controls
+if data.SurfaceData
+    if ~exist(weightsFile,'file')
+        calculateSkinningWeights(data, boneIdx)
+    end
+    load(weightsFile, 'controls')
+else
+    error(['No surface data available for cadaver ' data.Cadaver '!. Skinning is not possible.'])
+end
+
 LE      = data.T.LE;
-T.Scale = data.T.Scale;
-S.Scale = data.S.Scale;
+T.Scale = data.T.Scale; % Template (Cadaver)
+S.Scale = data.S.Scale; % Subject (Patient)
+
+% Change of the control points based on the femoral length, femoral 
+% version, CCD angle and neck length
+subjectControls = parameterBased(controls,T,S,visu);
+
+% Skinning
+skinnedMesh = skinningWrapper(weightsFile, subjectControls);
+
+%% Update struct LE of femur
+% Mesh
+LE(boneIdx).Mesh = skinnedMesh;
+
+% Joints
+LE(boneIdx).Joints.Hip.Pos = subjectControls.HJC;
+joints = fieldnames(LE(boneIdx).Joints);
+for s = 1:length(joints)
+    if isfield(LE(boneIdx).Joints.(joints{s}), 'Axis')
+        [LE(boneIdx).Joints.(joints{s}).Pos,LE(boneIdx).Joints.(joints{s}).Axis] = ...
+            updateAxis(...
+            LE(boneIdx).Joints.(joints{s}).Pos, ...
+            LE(boneIdx).Joints.(joints{s}).Axis, ...
+            data.T.LE(boneIdx).Mesh, LE(boneIdx).Mesh);
+    end
+end
+
+% Muscles
+% Calculate the translation of the nearest node to the muscle attachment 
+% position (MAP) between the template femur and the skinned femur. Add this
+% translation to the original MAP to get the skinned MAP.
+muscles = fieldnames(LE(boneIdx).Muscle);
+for m = 1:length(muscles)
+    for n = 1:length(LE(boneIdx).Muscle.(muscles{m}).Type)
+        trans = LE(boneIdx).Mesh.vertices(LE(boneIdx).Muscle.(muscles{m}).Node(n),:) ...
+            - data.T.LE(boneIdx).Mesh.vertices(LE(boneIdx).Muscle.(muscles{m}).Node(n),:);
+        LE(boneIdx).Muscle.(muscles{m}).Pos(n,:) = LE(boneIdx).Muscle.(muscles{m}).Pos(n,:) + trans;
+
+    end
+end
+
+% Surfaces
+surfaces = fieldnames(LE(boneIdx).Surface);
+for s = 1:length(surfaces)
+    [LE(boneIdx).Surface.(surfaces{s}).Center,LE(boneIdx).Surface.(surfaces{s}).Axis] = ...
+        updateAxis(...
+        LE(boneIdx).Surface.(surfaces{s}).Center, ...
+        LE(boneIdx).Surface.(surfaces{s}).Axis, ...
+        data.T.LE(boneIdx).Mesh, LE(boneIdx).Mesh);
+end
+
+% Landmarks
+% Landmarks of the femur are on the surface of the mesh. Hence, use the
+% nearest node to get the new position of the landmark.
+landmarks = fieldnames(LE(boneIdx).Landmarks);
+for lm = 1:length(landmarks)
+    if isfield(LE(boneIdx).Landmarks.(landmarks{lm}), 'Node')
+        LE(boneIdx).Landmarks.(landmarks{lm}).Pos = ...
+            LE(boneIdx).Mesh.vertices(LE(boneIdx).Landmarks.(landmarks{lm}).Node,:);
+    end
+end
+% Except landmark P1 [Bergmann 2016] that is not on the surface.
+LE(boneIdx).Landmarks.P1.Pos = subjectControls.P1;
+    
+data.S.LE(boneIdx) = LE(boneIdx);
+
+end
+
+function [sOrigin, sAxis] = updateAxis(origin, axis, tMesh, sMesh)
+
+% Get intersections of the template axis with the template mesh
+lIdx = lineToVertexIndices([origin, axis], tMesh);
+tLinePoints = tMesh.vertices(lIdx,:);
+% Create the template line with the template intersections
+tLine = createLine3d(tLinePoints(1,:),tLinePoints(2,:));
+tLine(4:6) = normalizeVector3d(tLine(4:6));
+% Position of the template origin on the template line
+tPos = linePosition3d(origin, tLine);
+% Distance between the template intersections
+tLength = distancePoints3d(tLinePoints(1,:),tLinePoints(2,:));
+
+% Repeat for the skinned mesh
+sLinePoints = sMesh.vertices(lIdx,:);
+sLine = createLine3d(sLinePoints(1,:),sLinePoints(2,:));
+sLine(4:6) = normalizeVector3d(sLine(4:6));
+sLength = distancePoints3d(sLinePoints(1,:),sLinePoints(2,:));
+
+% Calculate the origin and axis for the skinned mesh
+sOrigin = sLine(1:3) + sLength/tLength * tPos * sLine(4:6);
+sAxis = sLine(4:6);
+end
+
+
+function C = parameterBased(C,T,S,visu)
+% Change of the control points based on the femoral length, femoral 
+% version, CCD angle and neck length
 
 % Implant parameters
 if isequal(S.Scale(2).FemoralLength,  T.Scale(2).FemoralLength) &&...
@@ -26,17 +132,12 @@ else
     neckLength     = S.Scale(2).NeckLength;
 end
 
-% Load controls
-% mat files are created with data\Skinning\femurTLEM2ConstructControls.m
-load(['skinFemur' data.Cadaver '.mat'], 'controls')
-C = controls;
-
 if visu
     patchProps.EdgeColor = 'none'; %#ok<*UNRCH>
     patchProps.FaceColor = [223, 206, 161]/255;
     patchProps.FaceAlpha = 0.5;
     patchProps.FaceLighting = 'gouraud';
-    visualizeMeshes(LE(2).Mesh,patchProps)
+    visualizeMeshes(data.T.LE(2).Mesh,patchProps)
     pointProps.MarkerFaceColor='y';
     pointProps.MarkerEdgeColor='none';
     pointProps.Marker='o';
@@ -108,87 +209,13 @@ assert(ismembertol(neckLength, distancePoints3d(C.HJC,C.P1)))
 % Check if femoral length is correct
 assert(ismembertol(distancePoints3d(midPoint3d(C.MEC,C.LEC),C.HJC),femoralLength))
 
-% Skinning
-skinnedMesh = skinningWrapper(data.Cadaver, C);
-
-%% Update struct LE of femur
-% Mesh
-LE(2).Mesh = skinnedMesh;
-
-% Joints
-LE(2).Joints.Hip.Pos = C.HJC;
-joints = fieldnames(LE(2).Joints);
-for s = 1:length(joints)
-    if isfield(LE(2).Joints.(joints{s}), 'Axis')
-        [LE(2).Joints.(joints{s}).Pos,LE(2).Joints.(joints{s}).Axis] = ...
-            updateAxis(...
-            LE(2).Joints.(joints{s}).Pos, ...
-            LE(2).Joints.(joints{s}).Axis, ...
-            data.T.LE(2).Mesh, LE(2).Mesh);
-    end
 end
 
-% Muscles
-% Calculate the translation of the nearest node to the muscle attachment 
-% position (MAP) between the template femur and the skinned femur. Add this
-% translation to the original MAP to get the skinned MAP.
-muscles = fieldnames(LE(2).Muscle);
-for m = 1:length(muscles)
-    for n = 1:length(LE(2).Muscle.(muscles{m}).Type)
-        trans = LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:) ...
-            - data.T.LE(2).Mesh.vertices(LE(2).Muscle.(muscles{m}).Node(n),:);
-        LE(2).Muscle.(muscles{m}).Pos(n,:) = LE(2).Muscle.(muscles{m}).Pos(n,:) + trans;
+function C = landmarkBased(controls, S,~)
 
-    end
+LM = fieldnames(controls);
+for lm=1:length(LM)
+    C.(LM{lm}) = S.LE(2).Landmarks.(LM{lm}).Pos;
 end
 
-% Surfaces
-surfaces = fieldnames(LE(2).Surface);
-for s = 1:length(surfaces)
-    [LE(2).Surface.(surfaces{s}).Center,LE(2).Surface.(surfaces{s}).Axis] = ...
-        updateAxis(...
-        LE(2).Surface.(surfaces{s}).Center, ...
-        LE(2).Surface.(surfaces{s}).Axis, ...
-        data.T.LE(2).Mesh, LE(2).Mesh);
-end
-
-% Landmarks
-% Landmarks of the femur are on the surface of the mesh. Hence, use the
-% nearest node to get the new position of the landmark.
-landmarks = fieldnames(LE(2).Landmarks);
-for lm = 1:length(landmarks)
-    if isfield(LE(2).Landmarks.(landmarks{lm}), 'Node')
-        LE(2).Landmarks.(landmarks{lm}).Pos = ...
-            LE(2).Mesh.vertices(LE(2).Landmarks.(landmarks{lm}).Node,:);
-    end
-end
-% Except landmark P1 [Bergmann 2016] that is not on the surface.
-LE(2).Landmarks.P1.Pos = C.P1;
-    
-data.S.LE(2) = LE(2);
-
-end
-
-function [sOrigin, sAxis] = updateAxis(origin, axis, tMesh, sMesh)
-
-% Get intersections of the template axis with the template mesh
-lIdx = lineToVertexIndices([origin, axis], tMesh);
-tLinePoints = tMesh.vertices(lIdx,:);
-% Create the template line with the template intersections
-tLine = createLine3d(tLinePoints(1,:),tLinePoints(2,:));
-tLine(4:6) = normalizeVector3d(tLine(4:6));
-% Position of the template origin on the template line
-tPos = linePosition3d(origin, tLine);
-% Distance between the template intersections
-tLength = distancePoints3d(tLinePoints(1,:),tLinePoints(2,:));
-
-% Repeat for the skinned mesh
-sLinePoints = sMesh.vertices(lIdx,:);
-sLine = createLine3d(sLinePoints(1,:),sLinePoints(2,:));
-sLine(4:6) = normalizeVector3d(sLine(4:6));
-sLength = distancePoints3d(sLinePoints(1,:),sLinePoints(2,:));
-
-% Calculate the origin and axis for the skinned mesh
-sOrigin = sLine(1:3) + sLength/tLength * tPos * sLine(4:6);
-sAxis = sLine(4:6);
 end
