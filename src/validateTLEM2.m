@@ -31,10 +31,13 @@ for s = 1:length(OL)
                 % subjects. Left sides were mirrored. Hence, for left sides
                 % the OrthoLoad HJF has to be mirrored back for the 
                 % transformation into the Wu2002 CS.
-                meanPFP.HJF_pBW(1)=-meanPFP.HJF_pBW(1); % Right to left in 'RAS' 
-                OL(s).HJF_Wu2002 = transformVector3d(...
-                    meanPFP.HJF_pBW, OL(s).Wu2002TFM); % Transform to Wu2002 in 'ASR'
-                OL(s).HJF_Wu2002(3)=-OL(s).HJF_Wu2002(3); % Left to right in 'ASR'
+                
+                % Right to left in 'RAS'
+                meanPFP.HJF_pBW(1)=-meanPFP.HJF_pBW(1);
+                % Transform to Wu2002 in 'ASR'
+                OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
+                % Left to right in 'ASR'
+                OL(s).HJF_Wu2002(3)=-OL(s).HJF_Wu2002(3); 
             case 'R'
                 OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
             otherwise
@@ -47,12 +50,23 @@ for s = 1:length(OL)
         data.S.BodyHeight              = OL(s).BodyHeight;
         % Functional
         data.S.PelvicTilt              = 0; % Not available for OrthoLoad subjects
-        % Pelvis anatomy
+        % Pelvis scaling parameters
         data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
         data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
         data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
         data.S.Scale(1).PelvicDepth    = OL(s).PelvicDepth;
-        % Femur anatomy
+        % Femur scaling landmarks
+        femurLM = fieldnames(data.T.Scale(2).Landmarks);
+        for lm=1:length(femurLM)
+            data.S.Scale(2).Landmarks.(femurLM{lm})=OL(s).LM.Femur.([femurLM{lm} '_' OL(s).Subject(end)]);
+        end
+        % For scaling landmarks have to be mirrored to the right side as
+        % the cadavers are right sided.
+        switch OL(s).Subject(end)
+            case 'L'
+                
+        end
+        % Femur scaling parameters 
         data.S.Scale(2).FemoralLength  = OL(s).FemoralLength;
         data.S.Scale(2).FemoralWidth   = OL(s).FemoralWidth;
         data.S.Scale(2).FemoralVersion = OL(s).FemoralVersion;
@@ -98,7 +112,9 @@ for s = 1:length(OL)
         Results(s).OL_HJF_Wu2002       = OL(s).HJF_Wu2002;
         Results(s).HJF_Bergmann2016    = HJF_Bergmann2016;
         Results(s).OL_HJF_Bergmann2016 = OL(s).HJF_Bergmann2016;
-    catch
+    catch err
+        fprintf(1,'The identifier was: %s\n',err.identifier);
+        fprintf(1,'There was an error! The message was: %s\n',err.message);
         % Otherwise fill up with nan
         Results(s).HJF_Wu2002          = nan(1,3);
         Results(s).OL_HJF_Wu2002       = nan(1,3);

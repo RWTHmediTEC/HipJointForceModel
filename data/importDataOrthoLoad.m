@@ -35,28 +35,58 @@ Side_IL = Subject{s}(end);
 Side_CL = sides{~strcmp(Side_IL,sides)};
 
 %% Load landmark data
-% Read landmark file
-tempContent = read_mixed_csv([Subject{s} '_Landmarks.fcsv'], ',');
+% Read pelvis landmark file
+tempContent = read_mixed_csv([Subject{s} '_PelvisLandmarks.fcsv'], ',');
 tempContent(1:3,:) = [];
 tempPos = cellfun(@str2double, tempContent(:,2:4));
-
 % Write landmarks
 for t = 1:size(tempContent,1)
-    OL(s).LM.(tempContent{t,12}) = tempPos(t,:);
+    OL(s).LM.Pelvis.(tempContent{t,12}) = tempPos(t,:);
+end
+% Read femur landmark file
+tempContent = read_mixed_csv([Subject{s} '_FemurLandmarks.fcsv'], ',');
+tempContent(1:3,:) = [];
+tempPos = cellfun(@str2double, tempContent(:,2:4));
+% Write landmarks
+for t = 1:size(tempContent,1)
+    OL(s).LM.Femur.(tempContent{t,12}) = tempPos(t,:);
+end
+
+%% Write selected landmarks of the femur as excel file:
+if writeExcel
+    femurLM = {'PSA','DSA','MNA','LNA','MEC','LEC','MPC','LPC','HJC','P1','P2','GT','LT'};
+    excelLM(s).Subject=OL(s).Subject;
+    for lm=1:length(femurLM)
+        if isfield(OL(s).LM.Femur, [femurLM{lm} '_' Side_IL])
+            excelLM(s).([femurLM{lm}]) = OL(s).LM.Femur.([femurLM{lm} '_' Side_IL]) .* [-1 -1 1];
+        else
+            excelLM(s).([femurLM{lm}]) = [nan nan nan];
+        end
+    end
+    % Reconstruct P1
+    NeckAxis = createLine3d(OL(s).LM.Femur.(['MNA_' Side_IL]),OL(s).LM.Femur.(['LNA_' Side_IL]));
+    ShaftAxis = createLine3d(OL(s).LM.Femur.(['PSA_' Side_IL]),OL(s).LM.Femur.(['DSA_' Side_IL]));
+    [~, P1_NA, P1_SA] = distanceLines3d(NeckAxis, ShaftAxis);
+    excelLM(s).P1_Fischer = midPoint3d(P1_NA,P1_SA) .* [-1 -1 1];
+    excelLM(s).Distance_P1_Damm_Fischer = ...
+        distancePoints3d(OL(s).LM.Femur.(['P1_' Side_IL]), midPoint3d(P1_NA,P1_SA));
 end
 
 %% Calculate scaling parameters
 % See createDataTLEM2.m for the exact definitions
+% !!! Create functions for the parameter definitions !!!
 
-% Pelvic parameters
+% Pelvis parameters
 % Transform the landmarks into the pelvic coordinate system (CS) [Wu 2002]
-pTFM = createPelvisCS_TFM_Wu2002(OL(s).LM.ASIS_L, OL(s).LM.ASIS_R, OL(s).LM.PSIS_L, OL(s).LM.PSIS_R);
+pelvisTFM = createPelvisCS_TFM_Wu2002(OL(s).LM.Pelvis.ASIS_L, OL(s).LM.Pelvis.ASIS_R, ...
+    OL(s).LM.Pelvis.PSIS_L, OL(s).LM.Pelvis.PSIS_R);
+OL(s).LM.Pelvis = structfun(@(x) transformPoint3d(x, pelvisTFM),  OL(s).LM.Pelvis, 'uni', 0);
 
-ASIS_IL = transformPoint3d(OL(s).LM.(['ASIS_' Side_IL]), pTFM);
-ASIS_CL = transformPoint3d(OL(s).LM.(['ASIS_' Side_CL]), pTFM);
-HJC_IL  = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]),  pTFM);
-HJC_CL  = transformPoint3d(OL(s).LM.(['HJC_' Side_CL]),  pTFM);
-PSIS_IL = transformPoint3d(OL(s).LM.(['PSIS_' Side_IL]), pTFM);
+ASIS_IL = OL(s).LM.Pelvis.(['ASIS_' Side_IL]);
+ASIS_CL = OL(s).LM.Pelvis.(['ASIS_' Side_CL]);
+HJC_IL  = OL(s).LM.Pelvis.(['HJC_' Side_IL]);
+HJC_CL  = OL(s).LM.Pelvis.(['HJC_' Side_CL]);
+PSIS_IL = OL(s).LM.Pelvis.(['PSIS_' Side_IL]);
 
 OL(s).HipJointWidth = abs(HJC_IL(3)  - HJC_CL(3));
 OL(s).PelvicWidth   = abs(ASIS_IL(3) - ASIS_CL(3));
@@ -64,66 +94,41 @@ OL(s).PelvicHeight  = abs(ASIS_IL(2) - HJC_IL(2));
 OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
 
 % Femoral parameters
-% Transform the landmarks into the femoral CS [Wu 2002]
-fTFM = createFemurCS_TFM_Wu2002(...
-    OL(s).LM.(['MEC_' Side_IL]), ...
-    OL(s).LM.(['LEC_' Side_IL]), ...
-    OL(s).LM.(['HJC_' Side_IL]), Side_IL);
+% Transform the landmarks into the femur CS [Wu 2002] with the MEC-LEC midpoint as origin
+midPointEC = midPoint3d(OL(s).LM.Femur.(['LEC_' Side_IL]), OL(s).LM.Femur.(['MEC_' Side_IL]));
+femurTFM = createFemurCS_TFM_Wu2002(...
+    OL(s).LM.Femur.(['MEC_' Side_IL]), OL(s).LM.Femur.(['LEC_' Side_IL]), ...
+    OL(s).LM.Femur.(['HJC_' Side_IL]), Side_IL, 'origin', midPointEC);
+OL(s).LM.Femur = structfun(@(x) transformPoint3d(x, femurTFM),  OL(s).LM.Femur, 'uni', 0);
+midPointEC = transformPoint3d(midPointEC, femurTFM);
+assert(all(ismembertol(midPointEC,[0 0 0], 'ByRows',1,'DataScale',10)))
 % FemoralLength
-midPointEC = midPoint3d(OL(s).LM.(['LEC_' Side_IL]), OL(s).LM.(['MEC_' Side_IL]));
-OL(s).FemoralLength = distancePoints3d(...
-    transformPoint3d(midPointEC, fTFM), ...
-    transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), fTFM));
-% FemoralWidth: Distance between the HJC and the greater trochanter along
-% the Z-Axis.
+OL(s).FemoralLength = distancePoints3d(midPointEC, OL(s).LM.Femur.(['HJC_' Side_IL]));
+% FemoralWidth: Distance between the HJC and the greater trochanter along the Z-Axis.
 try
     HJC2GreaterTrochanter = ...
-        transformPoint3d(OL(s).LM.(['GT_' Side_IL]), fTFM) - ...
-        transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), fTFM);
+        OL(s).LM.Femur.(['GT_' Side_IL]) - OL(s).LM.Femur.(['HJC_' Side_IL]);
     OL(s).FemoralWidth = abs(HJC2GreaterTrochanter(3));
 catch
     OL(s).FemoralWidth = nan;
     warning(['Landmarks  of ' Subject{s} ' are missing! Returning: FemoralWidth = nan'])
 end
 
-% Transformation for the hip joint force from OrthoLoad CS [Bergmann 2016]
-% to [Wu 2002] CS
+% Transformation for the hip joint force from OrthoLoad CS [Bergmann 2016] to [Wu 2002] CS
 % Create transformation into OrthoLoad CS [Bergmann 2016].
 Bergman2016TFM = createFemurCS_TFM_Bergmann2016(...
-    OL(s).LM.(['MPC_' Side_IL]),...
-    OL(s).LM.(['LPC_' Side_IL]),...
-    OL(s).LM.(['P1_' Side_IL]), ...
-    OL(s).LM.(['P2_' Side_IL]), ...
-    OL(s).LM.(['HJC_' Side_IL]), Side_IL);
+    OL(s).LM.Femur.(['MPC_' Side_IL]),...
+    OL(s).LM.Femur.(['LPC_' Side_IL]),...
+    OL(s).LM.Femur.(['P1_' Side_IL]), ...
+    OL(s).LM.Femur.(['P2_' Side_IL]), ...
+    OL(s).LM.Femur.(['HJC_' Side_IL]), Side_IL);
 % Transform landmarks for [Wu 2002] into the [Bergmann 2016].
-MEC_IL = transformPoint3d(OL(s).LM.(['MEC_' Side_IL]), Bergman2016TFM);
-LEC_IL = transformPoint3d(OL(s).LM.(['LEC_' Side_IL]), Bergman2016TFM);
-HJC_IL = transformPoint3d(OL(s).LM.(['HJC_' Side_IL]), Bergman2016TFM);
+MEC_IL = transformPoint3d(OL(s).LM.Femur.(['MEC_' Side_IL]), Bergman2016TFM);
+LEC_IL = transformPoint3d(OL(s).LM.Femur.(['LEC_' Side_IL]), Bergman2016TFM);
+HJC_IL = transformPoint3d(OL(s).LM.Femur.(['HJC_' Side_IL]), Bergman2016TFM);
 % Create transformation from [Bergmann 2016] to [Wu 2002].
 OL(s).Wu2002TFM = createFemurCS_TFM_Wu2002(MEC_IL, LEC_IL, HJC_IL, Side_IL);
 
-if writeExcel
-    % Write selected landmarks of the femur as excel file:
-    femurLM = {'PSA','DSA','MNA','LNA','MEC','LEC','MPC','LPC','HJC','P1','P2','GT','LT'};
-    excelLM(s).Subject=OL(s).Subject;
-    for lm=1:length(femurLM)
-        if isfield(OL(s).LM, [femurLM{lm} '_' Side_IL])
-            excelLM(s).([femurLM{lm}]) = OL(s).LM.([femurLM{lm} '_' Side_IL]) .* [-1 -1 1];
-        else
-            excelLM(s).([femurLM{lm}]) = [nan nan nan];
-        end
-    end
-    % Reconstruct P1
-    NeckAxis = createLine3d(OL(s).LM.(['MNA_' Side_IL]),OL(s).LM.(['LNA_' Side_IL]));
-    ShaftAxis = createLine3d(OL(s).LM.(['PSA_' Side_IL]),OL(s).LM.(['DSA_' Side_IL]));
-    [~, P1_NA, P1_SA] = distanceLines3d(NeckAxis, ShaftAxis);
-    excelLM(s).P1_Fischer = midPoint3d(P1_NA,P1_SA) .* [-1 -1 1];
-    excelLM(s).Distance_P1_Damm_Fischer = ...
-        distancePoints3d(OL(s).LM.(['P1_' Side_IL]), midPoint3d(P1_NA,P1_SA));
-end
-
-
-%% Add skinning parameters 
 % NeckLength, FemoralVersion and CCD angle [CCD]
 OL(s).NeckLength = NeckLength(s);
 OL(s).FemoralVersion = -alphaZ(s);

@@ -1,13 +1,13 @@
 function data = scaleTLEM2(data)
-% Patient specific scaling of TLEM2 by pelvic width, pelvic height,
-% pelvic depth and femoral length
 
-%% Create scaling matrices
+% Create scaling matrices
 scaleTFM = repmat(eye(4), 1, 1, 6);
 
 %% Scale factors
 switch data.ScalingLaw
     case {'NonuniformEggert2018','SkinningFischer2018'}
+        % Patient specific scaling of TLEM2 by pelvic width, pelvic height,
+        % pelvic depth and femoral length
         PW = data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth;
         PH = data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight;
         PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
@@ -62,4 +62,5 @@ boneCS_TFM(:,:,1) = createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE);
 boneCS_TFM(:,:,2) = createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R');
 
 data.S.LE = transformTLEM2(data.S.LE, boneCS_TFM);
+
 end

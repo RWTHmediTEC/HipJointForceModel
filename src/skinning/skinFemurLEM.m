@@ -146,7 +146,7 @@ end
 
 % Femoral version
 % Change position of HJC by a rotation around the shaft axis
-ROT = createRotation3dLineAngle([C.ICN, C.ICN - C.P1],...
+ROT = createRotation3dLineAngle([C.P2, C.P2 - C.P1],...
     deg2rad(femoralVersion - T.Scale(2).FemoralVersion));
 C.HJC = transformPoint3d(C.HJC, ROT);
 
@@ -156,11 +156,11 @@ if visu
 end
 
 % CCD
-tempCCD = rad2deg(vectorAngle3d(C.ICN - C.P1, C.HJC - C.P1));
+tempCCD = rad2deg(vectorAngle3d(C.P2 - C.P1, C.HJC - C.P1));
 tempHeight = sind(tempCCD - 90) * distancePoints3d(C.HJC, C.P1);
 tempOffset = cosd(tempCCD - 90) * distancePoints3d(C.HJC, C.P1);
 HeightAdjust = tand(CCD - 90) * tempOffset - tempHeight;
-C.HJC = C.HJC + HeightAdjust * normalizeVector3d(C.P1 - C.ICN);
+C.HJC = C.HJC + HeightAdjust * normalizeVector3d(C.P1 - C.P2);
 
 % Neck Length
 neckLengthAdjust = neckLength - distancePoints3d(C.HJC, C.P1);
@@ -182,14 +182,14 @@ C.MEC = C.MEC + mechAxisAdjust * -mechAxis(4:6);
 C.LEC = C.LEC + mechAxisAdjust * -mechAxis(4:6);
 % Calculate the new epicondylar midpoint
 newECmidPoint = mechAxis(1:3) + femoralLength * mechAxis(4:6);
-shaftAxis = normalizeLine3d(createLine3d(C.ICN,C.P1));
+shaftAxis = normalizeLine3d(createLine3d(C.P2,C.P1));
 % Project the old and new epicondylar midpoint on the straight femur axis
 % and calculate the difference along the straight femur axis.
 shaftAxisAdjust = ...
     linePosition3d(newECmidPoint, shaftAxis) - ...
     linePosition3d(ECmidPoint, shaftAxis);
-% Move ICN, MPC, and LPC along the straight femur axis
-C.ICN = C.ICN + shaftAxisAdjust * shaftAxis(4:6);
+% Move P2, MPC, and LPC along the straight femur axis
+C.P2 = C.P2 + shaftAxisAdjust * shaftAxis(4:6);
 C.MPC = C.MPC + shaftAxisAdjust * shaftAxis(4:6);
 C.LPC = C.LPC + shaftAxisAdjust * shaftAxis(4:6);
 
@@ -201,9 +201,9 @@ end
 
 %% Check if femoral version is correct
 assert(ismembertol(femoralVersion,...
-    measureFemoralVersionBergmann2016(C.HJC, C.P1, C.ICN, C.MPC, C.LPC),'Datascale',10))
+    measureFemoralVersionBergmann2016(C.HJC, C.P1, C.P2, C.MPC, C.LPC),'Datascale',10))
 % Check if CCD angle is correct
-assert(ismembertol(CCD, rad2deg(vectorAngle3d(C.ICN - C.P1, C.HJC - C.P1))))
+assert(ismembertol(CCD, rad2deg(vectorAngle3d(C.P2 - C.P1, C.HJC - C.P1))))
 % Check if neck length is correct
 assert(ismembertol(neckLength, distancePoints3d(C.HJC,C.P1)))
 % Check if femoral length is correct
@@ -211,11 +211,3 @@ assert(ismembertol(distancePoints3d(midPoint3d(C.MEC,C.LEC),C.HJC),femoralLength
 
 end
 
-function C = landmarkBased(controls, S,~)
-
-LM = fieldnames(controls);
-for lm=1:length(LM)
-    C.(LM{lm}) = S.LE(2).Landmarks.(LM{lm}).Pos;
-end
-
-end

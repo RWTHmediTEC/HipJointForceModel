@@ -1,10 +1,11 @@
 function skinnedMesh = skinningWrapper(weightsFile, newControls)
 % Wrapper for linear blend skinning (LBS)
 
-% Load TLEMversion controls
-% mat file is created with data\Skinning\femurTLEM2ConstructControls.m
+% Load mesh, controls and weights
 load(weightsFile, 'mesh', 'controls', 'weights')
+% Number of controls
 NoC = length(fieldnames(controls));
+% Convert to point matrix
 C = cell2mat(struct2cell(controls));
 new_C = cell2mat(struct2cell(newControls));
 
