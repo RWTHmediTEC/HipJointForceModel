@@ -2,7 +2,7 @@
 # CoordinateSystem = RAS
 # columns = id,x,y,z,ow,ox,oy,oz,vis,sel,lock,label,desc,associatedNodeID
 vtkMRMLMarkupsFiducialNode_20,-105.8,-25.379,1593.8,0,0,0,1,1,0,1,HJC_L,,vtkMRMLScalarVolumeNode2
-vtkMRMLMarkupsFiducialNode_20,-162.416,-40.908,1587.86,0,0,0,1,1,0,1,GT_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_20,-156.87786865234375,-49.432064056396484,1586.354248046875,0,0,0,1,1,0,1,GT_L,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_20,-152.909,-40.781,1172.985473632813,0,0,0,1,1,0,1,LEC_L,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_20,-65.585,-55.392,1180.739501953125,0,0,0,1,1,0,1,MEC_L,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_20,-144.606,-29.834,1545.72,0,0,0,1,1,0,1,P1_L,,

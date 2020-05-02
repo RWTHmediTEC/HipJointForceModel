@@ -105,14 +105,8 @@ assert(all(ismembertol(midPointEC,[0 0 0], 'ByRows',1,'DataScale',10)))
 % FemoralLength
 OL(s).FemoralLength = distancePoints3d(midPointEC, OL(s).LM.Femur.(['HJC_' Side_IL]));
 % FemoralWidth: Distance between the HJC and the greater trochanter along the Z-Axis.
-try
-    HJC2GreaterTrochanter = ...
-        OL(s).LM.Femur.(['GT_' Side_IL]) - OL(s).LM.Femur.(['HJC_' Side_IL]);
-    OL(s).FemoralWidth = abs(HJC2GreaterTrochanter(3));
-catch
-    OL(s).FemoralWidth = nan;
-    warning(['Landmarks  of ' Subject{s} ' are missing! Returning: FemoralWidth = nan'])
-end
+HJC2GreaterTrochanter = OL(s).LM.Femur.(['GT_' Side_IL]) - OL(s).LM.Femur.(['HJC_' Side_IL]);
+OL(s).FemoralWidth = abs(HJC2GreaterTrochanter(3));
 
 % Transformation for the hip joint force from OrthoLoad CS [Bergmann 2016] to [Wu 2002] CS
 % Create transformation into OrthoLoad CS [Bergmann 2016].

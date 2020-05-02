@@ -48,13 +48,20 @@ for s = 1:length(OL)
         data.S.Side                    = OL(s).Subject(end);
         data.S.BodyWeight              = OL(s).BodyWeight;
         data.S.BodyHeight              = OL(s).BodyHeight;
-        % Functional
+        
+        % Functional pelvic parameters
         data.S.PelvicTilt              = 0; % Not available for OrthoLoad subjects
+        % Pelvis scaling landmarks
+        pelvisLM = fieldnames(data.T.Scale(1).Landmarks);
+        for lm=1:length(pelvisLM)
+            data.S.Scale(1).Landmarks.(pelvisLM{lm})=OL(s).LM.Pelvis.([pelvisLM{lm} '_' OL(s).Subject(end)]);
+        end
         % Pelvis scaling parameters
         data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
         data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
         data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
         data.S.Scale(1).PelvicDepth    = OL(s).PelvicDepth;
+        
         % Femur scaling landmarks
         femurLM = fieldnames(data.T.Scale(2).Landmarks);
         for lm=1:length(femurLM)
