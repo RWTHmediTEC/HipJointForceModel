@@ -1,4 +1,4 @@
-function data = skinFemurLEM(data,varargin)
+function data = skinFemurLEM(data,method,varargin)
 % Linear blend skinning (LBS) of the femur
 
 % Parsing
@@ -27,7 +27,12 @@ S.Scale = data.S.Scale; % Subject (Patient)
 
 % Change of the control points based on the femoral length, femoral 
 % version, CCD angle and neck length
-subjectControls = parameterBased(controls,T,S,visu);
+switch method
+    case 'ParameterBased'
+        subjectControls = parameterBased(controls,T,S,visu);
+    case 'LandmarkBased'
+        subjectControls = S.Scale(2).Landmarks;
+end
 
 % Skinning
 skinnedMesh = skinningWrapper(weightsFile, subjectControls);

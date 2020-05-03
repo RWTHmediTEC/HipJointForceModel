@@ -67,18 +67,23 @@ for s = 1:length(OL)
         for lm=1:length(femurLM)
             data.S.Scale(2).Landmarks.(femurLM{lm})=OL(s).LM.Femur.([femurLM{lm} '_' OL(s).Subject(end)]);
         end
-        % For scaling landmarks have to be mirrored to the right side as
-        % the cadavers are right sided.
-        switch OL(s).Subject(end)
-            case 'L'
-                
-        end
         % Femur scaling parameters 
         data.S.Scale(2).FemoralLength  = OL(s).FemoralLength;
         data.S.Scale(2).FemoralWidth   = OL(s).FemoralWidth;
         data.S.Scale(2).FemoralVersion = OL(s).FemoralVersion;
         data.S.Scale(2).NeckLength     = OL(s).NeckLength;
         data.S.Scale(2).CCD            = OL(s).CCD;
+        
+        % For scaling landmarks have to be mirrored to the right side as
+        % the cadavers are right sided.
+        switch OL(s).Subject(end)
+            case 'L'
+                mirrorZTFM = eye(4); mirrorZTFM(3,3) = -1;
+                data.S.Scale(1).Landmarks = structfun(@(x) ...
+                    transformPoint3d(x, mirrorZTFM), data.S.Scale(1).Landmarks,'uni',0);
+                data.S.Scale(2).Landmarks = structfun(@(x) ...
+                    transformPoint3d(x, mirrorZTFM), data.S.Scale(2).Landmarks,'uni',0);
+        end
         
         %% Calculate HJF
         data = scaleTLEM2(data);
