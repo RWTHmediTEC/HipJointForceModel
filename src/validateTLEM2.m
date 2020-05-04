@@ -1,12 +1,7 @@
 function Results = validateTLEM2(data, gui)
 % Calculate validation parameters for the OrthoLoad subjects
 
-if exist('data\OrthoLoad.mat', 'file')
-    load('OrthoLoad.mat', 'OL')
-else
-    importDataOrthoLoad()
-    load('OrthoLoad.mat', 'OL')
-end
+OL = importDataOrthoLoad;
 
 Results = repmat(struct('Subject', []), length(OL),1);
 
@@ -45,16 +40,22 @@ for s = 1:length(OL)
         end
         
         % Biometric
-        data.S.Side                    = OL(s).Subject(end);
-        data.S.BodyWeight              = OL(s).BodyWeight;
-        data.S.BodyHeight              = OL(s).BodyHeight;
+        data.S.Side       = OL(s).Subject(end);
+        data.S.BodyWeight = OL(s).BodyWeight;
+        data.S.BodyHeight = OL(s).BodyHeight;
         
         % Functional pelvic parameters
-        data.S.PelvicTilt              = 0; % Not available for OrthoLoad subjects
-        % Pelvis scaling landmarks
+        data.S.PelvicTilt = 0; % Not available for OrthoLoad subjects
+        % Pelvis skinning landmarks
         pelvisLM = fieldnames(data.T.Scale(1).Landmarks);
         for lm=1:length(pelvisLM)
-            data.S.Scale(1).Landmarks.(pelvisLM{lm})=OL(s).LM.Pelvis.([pelvisLM{lm} '_' OL(s).Subject(end)]);
+            data.S.Scale(1).Landmarks.(pelvisLM{lm}) = ...
+                OL(s).Landmarks.Pelvis.([pelvisLM{lm} '_' OL(s).Subject(end)]);
+        end
+        pelvicBoneCSLM = fieldnames(data.T.Scale(1).boneCSLandmarks);
+        for lm=1:length(pelvicBoneCSLM)
+            data.S.Scale(1).boneCSLandmarks.(pelvicBoneCSLM{lm}) = ...
+                OL(s).Landmarks.Pelvis.(pelvicBoneCSLM{lm});
         end
         % Pelvis scaling parameters
         data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
@@ -62,10 +63,11 @@ for s = 1:length(OL)
         data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
         data.S.Scale(1).PelvicDepth    = OL(s).PelvicDepth;
         
-        % Femur scaling landmarks
+        % Femur skinning landmarks
         femurLM = fieldnames(data.T.Scale(2).Landmarks);
         for lm=1:length(femurLM)
-            data.S.Scale(2).Landmarks.(femurLM{lm})=OL(s).LM.Femur.([femurLM{lm} '_' OL(s).Subject(end)]);
+            data.S.Scale(2).Landmarks.(femurLM{lm}) = ...
+                OL(s).Landmarks.Femur.([femurLM{lm} '_' OL(s).Subject(end)]);
         end
         % Femur scaling parameters 
         data.S.Scale(2).FemoralLength  = OL(s).FemoralLength;
@@ -81,6 +83,8 @@ for s = 1:length(OL)
                 mirrorZTFM = eye(4); mirrorZTFM(3,3) = -1;
                 data.S.Scale(1).Landmarks = structfun(@(x) ...
                     transformPoint3d(x, mirrorZTFM), data.S.Scale(1).Landmarks,'uni',0);
+                data.S.Scale(1).boneCSLandmarks = structfun(@(x) ...
+                    transformPoint3d(x, mirrorZTFM), data.S.Scale(1).boneCSLandmarks,'uni',0);
                 data.S.Scale(2).Landmarks = structfun(@(x) ...
                     transformPoint3d(x, mirrorZTFM), data.S.Scale(2).Landmarks,'uni',0);
         end

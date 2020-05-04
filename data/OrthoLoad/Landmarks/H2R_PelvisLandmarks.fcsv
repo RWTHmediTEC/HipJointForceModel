@@ -3,8 +3,8 @@
 # columns = id,x,y,z,ow,ox,oy,oz,vis,sel,lock,label,desc,associatedNodeID
 vtkMRMLMarkupsFiducialNode_1,80.9,-32.8,1671.2,0,0,0,1,1,0,1,HJC_R,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_1,-77.9198,-37.115,1687.06,0,0,0,1,1,0,1,HJC_L,,vtkMRMLScalarVolumeNode1
-vtkMRMLMarkupsFiducialNode_1,-33.8045,-110.556,1781.73,0,0,0,1,1,0,1,PSIS_R,,vtkMRMLScalarVolumeNode1
-vtkMRMLMarkupsFiducialNode_1,47.2529,-118.22,1777.61,0,0,0,1,1,0,1,PSIS_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_1,-33.8045,-110.556,1781.73,0,0,0,1,1,0,1,PSIS_L,,vtkMRMLScalarVolumeNode1
+vtkMRMLMarkupsFiducialNode_1,47.2529,-118.22,1777.61,0,0,0,1,1,0,1,PSIS_R,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_1,115.92683410644531,30.01468849182129,1726.49755859375,0,0,0,1,1,0,1,ASIS_R,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_1,-111.911,33.495,1747.82,0,0,0,1,1,0,1,ASIS_L,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_1,20.1068,26.301,1648.55,0,0,0,1,1,0,1,PT_R,,vtkMRMLScalarVolumeNode1

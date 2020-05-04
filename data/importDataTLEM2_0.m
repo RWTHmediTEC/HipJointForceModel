@@ -134,7 +134,6 @@ end
 
 % Fascicle list
 fascicleList = mRaw(:,2);
-
 for b = 1:NoB
     LE(b).Muscle = [];
     % Get the muscles that are connected to the bone
@@ -155,17 +154,15 @@ for b = 1:NoB
     end
 end
 
-% Save node closest to femoral muscle origins, insertions and via points
-femurNS = createns(LE(2).Mesh.vertices);
-Fascicles = fieldnames(LE(2).Muscle);
-% [IDX,D] = deal([]);
-for m = 1:length(Fascicles)
-    LE(2).Muscle.(Fascicles{m}).Node = knnsearch(femurNS, LE(2).Muscle.(Fascicles{m}).Pos);
-%     [idx, d] = knnsearch(femurNS, LE(2).Muscle.(Fascicles{m}).Pos);
-%     IDX = [IDX; idx];
-%     D = [D; d];
+% Save node closest to muscle origins, insertions and via points
+for b = 1:NoB
+    if ~isempty(LE(b).Muscle)
+        Fascicles = fieldnames(LE(b).Muscle);
+        for m = 1:length(Fascicles)
+            LE(b).Muscle.(Fascicles{m}).Node = knnsearch(LE(b).Mesh.vertices, LE(b).Muscle.(Fascicles{m}).Pos);
+        end
+    end
 end
-
 
 %% Import wrapping surfaces
 sRaw = readcell('TLEM 2.0 - Musculoskeletal Model Dataset - Table A5 - Wrapping Surfaces.xlsx');
@@ -225,22 +222,20 @@ for r = 1:length(REQ)
 end
 
 % Save node closest to landmark
-pelvisNS = createns(LE(1).Mesh.vertices);
-landmarksPelvis = fieldnames(LE(1).Landmarks);
-for lm = 1:length(landmarksPelvis)
-    [LE(1).Landmarks.(landmarksPelvis{lm}).Node, tempDist] = ...
-        knnsearch(pelvisNS, LE(1).Landmarks.(landmarksPelvis{lm}).Pos);
-    if tempDist > 3 % [mm]
-        warning(['The landmark ' landmarksPelvis{lm} ' was more than 3 mm away' ...
-            ' from the nearest vertex. Therefore no node was saved!'])
-        LE(1).Landmarks.(landmarksPelvis{lm})=...
-            rmfield(LE(1).Landmarks.(landmarksPelvis{lm}), 'Node');
+for b = 1:NoB
+    if ~isempty(LE(b).Landmarks)
+        Landmarks = fieldnames(LE(b).Landmarks);
+        for lm = 1:length(Landmarks)
+            [LE(b).Landmarks.(Landmarks{lm}).Node, tempDist] = ...
+                knnsearch(LE(b).Mesh.vertices, LE(b).Landmarks.(Landmarks{lm}).Pos);
+            if tempDist > 3 % [mm]
+                warning(['The landmark ' Landmarks{lm} ' was more than 3 mm away' ...
+                    ' from the nearest vertex. Therefore no node was saved!'])
+                LE(b).Landmarks.(Landmarks{lm})=...
+                    rmfield(LE(b).Landmarks.(Landmarks{lm}), 'Node');
+            end
+        end
     end
-end
-
-landmarksFemur = fieldnames(LE(2).Landmarks);
-for lm = 1:length(landmarksFemur)
-    LE(2).Landmarks.(landmarksFemur{lm}).Node = knnsearch(femurNS, LE(2).Landmarks.(landmarksFemur{lm}).Pos);
 end
 
 %% Add additional landmarks

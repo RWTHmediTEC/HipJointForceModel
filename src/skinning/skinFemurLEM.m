@@ -1,17 +1,10 @@
-function data = skinFemurLEM(data,method,varargin)
+function data = skinFemurLEM(data, method)
 % Linear blend skinning (LBS) of the femur
 
-% Parsing
-p = inputParser;
-logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
-addParameter(p,'visualization',0,logParValidFunc);
-parse(p,varargin{:});
-visu = p.Results.visualization;
-
-boneIdx = 2; % Femur
+boneIdx = 2; % femur
 weightsFile = [data.T.LE(boneIdx).Name 'Weights' data.Cadaver '.mat'];
 
-% Load controls
+% Create controls - !!! Caching should be included here !!!
 if data.SurfaceData
     if ~exist(weightsFile,'file')
         calculateSkinningWeights(data, boneIdx)
@@ -25,13 +18,13 @@ LE      = data.T.LE;
 T.Scale = data.T.Scale; % Template (Cadaver)
 S.Scale = data.S.Scale; % Subject (Patient)
 
-% Change of the control points based on the femoral length, femoral 
-% version, CCD angle and neck length
 switch method
     case 'ParameterBased'
-        subjectControls = parameterBased(controls,T,S,visu);
+        % Change of the control points based on the femoral length, femoral
+        % version, CCD angle and neck length
+        subjectControls = parameterBased(controls,T,S);
     case 'LandmarkBased'
-        subjectControls = S.Scale(2).Landmarks;
+        subjectControls = S.Scale(boneIdx).Landmarks;
 end
 
 % Skinning
@@ -120,9 +113,16 @@ sAxis = sLine(4:6);
 end
 
 
-function C = parameterBased(C,T,S,visu)
+function C = parameterBased(C, T, S, varargin)
 % Change of the control points based on the femoral length, femoral 
 % version, CCD angle and neck length
+
+% Parsing
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p,'visualization',0, logParValidFunc);
+parse(p,varargin{:});
+visu = p.Results.visualization;
 
 % Implant parameters
 if isequal(S.Scale(2).FemoralLength,  T.Scale(2).FemoralLength) &&...

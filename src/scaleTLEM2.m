@@ -56,6 +56,7 @@ switch data.ScalingLaw
     case 'ParameterSkinningFischer2018'
         data = skinFemurLEM(data,'ParameterBased');
     case 'LandmarkSkinningFischer2018'
+        data = skinPelvisLEM(data,'LandmarkBased');
         data = skinFemurLEM(data,'LandmarkBased');
 end
 

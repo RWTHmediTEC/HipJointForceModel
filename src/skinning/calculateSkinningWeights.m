@@ -1,23 +1,32 @@
-function calculateSkinningWeights(data, boneIdx)
+function calculateSkinningWeights(data, boneIdx,varargin)
+
+% Parsing
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p,'visualization', 0, logParValidFunc);
+parse(p,varargin{:});
+visu = p.Results.visualization;
 
 mesh = data.T.LE(boneIdx).Mesh;
 controls = data.T.Scale(boneIdx).Landmarks;
 
-% Visualize controls
-patchProps.EdgeColor = 'none';
-patchProps.FaceColor = [223, 206, 161]/255;
-patchProps.FaceAlpha = 0.5;
-patchProps.FaceLighting = 'gouraud';
-visualizeMeshes(mesh, patchProps)
-
-pointProps.Marker = 'o';
-pointProps.MarkerFaceColor = 'k';
-pointProps.MarkerEdgeColor = 'y';
-pointProps.MarkerSize = 7;
-pointProps.LineStyle = 'none';
-structfun(@(x) drawPoint3d(x,pointProps),controls);
-
-anatomicalViewButtons('ASR')
+if visu
+    % Visualize controls
+    patchProps.EdgeColor = 'none';
+    patchProps.FaceColor = [223, 206, 161]/255;
+    patchProps.FaceAlpha = 0.5;
+    patchProps.FaceLighting = 'gouraud';
+    visualizeMeshes(mesh, patchProps)
+    
+    pointProps.Marker = 'o';
+    pointProps.MarkerFaceColor = 'k';
+    pointProps.MarkerEdgeColor = 'y';
+    pointProps.MarkerSize = 7;
+    pointProps.LineStyle = 'none';
+    structfun(@(x) drawPoint3d(x,pointProps), controls);
+    
+    anatomicalViewButtons('ASR')
+end
 
 %% Create weights
 disp('Skinning weights are calculated. This may take a few minutes ...')
