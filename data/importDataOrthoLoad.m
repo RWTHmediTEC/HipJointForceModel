@@ -135,7 +135,5 @@ if writeExcel
     writetable(struct2table(excelLM),'data\OrthoLoad\Landmarks\OrthoLoadFemurLandmarks.xlsx',...
         'WriteVariableNames',false,'Range','B4')
 end
-%% Save data
-save('data\OrthoLoad.mat', 'OL')
 
 end
