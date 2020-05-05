@@ -442,8 +442,15 @@ visualizeTLEM2(gui.Home.Visualization.Axis_Visualization, ...
     'MusclePathModel',data.MusclePathModel,...
     'Surfaces',gui.Home.Settings.Checkbox_ShowWrappingSurfaces.Value);
 
-gui.Home.Visualization.Axis_Visualization.View = [90, 0];
-gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
+MC3D(:,:,1)=[ 1  0  0 0; 0  0 -1 0; 0  1  0 0; 0 0 0 1];
+MC3D(:,:,2)=[-1  0  0 0; 0  0  1 0; 0  1  0 0; 0 0 0 1];
+MC3D(:,:,3)=[ 0  0  1 0; 1  0  0 0; 0  1  0 0; 0 0 0 1];
+MC3D(:,:,4)=[ 0  0 -1 0;-1  0  0 0; 0  1  0 0; 0 0 0 1];
+MC3D(:,:,5)=[ 0  0  1 0; 0  1  0 0;-1  0  0 0; 0 0 0 1];
+MC3D(:,:,6)=[ 0  0  1 0; 0 -1  0 0; 1  0  0 0; 0 0 0 1];
+mouseControl3d(gui.Home.Visualization.Axis_Visualization, MC3D(:,:,3))
+% gui.Home.Visualization.Axis_Visualization.View = [90, 0];
+% gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
 
 % Push buttons
 gui.Home.Visualization.Layout_Grid = uix.Grid(...
@@ -453,33 +460,33 @@ gui.Home.Visualization.Layout_Grid = uix.Grid(...
 
 uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
     'Style', 'PushButton',...
-    'String', 'Front',...
-    'Callback', @onPushButton_Front);
-
-uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
-    'Style', 'PushButton',...
-    'String', 'Back',...
-    'Callback', @onPushButton_Back);
-
-uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
-    'Style', 'PushButton',...
-    'String', 'Top',...
-    'Callback', @onPushButton_Top);
-
-uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
-    'Style', 'PushButton',...
-    'String', 'Bottom',...
-    'Callback', @onPushButton_Bottom);
+    'String', 'Left',...
+    'Callback', @(s,e) mouseControl3d(gui.Home.Visualization.Axis_Visualization, MC3D(:,:,1)));
 
 uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
     'Style', 'PushButton',...
     'String', 'Right',...
-    'Callback', @onPushButton_Right);
+    'Callback', @(s,e) mouseControl3d(gui.Home.Visualization.Axis_Visualization, MC3D(:,:,2)));
 
 uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
     'Style', 'PushButton',...
-    'String', 'Left',...
-    'Callback', @onPushButton_Left);
+    'String', 'Anterior',...
+    'Callback', @(s,e) mouseControl3d(gui.Home.Visualization.Axis_Visualization, MC3D(:,:,3)));
+
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Posterior',...
+    'Callback',@(s,e) mouseControl3d(gui.Home.Visualization.Axis_Visualization, MC3D(:,:,4)));
+
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Superior',...
+    'Callback', @(s,e) mouseControl3d(gui.Home.Visualization.Axis_Visualization, MC3D(:,:,5)));
+
+uicontrol('Parent', gui.Home.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Inferior',...
+    'Callback', @(s,e) mouseControl3d(gui.Home.Visualization.Axis_Visualization, MC3D(:,:,6)));
 
 % Adjust layout
 set(gui.Home.Visualization.Layout_V,    'Height', [-18, -1])
@@ -976,37 +983,6 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
         updateHomeTab();
     end
 
-%% Box panel visualization
-
-    function onPushButton_Front(~, ~)
-        gui.Home.Visualization.Axis_Visualization.View = [90 ,0];
-        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
-    end
-
-    function onPushButton_Back(~, ~)
-        gui.Home.Visualization.Axis_Visualization.View = [-90, 0];
-        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
-    end
-
-    function onPushButton_Top(~, ~)
-        gui.Home.Visualization.Axis_Visualization.View = [0, 180];
-        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [-1, 0, 0];
-    end
-
-    function onPushButton_Left(~, ~)
-        gui.Home.Visualization.Axis_Visualization.View = [0, -90];
-        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
-    end
-
-    function onPushButton_Right(~, ~)
-        gui.Home.Visualization.Axis_Visualization.View = [0, 90];
-        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [0, 1, 0];
-    end
-
-    function onPushButton_Bottom(~, ~)
-        gui.Home.Visualization.Axis_Visualization.View = [0, 0];
-        gui.Home.Visualization.Axis_Visualization.CameraUpVector = [1, 0, 0];
-    end
 
 %% Box panel results
 

@@ -167,10 +167,8 @@ end
 
 %%
 xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
-%axH.Units='normalized';
 if NoB>2
     axis(axH, 'equal')
-    % mouseControl3d(axH)
 else
     axis(axH, 'equal','tight');
 end

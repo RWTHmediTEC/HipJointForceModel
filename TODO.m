@@ -3,15 +3,6 @@
 % - TLEM2: Review via points: sartorius
 % - TLEM2: Move origin of the femur mesh (from the EC midpoint) to the HJC 
 
-% Muscle model
-% - Revision of PCSAs
-% 	- Vergleich mit AnyBody; AnyBody passt die PCSAs anhand eines "Scaling Laws" an
-% 	- PCSA = MuscleVolume/OptimalFiberLength
-% 	- Sowohl MuscleVolume als auch OptimalFiberLength können patienten-spezifisch über ein Skalierungsgesetz angepasst werden
-% 	- Hier werden die Daten vom TLEM1 (Klein Horsman) verwendet:
-% 		- MuscleVolume = Mass/1.056 (MuscleDensity) 
-% 		- OptimalFiberLength (Lopt)
-
 % HJF models
 % - Implement other one-leg stance models
 % - Parameter / sensitivity study of the HJF models
@@ -26,9 +17,13 @@
 % - Use EMS studies (OrthoLoad) to select muscles of the models
 
 % Scaling laws
-% - Verify LBS for OrthoLoad subjects
 % - Add caching for skinning weights
+% - Revision of PCSAs
+% 	- AnyBody adapts the PCSAs by: PCSA = MuscleVolume/OptimalFiberLength
+% 	- MuscleVolume and OptimalFiberLength can be patient-specific adapted 
+%     by a scaling law. The data of TLEM1 [Klein Horsman] is used:
+% 		- MuscleVolume = Mass/1.056 (MuscleDensity) 
+% 		- OptimalFiberLength (Lopt)
 
-%% GUI
 % Validation
-% - Source of the OrthoLoad force data should be documented
+% - Source of the OrthoLoad HJF data has to be documented
