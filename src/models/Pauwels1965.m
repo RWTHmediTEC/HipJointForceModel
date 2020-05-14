@@ -139,9 +139,9 @@ end
 function [R_FP_MA, R_FP_Angle] = derivationFromFick1850
 % Switch for visualization of Fick's data and Pauwel's derivation of the
 % orientation of the abducturs resulting force
-visu=0;
+visu=1;
 
-[Moment, HJC, HM, axH] = Fick1850('visu', visu);  %#ok<ASGLU>
+[Moment, HJC, HM, muscleList, axH] = Fick1850('visu', 0);  %#ok<ASGLU>
 
 %% P.T. Group [Pauwels 1965, S.110] 
 % Positional data for the origin and insertion of the Piriformis muscle is
@@ -174,8 +174,8 @@ RF1 = createLine3d(HM(1).Muscle.RectusFemoris1.Pos, HM(2).Muscle.RectusFemoris1.
 RF2 = createLine3d(HM(1).Muscle.RectusFemoris2.Pos, HM(2).Muscle.RectusFemoris2.Pos);
 TF1 = createLine3d(HM(1).Muscle.TensorFasciae1.Pos, HM(2).Muscle.TensorFasciae1.Pos);
 TF2 = createLine3d(HM(1).Muscle.TensorFasciae2.Pos, HM(2).Muscle.TensorFasciae2.Pos);
-S1 = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
-S2 = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
+S1  = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
+S2  = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
 
 % Bisectrix
 RF_FP = bisector(RF1([2,3,5,6]),RF2([2,3,5,6]));
@@ -208,12 +208,52 @@ R_FP_MA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),R_FP));
 R_FP_Angle = rad2deg(lineAngle(R_FP,[0 0 1 0]));
 
 if visu
-    box = [get(axH, 'xlim') get(axH, 'ylim') get(axH, 'zlim')]; %#ok<UNRCH>
+    figName = '[Pauwels 1965, S.110, Fig. 169]';
+    figH=figure('Name',figName,'NumberTitle','off','Color','w');
+    axH=axes(figH);
+    hold(axH,'on')
+    lineProps.Marker = 'o';
+    lineProps.MarkerSize = 10;
+    lineProps.Color = 'k';
+    lineProps.MarkerEdgeColor = 'none';
+    lineProps.MarkerFaceColor = lineProps.Color;
+    
+    drawPoint3d(axH,HJC,lineProps)
+    
+    MusclesPauwels = {...
+        'GluteusMedius',...
+        'GluteusMinimus',...
+        'RectusFemoris',...
+        'TensorFasciae',...
+        'Sartorius'};
+    
+    Fascicles = fieldnames(HM(1).Muscle);
+    Fascicles(~contains(Fascicles, MusclesPauwels))=[];
+    lineProps.MarkerSize = 2;
+    for m = 1:length(Fascicles)
+        Origin = HM(1).Muscle.(Fascicles{m}).Pos;
+        Insertion = HM(2).Muscle.(Fascicles{m}).Pos;
+        lineProps.DisplayName = Fascicles{m};
+        colorIdx = strcmp(Fascicles{m}(1:end-1), muscleList(:,1));
+        lineProps.Color = muscleList{colorIdx,2};
+        lineProps.MarkerEdgeColor = lineProps.Color;
+        lineProps.MarkerFaceColor = lineProps.Color;
+        drawEdge3d(axH, Origin, Insertion, lineProps);
+        drawLabels3d(axH, midPoint3d(Origin, Insertion), Fascicles{m}([1,end]), lineProps);
+    end
+    
+    box = [get(axH, 'xlim') get(axH, 'ylim') get(axH, 'zlim')];
     edge = clipLine3d([0 PT_group_FP(1:2), 0 PT_group_FP(3:4);...
                        0 SC_group_FP(1:2), 0 SC_group_FP(3:4)], box);
     drawEdge3d(axH,edge,'Color','k','LineStyle','-.');
         edge = clipLine3d([0 R_FP(1:2), 0 R_FP(3:4)], box);
     drawEdge3d(axH,edge,'Color','k','LineStyle','-');
+    
+    axis(axH, 'equal', 'tight');
+    grid(axH, 'minor');
+    xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
+    title(axH,figName)
+    anatomicalViewButtons(axH,'PIR')
 end
 
 end
