@@ -79,7 +79,7 @@ end
 function data = Calculation(data)
 
 % Inputs
-Side              = data.S.Side;
+Side = data.S.Side;
 
 %% Define parameters
 G = -data.g; % Weight force
@@ -141,7 +141,9 @@ function [R_FP_MA, R_FP_Angle] = derivationFromFick1850
 % orientation of the abducturs resulting force
 visu=1;
 
-[Moment, HJC, HM, muscleList, axH] = Fick1850('visu', 0);  %#ok<ASGLU>
+[HM, muscleList, Moments] = Fick1850('visu', 0);
+
+HJC = HM(1).Joints.Hip.Pos;
 
 %% P.T. Group [Pauwels 1965, S.110] 
 % Positional data for the origin and insertion of the Piriformis muscle is
@@ -162,8 +164,8 @@ GMe_FP_MA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),GMe_FP));
 GMi_FP_MA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),GMi_FP));
 
 % Relative force of the muscle based on its volume
-GMe_rF=Moment.GluteusMedius(2)/GMe_FP_MA;
-GMi_rF=Moment.GluteusMinimus(2)/GMi_FP_MA;
+GMe_rF = Moments.GluteusMedius(2)/GMe_FP_MA;
+GMi_rF = Moments.GluteusMinimus(2)/GMi_FP_MA;
 
 % Calculate the P.T. group's resulting force
 PT_group_Its = intersectLines(GMe_FP,GMi_FP);
@@ -174,51 +176,51 @@ RF1 = createLine3d(HM(1).Muscle.RectusFemoris1.Pos, HM(2).Muscle.RectusFemoris1.
 RF2 = createLine3d(HM(1).Muscle.RectusFemoris2.Pos, HM(2).Muscle.RectusFemoris2.Pos);
 TF1 = createLine3d(HM(1).Muscle.TensorFasciae1.Pos, HM(2).Muscle.TensorFasciae1.Pos);
 TF2 = createLine3d(HM(1).Muscle.TensorFasciae2.Pos, HM(2).Muscle.TensorFasciae2.Pos);
-S1  = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
-S2  = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
+ S1 = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
+ S2 = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
 
 % Bisectrix
 RF_FP = bisector(RF1([2,3,5,6]),RF2([2,3,5,6]));
 if RF_FP(3)<0; RF_FP(3:4)=-RF_FP(3:4); end
 TF_FP = bisector(TF1([2,3,5,6]),TF2([2,3,5,6]));
 if TF_FP(3)<0; TF_FP(3:4)=-TF_FP(3:4); end
-S_FP = bisector(S1([2,3,5,6]),S2([2,3,5,6]));
+ S_FP = bisector(S1([2,3,5,6]),S2([2,3,5,6]));
 if S_FP(3)<0; S_FP(3:4)=-S_FP(3:4); end
 
 % Moment arms of the muscles
-RF_FP_MA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),RF_FP));
-TF_FP_MA = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),TF_FP));
-S_FP_MA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),S_FP));
+RF_FP_MA = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3), RF_FP));
+TF_FP_MA = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3), TF_FP));
+ S_FP_MA = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3), S_FP));
 
 % Relative force of the muscle based on its volume
-RF_rF=Moment.RectusFemoris(2)/RF_FP_MA;
-TF_rF=Moment.TensorFasciae(2)/TF_FP_MA;
-S_rF =Moment.Sartorius(2)/S_FP_MA;
+RF_rF = Moments.RectusFemoris(2)/RF_FP_MA;
+TF_rF = Moments.TensorFasciae(2)/TF_FP_MA;
+ S_rF = Moments.Sartorius(2)/S_FP_MA;
 
 % Calculate the S.C. group's resulting force
 RF_TF_Its = intersectLines(RF_FP,TF_FP);
-RF_TF_FP = [RF_TF_Its RF_FP(3:4)*RF_rF+TF_FP(3:4)*TF_rF];
-SC_group_Its = intersectLines(RF_TF_FP,S_FP);
-SC_group_FP = [SC_group_Its RF_TF_FP(3:4)+S_FP(3:4)*S_rF];
+RF_TF_FP = [RF_TF_Its RF_FP(3:4)*RF_rF + TF_FP(3:4)*TF_rF];
+SC_group_Its = intersectLines(RF_TF_FP, S_FP);
+SC_group_FP = [SC_group_Its RF_TF_FP(3:4) + S_FP(3:4)*S_rF];
 
 % R (resulting line of action)
 R_Its = intersectLines(PT_group_FP,SC_group_FP);
-R_FP = [R_Its PT_group_FP(3:4)+SC_group_FP(3:4)];
-R_FP_MA  = distancePoints(HJC(2:3),projPointOnLine(HJC(2:3),R_FP));
+R_FP = [R_Its PT_group_FP(3:4) + SC_group_FP(3:4)];
+R_FP_MA  = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3),R_FP));
 R_FP_Angle = rad2deg(lineAngle(R_FP,[0 0 1 0]));
 
 if visu
     figName = '[Pauwels 1965, S.110, Fig. 169]';
-    figH=figure('Name',figName,'NumberTitle','off','Color','w');
-    axH=axes(figH);
+    figH = figure('Name',figName,'NumberTitle','off','Color','w');
+    axH = axes(figH);
     hold(axH,'on')
-    lineProps.Marker = 'o';
-    lineProps.MarkerSize = 10;
-    lineProps.Color = 'k';
-    lineProps.MarkerEdgeColor = 'none';
-    lineProps.MarkerFaceColor = lineProps.Color;
+    pointProps.Marker = 'o';
+    pointProps.MarkerSize = 5;
+    pointProps.Color = 'none';
+    pointProps.MarkerEdgeColor = 'k';
+    pointProps.MarkerFaceColor = 'k';
     
-    drawPoint3d(axH,HJC,lineProps)
+    drawPoint3d(axH,HJC,pointProps)
     
     MusclesPauwels = {...
         'GluteusMedius',...
@@ -229,19 +231,19 @@ if visu
     
     Fascicles = fieldnames(HM(1).Muscle);
     Fascicles(~contains(Fascicles, MusclesPauwels))=[];
-    lineProps.MarkerSize = 2;
+    pointProps.MarkerSize = 3;
     for m = 1:length(Fascicles)
         Origin = HM(1).Muscle.(Fascicles{m}).Pos;
         Insertion = HM(2).Muscle.(Fascicles{m}).Pos;
-        lineProps.DisplayName = Fascicles{m};
+        pointProps.DisplayName = Fascicles{m};
         colorIdx = strcmp(Fascicles{m}(1:end-1), muscleList(:,1));
-        lineProps.Color = muscleList{colorIdx,2};
-        lineProps.MarkerEdgeColor = lineProps.Color;
-        lineProps.MarkerFaceColor = lineProps.Color;
-        drawEdge3d(axH, Origin, Insertion, lineProps);
-        drawLabels3d(axH, midPoint3d(Origin, Insertion), Fascicles{m}([1,end]), lineProps);
+        pointProps.MarkerEdgeColor = muscleList{colorIdx,2};
+        pointProps.MarkerFaceColor = muscleList{colorIdx,2};
+        drawEdge3d(axH, Origin, Insertion, pointProps);
+        drawLabels3d(axH, [Origin; Insertion], [Fascicles{m}([1,end]);Fascicles{m}([1,end])], pointProps);
     end
     
+    ylim([-150 500]);zlim([-50 350])
     box = [get(axH, 'xlim') get(axH, 'ylim') get(axH, 'zlim')];
     edge = clipLine3d([0 PT_group_FP(1:2), 0 PT_group_FP(3:4);...
                        0 SC_group_FP(1:2), 0 SC_group_FP(3:4)], box);
@@ -249,7 +251,7 @@ if visu
         edge = clipLine3d([0 R_FP(1:2), 0 R_FP(3:4)], box);
     drawEdge3d(axH,edge,'Color','k','LineStyle','-');
     
-    axis(axH, 'equal', 'tight');
+    axis(axH, 'equal');
     grid(axH, 'minor');
     xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
     title(axH,figName)

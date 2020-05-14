@@ -1,4 +1,4 @@
-function varargout = Fick1850(varargin)
+function [HM, muscleList, Moments] = Fick1850(varargin)
 % Reference:
 % [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des Oberschenkels
 
@@ -25,26 +25,26 @@ HM(1).Parent=[];
 HM(2).Parent=1;
 
 % [Fick 1850, S.103-104]
-Moment.GluteusMaximus           = [-157.612 -66.596  78.240];
+Moments.GluteusMaximus           = [-157.612 -66.596  78.240];
 % Moment.Piriformis             = [  -3.332  15.138  15.885]; % Attachment points are missing in [Fick 1850]
-Moment.ObturatorEtGemelli       = [   2.821  -7.622  18.835];
-Moment.QuadratusFemoris         = [   0.342 -26.209  25.157];
-Moment.Semitendinosus           = [ -20.849  -8.420  -1.559];
-Moment.BicepsFemorisCaputLongum = [ -32.692  -9.950   0.857];
-Moment.Semimembranosus          = [ -20.462  -7.307  -1.251];
-Moment.AdductorMagnusProximal   = [   3.978 -17.505   2.089];
-Moment.AdductorMagnusDistal     = [ -42.721 -67.133  -1.434];
-Moment.PsoasEtIliacus           = [  76.587   0.000 -12.236];
-Moment.AdductorPectineus        = [  11.601 -10.569   1.939];
-Moment.AdductorBrevis           = [  26.479 -42.213   2.185];
-Moment.AdductorLongus           = [  33.697 -40.557  -1.880];
-Moment.Gracilis                 = [   3.946 -17.631   0.032];
-Moment.Sartorius                = [  11.210   4.003   0.676];
-Moment.TensorFasciae            = [  12.495   7.605   0.001];
-Moment.RectusFemoris            = [  46.182  14.813   2.958];
-Moment.GluteusMedius            = [  -9.928 114.177 -17.612];
-Moment.GluteusMinimus           = [   7.855  53.864 -15.817];
-Moment.ObturatorExternus        = [  16.758 -25.138   0.126];
+Moments.ObturatorEtGemelli       = [   2.821  -7.622  18.835];
+Moments.QuadratusFemoris         = [   0.342 -26.209  25.157];
+Moments.Semitendinosus           = [ -20.849  -8.420  -1.559];
+Moments.BicepsFemorisCaputLongum = [ -32.692  -9.950   0.857];
+Moments.Semimembranosus          = [ -20.462  -7.307  -1.251];
+Moments.AdductorMagnusProximal   = [   3.978 -17.505   2.089];
+Moments.AdductorMagnusDistal     = [ -42.721 -67.133  -1.434];
+Moments.PsoasEtIliacus           = [  76.587   0.000 -12.236];
+Moments.AdductorPectineus        = [  11.601 -10.569   1.939];
+Moments.AdductorBrevis           = [  26.479 -42.213   2.185];
+Moments.AdductorLongus           = [  33.697 -40.557  -1.880];
+Moments.Gracilis                 = [   3.946 -17.631   0.032];
+Moments.Sartorius                = [  11.210   4.003   0.676];
+Moments.TensorFasciae            = [  12.495   7.605   0.001];
+Moments.RectusFemoris            = [  46.182  14.813   2.958];
+Moments.GluteusMedius            = [  -9.928 114.177 -17.612];
+Moments.GluteusMinimus           = [   7.855  53.864 -15.817];
+Moments.ObturatorExternus        = [  16.758 -25.138   0.126];
 
 % [Fick 1850, S.105-106]
 % Tensor Fasciae
@@ -179,7 +179,7 @@ HM(2).Muscle=structfun(@(x) setfield(x,'Type',{'Insertion'}), HM(2).Muscle, 'uni
 
 
 %% Derivation of muscle cross sections volumes from moments
-muscleList = fieldnames(Moment);
+muscleList = fieldnames(Moments);
 NoM = size(muscleList,1);
 % A random color for each muscle
 muscleList(:,2) = mat2cell(round(rand(NoM,3),4),ones(NoM,1));
@@ -207,20 +207,19 @@ for m = 1:NoM
     Adduction = cosP(2)*MomentArm(3) + cosP(3)*MomentArm(2);
     Rotation  = cosP(1)*MomentArm(3) + cosP(3)*MomentArm(1);
     % Actually the three absolute values of CrossSectionVolumes should
-    % be quite similiar. However, the rotational component seems to be
-    % incorrect.
+    % be quite similiar. However, the rotational component is different 
+    % compared to the flexion and adduction component in most of the cases.
     % As workaround, let's take the mean of the absolute values of the
-    % Flexion and Adduction component.
-    CrossSectionVolumes(1) = Moment.(muscleList{m,1})(1)/Flexion;
-    CrossSectionVolumes(2) = Moment.(muscleList{m,1})(2)/Adduction;
-    CrossSectionVolumes(3) = Moment.(muscleList{m,1})(3)/Rotation;
+    % flexion and adduction component:
+    CrossSectionVolumes(1) = Moments.(muscleList{m,1})(1)/Flexion;
+    CrossSectionVolumes(2) = Moments.(muscleList{m,1})(2)/Adduction;
+    CrossSectionVolumes(3) = Moments.(muscleList{m,1})(3)/Rotation;
     if ~any(abs(CrossSectionVolumes(1:2)) < 0.01)
         muscleList{m,5} = mean(abs(CrossSectionVolumes(1:2)));
     else
         muscleList{m,5} = sum(abs(CrossSectionVolumes(1:2)));
     end
 end
-
 % Normalize cross sections by the Gluteus Maximus
 muscleList(:,5) = cellfun(@(x) ...
     x/muscleList{strcmp('GluteusMaximus', muscleList(:,1)),5}, ...
@@ -228,14 +227,9 @@ muscleList(:,5) = cellfun(@(x) ...
 % The muscle model: Straight Line (S)
 muscleList(:,6) = {'S'};
 
-varargout{1}=Moment;
-varargout{2}=HJC;
-varargout{3}=HM;
-varargout{4}=muscleList;
-varargout{5}=NaN;
-
 if visu
-    figH=figure('Name','[Fick 1850]','NumberTitle','off','Color','w');
+    figName = '[Fick 1850]';
+    figH=figure('Name',figName, 'NumberTitle','off', 'Color','w');
     axH=axes(figH);
     hold(axH,'on')
     lineProps.Marker = 'o';
@@ -273,9 +267,8 @@ if visu
     axis(axH, 'equal', 'tight'); 
     grid(axH, 'minor');
     xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
-    title(axH,'Data from [Fick 1850]')
+    title(axH,figName)
     anatomicalViewButtons(axH,'PIR')
-    varargout{5}=axH;
 end
 
 end
@@ -351,7 +344,7 @@ end
 % It is unclear from [Fick 1850] how to reconstruct the 3d line of action 
 % from the two 2d projections of the reconstructed midline in the frontal 
 % and sagittal plane.
-% Let's take the mean of the y-component as workaround:
+% As workaround, let's take the mean of the y-component:
 midFibers3d(1,[1,1+3])=nan;
 midFibers3d(2,[3,3+3])=nan;
 midFiber3d = nanmean(midFibers3d);
