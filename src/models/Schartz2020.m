@@ -28,81 +28,14 @@ function [activeMuscles, enable] = Muscles(~)
 enable = 'on';
 % Default fascicles of the model
 activeMuscles = {...
-%     'BicepsFemorisCaputLongum1';
-%     'BicepsFemorisCaputBreve1';
-%     'BicepsFemorisCaputBreve2';
-%     'BicepsFemorisCaputBreve3';
-%     'GastrocnemiusLateralis1';
-%     'GastrocnemiusMedialis1';
-    'GluteusMaximusInferior1';
-    'GluteusMaximusInferior2';
-    'GluteusMaximusInferior3';
-    'GluteusMaximusInferior4';
-    'GluteusMaximusInferior5';
-    'GluteusMaximusInferior6';
-    'GluteusMaximusSuperior1';
-    'GluteusMaximusSuperior2';
-    'GluteusMaximusSuperior3';
-    'GluteusMaximusSuperior4';
-    'GluteusMaximusSuperior5';
-    'GluteusMaximusSuperior6';
-    'GluteusMediusAnterior1';
-    'GluteusMediusAnterior2';
-    'GluteusMediusAnterior3';
-    'GluteusMediusAnterior4';
-    'GluteusMediusAnterior5';
-    'GluteusMediusAnterior6';
-    'GluteusMediusPosterior1';
-    'GluteusMediusPosterior2';
-    'GluteusMediusPosterior3';
-    'GluteusMediusPosterior4';
-    'GluteusMediusPosterior5';
-    'GluteusMediusPosterior6';
-    'GluteusMinimusAnterior1';
-    'GluteusMinimusAnterior2';
-    'GluteusMinimusMid1';
-    'GluteusMinimusMid2';
-    'GluteusMinimusPosterior1';
-    'GluteusMinimusPosterior2';
-    'IliacusLateralis1';
-    'IliacusLateralis2';
-    'IliacusMedialis1';
-    'IliacusMedialis2';
-    'IliacusMid1';
-    'IliacusMid2';
-    'RectusFemoris1';
-    'RectusFemoris2';
-%     'SoleusLateralis1';
-%     'SoleusLateralis2';
-%     'SoleusLateralis3';
-%     'SoleusMedialis1';
-%     'SoleusMedialis2';
-%     'SoleusMedialis3';
-%     'TibialisAnterior1';
-%     'TibialisAnterior2';
-%     'TibialisAnterior3';
-%     'VastusIntermedius1';
-%     'VastusIntermedius2';
-%     'VastusIntermedius3';
-%     'VastusIntermedius4';
-%     'VastusIntermedius5';
-%     'VastusIntermedius6';
-%     'VastusLateralisInferior1';
-%     'VastusLateralisInferior2';
-%     'VastusLateralisInferior3';
-%     'VastusLateralisInferior4';
-%     'VastusLateralisInferior5';
-%     'VastusLateralisInferior6';
-%     'VastusLateralisSuperior1';
-%     'VastusLateralisSuperior2';
-%     'VastusMedialisInferior1';
-%     'VastusMedialisInferior2';
-%     'VastusMedialisMid1';
-%     'VastusMedialisMid2';
-%     'VastusMedialisSuperior1';
-%     'VastusMedialisSuperior2';
-%     'VastusMedialisSuperior3';
-%     'VastusMedialisSuperior4'};
+%     'BicepsFemoris';
+%     'Gastrocnemius';
+    'Gluteus';
+    'Iliacus';
+    'RectusFemoris';
+%     'Soleus';
+%     'TibialisAnterior';
+%     'Vastus'};
     };
 end
 
@@ -149,10 +82,7 @@ end
 
 % Iglic 1990 equation 2
 syms f % Symbolic average muscle tension f
-for m = 1:Noam % Loop not needed for latest Matlab version
-    F(m,:) = A(m) * f * s(m,:);
-end
-% F = A .* cell2sym(repmat({'fa'}, Noam,1)) .* s;
+F = A .* cell2sym(repmat({'f'}, Noam,1)) .* s;
 
 % Moment of F around hip rotation center
 momentF = cross(r, F);

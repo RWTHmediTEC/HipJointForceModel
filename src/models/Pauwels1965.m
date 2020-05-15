@@ -45,30 +45,12 @@ enable = 'off';
 
 % Default fascicles of the model
 activeMuscles = {...
-    'GluteusMediusAnterior1';
-    'GluteusMediusAnterior2';
-    'GluteusMediusAnterior3';
-    'GluteusMediusAnterior4';
-    'GluteusMediusAnterior5';
-    'GluteusMediusAnterior6';
-    'GluteusMediusPosterior1';
-    'GluteusMediusPosterior2';
-    'GluteusMediusPosterior3';
-    'GluteusMediusPosterior4';
-    'GluteusMediusPosterior5';
-    'GluteusMediusPosterior6';
-    'GluteusMinimusAnterior1';
-    'GluteusMinimusAnterior2';
-    'TensorFasciaeLatae1';
-    'TensorFasciaeLatae2';
-    'RectusFemoris1';
-    'RectusFemoris2';
-    'GluteusMinimusMid1';
-    'GluteusMinimusMid2';
-    'GluteusMinimusPosterior1';
-    'GluteusMinimusPosterior2';
-    'Sartorius1'};
-    % 'Piriformis1' % In [Pauwels 1965, S.109] it is claimed that the  
+    'GluteusMedius';
+    'GluteusMinimus';
+    'TensorFasciaeLatae';
+    'RectusFemoris';
+    'Sartorius'};
+    % 'Piriformis' % In [Pauwels 1965, S.109] it is claimed that the  
     % Piriformis is considered as part of the P.T. group. However, 
     % positional data for the origin and insertion of the Piriformis muscle 
     % is missing in [Fick 1850, S.105-106] and is not present in 
