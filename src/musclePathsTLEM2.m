@@ -6,7 +6,8 @@ tStart = tic;
 LE = data.S.LE;
 MuscleList = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
-ActiveMuscles = data.activeMuscles;
+ActiveMuscles = parseActiveMuscles(data.activeMuscles, MuscleList);
+
 MusclePaths = cell2struct(ActiveMuscles(:,1)',{'Name'});
 % Switch sign for right and left side
 switch data.S.Side; case 'R'; side = 1; case 'L'; side = -1; end

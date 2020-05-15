@@ -41,30 +41,13 @@ enable = 'on';
 
 % Default fascicles of the model
 activeMuscles = {...
-    'GluteusMediusAnterior1';
-    'GluteusMediusAnterior2';
-    'GluteusMediusAnterior3';
-    'GluteusMediusAnterior4';
-    'GluteusMediusAnterior5';
-    'GluteusMediusAnterior6';
-    'GluteusMediusPosterior1';
-    'GluteusMediusPosterior2';
-    'GluteusMediusPosterior3';
-    'GluteusMediusPosterior4';
-    'GluteusMediusPosterior5';
-    'GluteusMediusPosterior6';
-    'GluteusMinimusAnterior1';
-    'GluteusMinimusAnterior2';
-    'TensorFasciaeLatae1';
-    'TensorFasciaeLatae2';
-    'RectusFemoris1';
-    'RectusFemoris2';
-    'GluteusMinimusMid1';
-    'GluteusMinimusMid2';
-    'GluteusMinimusPosterior1';
-    'GluteusMinimusPosterior2';
-    'Piriformis1'
-    'Sartorius1'};
+    'GluteusMedius';
+    'GluteusMinimus';
+    'TensorFasciaeLatae';
+    'RectusFemoris';
+    'GluteusMinimus';
+    'Piriformis'
+    'Sartorius'};
 end
 
 %% Calculation of the hip joint force
@@ -182,4 +165,3 @@ f1_f2_Its = intersectLines(f1, f2);
 r = [f1_f2_Its f1(3:4)+f2(3:4)];
 
 end
-

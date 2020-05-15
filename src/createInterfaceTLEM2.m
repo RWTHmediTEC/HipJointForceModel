@@ -938,14 +938,8 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
 
     function onListSelection_Muscles(src, ~)
         % User has selected muscles from the list
-        tempMuscleIdx = get(src, 'Value');
-        tempMuscles = data.MuscleList(tempMuscleIdx,[1,4]);
-        tempFascicles = {};
-        for m = 1:size(tempMuscles,1)
-            tempFascicles = [tempFascicles;...
-                cellstr(num2str((1:tempMuscles{m,2})', [tempMuscles{m,1} '%d']))];
-        end
-        data.activeMuscles = tempFascicles;
+        selectedMuscles = data.MuscleList(get(src, 'Value'),1);
+        data.activeMuscles = parseActiveMuscles(selectedMuscles, data.MuscleList);
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1085,10 +1079,7 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
         calculateTLEM2 = str2func(data.Model);
         gui.Home.Model.modelHandle = calculateTLEM2();
         [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
-        % Set muscle path model to straight line
-        % data.MusclePathModel = 'StraightLine';
-        % updateMusclePath();
-        % data = musclePathsTLEM2(data);
+        data.activeMuscles = parseActiveMuscles(data.activeMuscles, data.MuscleList);
         [postures, default] = gui.Home.Model.modelHandle.Posture();
         data.Posture = postures{default, 2};
         if isfield(gui.Home.Model, 'ListBox_Posture') == 1

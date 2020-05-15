@@ -42,29 +42,11 @@ enable = 'on';
 
 % Default fascicles of the model
 activeMuscles = {...
-    'GluteusMediusAnterior1';
-    'GluteusMediusAnterior2';
-    'GluteusMediusAnterior3';
-    'GluteusMediusAnterior4';
-    'GluteusMediusAnterior5';
-    'GluteusMediusAnterior6';
-    'GluteusMediusPosterior1';
-    'GluteusMediusPosterior2';
-    'GluteusMediusPosterior3';
-    'GluteusMediusPosterior4';
-    'GluteusMediusPosterior5';
-    'GluteusMediusPosterior6';
-    'GluteusMinimusAnterior1';
-    'GluteusMinimusAnterior2';
-    'TensorFasciaeLatae1';
-    'TensorFasciaeLatae2';
-    'RectusFemoris1';
-    'RectusFemoris2';
-    'GluteusMinimusMid1';
-    'GluteusMinimusMid2';
-    'GluteusMinimusPosterior1';
-    'GluteusMinimusPosterior2';
-    'Piriformis1'
+    'GluteusMedius';
+    'GluteusMinimus';
+    'TensorFasciaeLatae';
+    'RectusFemoris';
+    'Piriformis'
     };
 
 end
