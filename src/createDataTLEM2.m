@@ -57,6 +57,11 @@ switch Cadaver
         data.T.BodyWeight = 77; % Generic body weight [kg] [Destatis 2018]
         data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
         data.SurfaceData=false;
+    case 'Fick1850'
+        [LE, muscleList, Scale] = Fick1850;
+        data.T.BodyWeight = 77; % Generic body weight [kg] [Destatis 2018]
+        data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
+        data.SurfaceData=false;
     otherwise
         error('No valid TLEM version')
 end

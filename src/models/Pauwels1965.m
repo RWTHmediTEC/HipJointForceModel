@@ -136,10 +136,16 @@ assert(isequal(round(s5_l,1), round([+10.99 -0.97 11.04],1))); % [cm] Moment arm
 s5_l = s5_l*10; % Conversion to [mm]
 end
 
-function [R_FP_MA, R_FP_Angle] = derivationFromFick1850
+function [R_FP_MA, R_FP_Angle] = derivationFromFick1850(varargin)
 % Switch for visualization of Fick's data and Pauwel's derivation of the
 % orientation of the abducturs resulting force
-visu=1;
+
+% Parsing
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p,'visualization', 1, logParValidFunc);
+parse(p,varargin{:});
+visu = p.Results.visualization;
 
 [HM, muscleList, Moments] = Fick1850('visu', 0);
 
@@ -169,7 +175,7 @@ GMi_rF = Moments.GluteusMinimus(2)/GMi_FP_MA;
 
 % Calculate the P.T. group's resulting force
 PT_group_Its = intersectLines(GMe_FP,GMi_FP);
-PT_group_FP = [PT_group_Its GMe_FP(3:4)*GMe_rF+GMi_FP(3:4)*GMi_rF];
+PT_group_FP = [PT_group_Its GMe_FP(3:4)*GMe_rF + GMi_FP(3:4)*GMi_rF];
 
 %% S.C. Group [Pauwels 1965, S.110]
 RF1 = createLine3d(HM(1).Muscle.RectusFemoris1.Pos, HM(2).Muscle.RectusFemoris1.Pos);
@@ -243,7 +249,7 @@ if visu
         drawLabels3d(axH, [Origin; Insertion], [Fascicles{m}([1,end]);Fascicles{m}([1,end])], pointProps);
     end
     
-    ylim([-150 500]);zlim([-50 350])
+    ylim([-500 150]);zlim([-50 350])
     box = [get(axH, 'xlim') get(axH, 'ylim') get(axH, 'zlim')];
     edge = clipLine3d([0 PT_group_FP(1:2), 0 PT_group_FP(3:4);...
                        0 SC_group_FP(1:2), 0 SC_group_FP(3:4)], box);
@@ -255,7 +261,7 @@ if visu
     grid(axH, 'minor');
     xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
     title(axH,figName)
-    anatomicalViewButtons(axH,'PIR')
+    anatomicalViewButtons(axH,'ASR')
 end
 
 end

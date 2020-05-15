@@ -181,8 +181,8 @@ HM(2).Muscle=structfun(@(x) setfield(x,'Type',{'Insertion'}), HM(2).Muscle, 'uni
 %% Derivation of muscle cross sections volumes from moments
 muscleList = fieldnames(Moments);
 NoM = size(muscleList,1);
-% A random color for each muscle
-muscleList(:,2) = mat2cell(round(rand(NoM,3),4),ones(NoM,1));
+% A color for each muscle
+muscleList(:,2) = mat2cell(hsv(NoM),ones(NoM,1));
 % The connected bones: pelvis (1), femur (2)
 muscleList(:,3) = {[1 2]};
 % Number of fascicles 
@@ -227,6 +227,22 @@ muscleList(:,5) = cellfun(@(x) ...
 % The muscle model: Straight Line (S)
 muscleList(:,6) = {'S'};
 
+
+%% Transform into [Wu 2002] and mirror to the right side
+mirrorTFM = eye(4); mirrorTFM(3,3) = -1;
+TFM = mirrorTFM*anatomicalOrientationTFM('PIR','ASR')*createTranslation3d(-HJC);
+
+fascicles = fieldnames(HM(1).Muscle);
+for b=1:2
+    HM(b).Joints.Hip.Pos = transformPoint3d(HM(b).Joints.Hip.Pos, TFM);
+    for m = 1:length(fascicles)
+        HM(b).Muscle.(fascicles{m}).Pos = transformPoint3d(HM(b).Muscle.(fascicles{m}).Pos, TFM);
+    end
+end
+
+LinesOfAction = transformLine3d(LinesOfAction, TFM);
+transPlane = transformPlane3d(transPlane, TFM);
+
 if visu
     figName = '[Fick 1850]';
     figH=figure('Name',figName, 'NumberTitle','off', 'Color','w');
@@ -238,20 +254,19 @@ if visu
     lineProps.MarkerEdgeColor = 'none';
     lineProps.MarkerFaceColor = lineProps.Color;
     
-    drawPoint3d(axH,HJC,lineProps)
+    drawPoint3d(axH,HM(1).Joints.Hip.Pos,lineProps)
     
-    Fascicles = fieldnames(HM(1).Muscle);
     lineProps.MarkerSize = 2;
-    for m = 1:length(Fascicles)
-        Origin = HM(1).Muscle.(Fascicles{m}).Pos;
-        Insertion = HM(2).Muscle.(Fascicles{m}).Pos;
-        lineProps.DisplayName = Fascicles{m};
-        colorIdx = strcmp(Fascicles{m}(1:end-1), muscleList(:,1));
+    for m = 1:length(fascicles)
+        Origin = HM(1).Muscle.(fascicles{m}).Pos;
+        Insertion = HM(2).Muscle.(fascicles{m}).Pos;
+        lineProps.DisplayName = fascicles{m};
+        colorIdx = strcmp(fascicles{m}(1:end-1), muscleList(:,1));
         lineProps.Color = muscleList{colorIdx,2};
         lineProps.MarkerEdgeColor = lineProps.Color;
         lineProps.MarkerFaceColor = lineProps.Color;
         drawEdge3d(axH, Origin, Insertion, lineProps);
-        drawLabels3d(axH, midPoint3d(Origin, Insertion), Fascicles{m}([1,end]), lineProps);
+        drawLabels3d(axH, midPoint3d(Origin, Insertion), fascicles{m}([1,end]), lineProps);
     end
     
     lineProps.MarkerSize = 6;
@@ -268,7 +283,7 @@ if visu
     grid(axH, 'minor');
     xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
     title(axH,figName)
-    anatomicalViewButtons(axH,'PIR')
+    anatomicalViewButtons(axH,'ASR')
 end
 
 end
