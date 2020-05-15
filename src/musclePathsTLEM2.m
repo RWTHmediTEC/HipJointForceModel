@@ -2,7 +2,7 @@ function data = musclePathsTLEM2(data)
 %MUSCLEPATHSTLEM2 constructs the lines of action of the active muscles
 
 %% create the muscle paths
-tic;
+tStart = tic;
 LE = data.S.LE;
 MuscleList = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
@@ -88,11 +88,7 @@ if strcmp(MusclePathModel,'Wrapping')
                             if ~isempty(testIntersection)
                                 % Initialize values for wrapping
                                 cRot = createRotationVector3d([0 0 1], cAxis); % Rotation matrix
-                                % inputs for Cylinder:
-                                % Center of Cylinder, matrix of
-                                % rotation, linear velocity,
-                                % angular velocity, radius, heigth
-                                % of cylinder
+                                % Cylinder inputs: center, rotation matrix, linear velocity, angular velocity, radius, heigth
                                 cyl = Cylinder(cCenter', cRot(1:3,1:3), [0 0 0]', [0 0 0]', cRadius, 20*cRadius); % Cylinder initialization
                                 wrappingCyl = WrappingObstacle(cyl); % Initialization for wrapping Cylinder
                                 if ~isempty(muscleWrappingSystem)
@@ -145,8 +141,7 @@ if strcmp(MusclePathModel,'Wrapping')
                     for s = 1:length(Surface)
                         sBol = ismember(ActiveMuscles{i}(1:end-1), LE(b).Surface.(Surface{s}).Muscles); % check if muscles wrapps arround surface
                         if any(sBol)
-                            % Initialize values for MatGeom (see Documentation of MatGeom3D)
-                            % This loop finds the two points between which the muscle wraps
+                            % Initialize matGeom cylinder
                             for p = 1:size(MusclePaths(i).Points,1)-1 % loop through all the Points(Origin, Via, Insertion)
                                 testLine =  createLine3d(MusclePaths(i).Points(p,:), MusclePaths(i).Points(p+1,:)); % Line between two successive points
                                 cCenter = LE(b).Surface.(Surface{s}).Center; % Center of Cylinder
@@ -154,17 +149,15 @@ if strcmp(MusclePathModel,'Wrapping')
                                 cAxis = LE(b).Surface.(Surface{s}).Axis; % Axis of Cylinder
                                 cStart = cCenter + cAxis; % Start point of Cylinder
                                 cEnd = cCenter - cAxis; % End point of Cylinder
-                                % Origin of Gastrocnemius Lateralis lays in the cylinder. So radius of
-                                % cylinder is made smaller for that muscle so that origin is on cylinder.
-                                % Furthermore point can't lay on cylinder, therefore radius is made
-                                % smaller by 0.00001
+                                % Origin of Gastrocnemius Lateralis lays in the cylinder. Hence, the radius of 
+                                % the cylinder is made smaller for this muscle that origin is outside the cylinder.
                                 if isequal(MusclePaths(i).Name(1:end-1),'GastrocnemiusLateralis')
                                     axisLine = createLine3d(cStart, cEnd);
                                     cRadius = distancePointLine3d(MusclePaths(i).Points(1,:), axisLine) - 0.00001;
                                 end
                                 testCylinder = [cStart, cEnd, cRadius]; % Cylinder definition for MatGeom
                                 testIntersection = intersectLineCylinder(testLine, testCylinder, 'checkBounds', false); % Intersection Points of Line and Cylinder
-                                % initalize 2 vectors with diffrent direction
+                                % initalize 2 vectors with diffrent directions
                                 v1 = [1 0 0];
                                 v2 = [0 1 0];
                                 % vectors from first muscle point to cylinder intersection and from second muscle point to cylinder intersection
@@ -177,11 +170,7 @@ if strcmp(MusclePathModel,'Wrapping')
                                 if ~isempty(testIntersection) && isequal(v1, -v2)
                                     % Initialize values for wrapping
                                     cRot = createRotationVector3d([0 0 1], cAxis); % Rotaion matrix of the cylinder
-                                    % inputs for Cylinder:
-                                    % Center of Cylinder, matrix of
-                                    % rotation, linear velocity,
-                                    % angular velocity, radius, heigth
-                                    % of cylinder
+                                    % Cylinder inputs: center, rotation matrix, linear velocity, angular velocity, radius, heigth
                                     cyl = Cylinder(cCenter', cRot(1:3,1:3), [0 0 0]', [0 0 0]', cRadius, 20*cRadius); % Cylinder initialization
                                     wrappingCyl = WrappingObstacle(cyl); % Initialization for wrapping Cylinder
                                     % initialize starting conditions for wrapping
@@ -272,7 +261,8 @@ MusclePaths = rmfield(MusclePaths, 'idxPelvis');
 MusclePaths = rmfield(MusclePaths, 'idxFemur');
 
 data.S.MusclePaths = MusclePaths;
-toc;
+mpTime = toc(tStart);
+disp(['Muscle path modeling took ' num2str(mpTime,1) ' seconds.'])
 
 end
 
