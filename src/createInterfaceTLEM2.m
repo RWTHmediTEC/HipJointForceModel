@@ -49,40 +49,22 @@ gui.Home.Settings.Layout_V = uix.VBox(...
     'Spacing', 3);
 
 % Panel Cadaver
+cadavers={'TLEM2_0', 'TLEM2_1', 'Dostal1981', 'Fick1850'};
 gui.Home.Settings.Panel_Cadaver = uix.Panel(...
     'Parent', gui.Home.Settings.Layout_V,...
-    'Title', 'Used cadaver');
+    'Title', 'Cadaver template');
 
-gui.Home.Settings.RadioButtonBox_Cadaver = uix.VButtonBox(...
+gui.Home.Settings.Popup_Cadaver = uicontrol(...
     'Parent', gui.Home.Settings.Panel_Cadaver,...
-    'Spacing', 3,...
-    'HorizontalAlignment', 'left',...
-    'ButtonSize', [80 20]);
-
-gui.Home.Settings.RadioButton_TLEM2_0 = uicontrol(...
-    'Parent', gui.Home.Settings.RadioButtonBox_Cadaver,...
-    'Style', 'radiobutton',...
-    'String', 'TLEM 2.0',...
-    'Callback', @onTLEM2_0);
-
-gui.Home.Settings.RadioButton_TLEM2_1 = uicontrol(...
-    'Parent', gui.Home.Settings.RadioButtonBox_Cadaver,...
-    'Style', 'radiobutton',...
-    'String', 'TLEM 2.1',...
-    'Callback', @onTLEM2_1);
-
-gui.Home.Settings.RadioButton_Dostal1981 = uicontrol(...
-    'Parent', gui.Home.Settings.RadioButtonBox_Cadaver,...
-    'Style', 'radiobutton',...
-    'String', 'Dostal1981',...
-    'Callback', @onDostal1981);
-
-set(gui.Home.Settings.(['RadioButton_' data.Cadaver]), 'Value', 1)
+    'Style', 'popupmenu',...
+    'String', cadavers,...
+    'Callback', @onCadavers);
+gui.Home.Settings.Popup_Cadaver.Value=1;
 
 % Panel Show Hip Joint Force for
 gui.Home.Settings.Panel_View = uix.Panel(...
     'Parent', gui.Home.Settings.Layout_V,...
-    'Title', 'Show Hip Joint Force for');
+    'Title', 'Show hip joint force for');
 
 gui.Home.Settings.RadioButtonBox_View = uix.HButtonBox(...
     'Parent', gui.Home.Settings.Panel_View,...
@@ -160,7 +142,7 @@ gui.Home.Settings.Checkbox_ShowWrappingSurfaces = uicontrol(...
 set(gui.Home.Settings.(['RadioButton_' data.MusclePathModel]), 'Value', 1)
 
 % Adjust layout
-set(gui.Home.Settings.Layout_V, 'Height', [-1, -0.4, -0.4, -1])
+set(gui.Home.Settings.Layout_V, 'Height', [40, 40, 40, 40*3])
 
 %% Box panel patient specific parameters
 gui.Home.Parameters.BoxPanel = uix.BoxPanel(...
@@ -759,29 +741,20 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
 
 %% Box panel settings
 
-    function onTLEM2_0(~, ~)
-        % User has chosen TLEM 2.0 version
-        data = createDataTLEM2(data, 'TLEM2_0');
-        gui.Home.Settings.RadioButton_ViaPoint.Enable='on';
-        gui.Home.Settings.RadioButton_Wrapping.Enable='on';
-        gui.IsUpdated = false;
-        updateHomeTab();
-    end
-
-    function onTLEM2_1(~, ~)
-        % User has chosen TLEM 2.1 version
-        data = createDataTLEM2(data, 'TLEM2_1');
-        gui.Home.Settings.RadioButton_ViaPoint.Enable='on';
-        gui.Home.Settings.RadioButton_Wrapping.Enable='on';
-        gui.IsUpdated = false;
-        updateHomeTab();
-    end
-
-    function onDostal1981(~, ~)
-        % User has chosen Dostal1981
-        data = createDataTLEM2(data, 'Dostal1981');
-        gui.Home.Settings.RadioButton_ViaPoint.Enable='off';
-        gui.Home.Settings.RadioButton_Wrapping.Enable='off';
+    function onCadavers(~, ~)
+        data.Cadaver = ...
+            gui.Home.Settings.Popup_Cadaver.String{gui.Home.Settings.Popup_Cadaver.Value};
+        data = createDataTLEM2(data, data.Cadaver);
+        switch data.Cadaver
+            case {'TLEM2_0','TLEM2_1'}
+                gui.Home.Settings.RadioButton_ViaPoint.Enable='on';
+                gui.Home.Settings.RadioButton_Wrapping.Enable='on';
+            case {'Dostal1981', 'Fick1850'}
+                gui.Home.Settings.RadioButton_ViaPoint.Enable='off';
+                gui.Home.Settings.RadioButton_Wrapping.Enable='off';
+            otherwise
+                error('Unknown cadaver!')
+        end
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1033,7 +1006,6 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
 %% Home tab
 
     function updateHomeTab()
-        updateCadaver();
         updateHipJointForceView();
         updateScalingLaw();
         updateMusclePath();
@@ -1045,22 +1017,6 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
     end
 
 %% Box panel settings
-
-    function updateCadaver()
-        set(gui.Home.Settings.RadioButton_TLEM2_0, 'Value', 0);
-        set(gui.Home.Settings.RadioButton_TLEM2_1, 'Value', 0);
-        set(gui.Home.Settings.RadioButton_Dostal1981, 'Value', 0);
-        switch data.Cadaver
-            case 'TLEM2_0'
-                set(gui.Home.Settings.RadioButton_TLEM2_0, 'Value', 1);
-            case 'TLEM2_1'
-                set(gui.Home.Settings.RadioButton_TLEM2_1, 'Value', 1);
-            case 'Dostal1981'
-                set(gui.Home.Settings.RadioButton_Dostal1981, 'Value', 1);
-            otherwise
-                error('Unknown cadaver!')
-        end
-    end
 
     function updateHipJointForceView()
         set(gui.Home.Settings.RadioButton_Pelvis, 'Value', 0);
