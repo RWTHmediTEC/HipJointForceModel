@@ -16,8 +16,8 @@ if nargin == 0 || isempty(data)
     Cadaver = 'TLEM2_0';
     % View of the HJF: Pelvis; Femur
     data.View = 'Femur';
-    % Scaling law: NonuniformEggert2018, NonuniformSedghi2017, Skinning
-    data.ScalingLaw = 'NonuniformEggert2018';
+    % Scaling law
+    data.ScalingLaw = 'None';
     % Muscle Path Model: StraightLine, ViaPoint, Wrapping
     data.MusclePathModel = 'StraightLine';
     % Side of the hip joint: Right 'R'; Left 'L'
@@ -58,7 +58,7 @@ switch Cadaver
         data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
         data.SurfaceData=false;
     case 'Fick1850'
-        [LE, muscleList, Scale] = Fick1850;
+        [LE, muscleList] = Fick1850;
         data.T.BodyWeight = 77; % Generic body weight [kg] [Destatis 2018]
         data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
         data.SurfaceData=false;
@@ -69,7 +69,17 @@ end
 data.T.LE = LE;
 data.MuscleList = muscleList;
 
-%% Bony landmarks & paramters
+%% Save initally as (T)emplate (Cadaver) and (S)ubject (Patient)
+data.S.Side       = data.T.Side;
+data.S.BodyWeight = data.T.BodyWeight;
+data.S.BodyHeight = data.T.BodyHeight;
+data.S.PelvicTilt = data.T.PelvicTilt;
+data.S.LE         = data.T.LE;
+
+%% Bony landmarks
+if isfield(data.T, 'Scale')
+    data.T = rmfield(data.T, 'Scale');
+end
 if data.SurfaceData
     % Pelvic skinning landmarks
     data.T.Scale(1).Landmarks = struct(...
@@ -103,13 +113,29 @@ if data.SurfaceData
         'LT',LE(2).Mesh.vertices(LE(2).Landmarks.LesserTrochanter.Node,:));
 end
 
-%% Pelvic parameters:
+%% Scaling parameters
+% If no landmarks or parameters are available assign with nan and return
+if ~isfield(data.T, 'Scale') && ~exist('Scale', 'var')
+    [data.T.Scale(1).HipJointWidth,...
+        data.T.Scale(1).PelvicWidth,...
+        data.T.Scale(1).PelvicHeight,...
+        data.T.Scale(1).PelvicDepth,...
+        data.T.Scale(2).FemoralLength,...
+        data.T.Scale(2).FemoralWidth,...
+        data.T.Scale(2).FemoralVersion,...
+        data.T.Scale(2).NeckLength,...
+        data.T.Scale(2).CCD] = deal(nan);
+    data.S.Scale = data.T.Scale;
+    return
+end
+
+% Pelvic parameters:
 % !!! The landmarks should be transformed into the pelvic bone coordinate 
 % systems [Wu 2002] to use consistent parameter definitions. However, this 
 % is not possible for some of the cadavers due to missing landmark 
 % information !!!
 
-% HipJointWidth  = Distance between the hip joint centers
+% HipJointWidth = Distance between the hip joint centers
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         % !!! No consideration of the width of the pubic symphysis !!!
@@ -179,14 +205,6 @@ else
     data.T.Scale(2).CCD = nan;
 end
 
-
-%% Save initally as (T)emplate (Cadaver) and (S)ubject (Patient)
-data.S.Side       = data.T.Side;
-data.S.BodyWeight = data.T.BodyWeight;
-data.S.BodyHeight = data.T.BodyHeight;
-data.S.PelvicTilt = data.T.PelvicTilt;
-
-data.S.LE    = data.T.LE;
 data.S.Scale = data.T.Scale;
 
 end

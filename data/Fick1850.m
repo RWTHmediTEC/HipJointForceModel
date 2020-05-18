@@ -5,7 +5,7 @@ function [HM, muscleList, Moments] = Fick1850(varargin)
 % Parsing
 p = inputParser;
 logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
-addParameter(p,'visualization',true,logParValidFunc);
+addParameter(p,'visualization',0, logParValidFunc);
 parse(p,varargin{:});
 visu = p.Results.visualization;
 

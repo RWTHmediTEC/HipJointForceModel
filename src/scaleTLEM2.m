@@ -29,10 +29,14 @@ switch data.ScalingLaw
         PW = data.S.Scale(1).PelvicWidth   / data.T.Scale(1).PelvicWidth;
         FL = 1;
         FW = 1;
-    case 'LandmarkSkinningFischer2018'
+    case {'None','LandmarkSkinningFischer2018'}
         [PD, PH, PW, FL, FW] = deal(1);
     otherwise
         error('Invalid scaling law!')
+end
+
+if any(isnan([PD, PH, PW, FL, FW]))
+    error('At least one of the scaling parameters is nan! Choose another cadaver to use this scaling law!')
 end
 
 

@@ -91,7 +91,7 @@ gui.Home.Settings.Panel_ScalingLaw = uix.Panel(...
     'Parent', gui.Home.Settings.Layout_V,...
     'Title', 'Scaling Law');
 
-scalingLaws={...
+scalingLaws={'None',...
     'NonuniformEggert2018',...
     'NonuniformSedghi2017',...
     'ParameterSkinningFischer2018',...
@@ -345,6 +345,7 @@ defaultModel=1;
 [~, models] = arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
 data.Model = models{defaultModel};
 postures ={}; default=nan;
+gui.ManualSelectedMuscles = 0;
 updateModel()
 gui.Home.Model.ListBox_Model = uicontrol(...
     'Parent', gui.Home.Model.Panel_Model,...
@@ -755,6 +756,7 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
             otherwise
                 error('Unknown cadaver!')
         end
+        gui.ManualSelectedMuscles = 0;
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -924,8 +926,8 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
     function onListSelection_Model(src, ~)
         % User has selected a model from the list
         data.Model = models{get(src, 'Value')};
+        gui.ManualSelectedMuscles = 0;
         gui.IsUpdated = false;
-        updateModel();
         updateHomeTab();
     end
 
@@ -938,14 +940,14 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
 
     function onListSelection_Muscles(src, ~)
         % User has selected muscles from the list
-        selectedMuscles = data.MuscleList(get(src, 'Value'),1);
-        data.activeMuscles = parseActiveMuscles(selectedMuscles, data.MuscleList);
+        data.activeMuscles = data.MuscleList(get(src, 'Value'),1);
+        gui.ManualSelectedMuscles = 1;
         gui.IsUpdated = false;
         updateHomeTab();
     end
 
     function onPushButton_ResetMuscle(~, ~)
-        [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
+        gui.ManualSelectedMuscles = 0;
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1005,6 +1007,7 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
         updateMusclePath();
         gui = updateSide(data, gui);
         gui = updateParameters(data, gui);
+        updateModel()
         updateMuscleList();
         updateVisualization();
         gui = updateResults(data, gui);
@@ -1035,7 +1038,7 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
                      gui.Home.Parameters.EditText_CCD,...
                      gui.Home.Parameters.EditText_NeckLength],...
                      'Enable', 'on');
-            case 'LandmarkSkinningFischer2018'
+            case {'None','LandmarkSkinningFischer2018'}
                 set([gui.Home.Parameters.EditText_PelvicHeight,...
                     gui.Home.Parameters.EditText_PelvicWidth,...
                     gui.Home.Parameters.EditText_PelvicDepth,...
@@ -1078,7 +1081,9 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
     function updateModel()
         calculateTLEM2 = str2func(data.Model);
         gui.Home.Model.modelHandle = calculateTLEM2();
-        [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
+        if ~gui.ManualSelectedMuscles
+            [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
+        end
         data.activeMuscles = parseActiveMuscles(data.activeMuscles, data.MuscleList);
         [postures, default] = gui.Home.Model.modelHandle.Posture();
         data.Posture = postures{default, 2};

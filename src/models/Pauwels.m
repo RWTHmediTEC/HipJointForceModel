@@ -59,8 +59,12 @@ MuscleList      = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
 HJC             = data.S.LE(1).Joints.Hip.Pos;
-HJW             = data.S.Scale(1).HipJointWidth;
 Side            = data.S.Side;
+HJW             = data.S.Scale(1).HipJointWidth;
+if isnan(HJW)
+    error('Please specifiy the hip joint width (HJW)!')
+end
+
 
 %% Define parameters
 G = -data.g; % Weight force
@@ -68,8 +72,8 @@ G = -data.g; % Weight force
 % Partial body weight and its lever arm in percent of the full body weight
 % and the hip joint width
 [relPartialBW, ratioLeverArm2HJW] = derivationFromBrauneAndFischer189X();
-S5=S*relPartialBW;
-a=HJW*ratioLeverArm2HJW;
+S5 = S*relPartialBW;
+a = HJW*ratioLeverArm2HJW;
 
 % Moment arm of the muscle force M
 % Angle between the muscle force M and the vertical in the frontal plane
@@ -100,7 +104,7 @@ data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
 end
 
-function [relPartialBW, leverArm2HJW] = derivationFromBrauneAndFischer189X()
+function [relPartialBW, leverArm2HJW, a] = derivationFromBrauneAndFischer189X()
 % Derivation of the lever arm of the body weight during stance phase.
 % Step 16, Experiment 1, Braune and Fischer
 [S, HJW, G1, G2, g1_16, g2_L_16, hjc_R_16] = BrauneAndFischer189X();
@@ -113,7 +117,7 @@ s5 = (g1_16*G1+g2_L_16*G2)/(G1+G2); % [Pauwels 1965, S.101]
 % Lever arms of S5 projected into the anatomical planes
 a = hjc_R_16(2)-s5(2); % Frontal plane [Pauwels 1965, S.103]
 % Ratio between the lever arm in the frontal plane and the hip joint width
-leverArm2HJW=a*10/HJW;
+leverArm2HJW=a/HJW;
 end
 
 function [R_FP_MA, R_FP_Angle] = combineMuscleForces(MusclePaths, MusclePathModel, MuscleList, HJC)

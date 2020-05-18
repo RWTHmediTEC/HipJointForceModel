@@ -46,48 +46,53 @@ for s = 1:length(OL)
         
         % Functional pelvic parameters
         data.S.PelvicTilt = 0; % Not available for OrthoLoad subjects
-        % Pelvis skinning landmarks
-        pelvisLM = fieldnames(data.T.Scale(1).Landmarks);
-        for lm=1:length(pelvisLM)
-            data.S.Scale(1).Landmarks.(pelvisLM{lm}) = ...
-                OL(s).Landmarks.Pelvis.([pelvisLM{lm} '_' OL(s).Subject(end)]);
+        
+        %% Skinning landmarks
+        if isfield(data.T.Scale, 'Landmarks')
+            % Pelvis skinning landmarks
+            pelvisLM = fieldnames(data.T.Scale(1).Landmarks);
+            for lm=1:length(pelvisLM)
+                data.S.Scale(1).Landmarks.(pelvisLM{lm}) = ...
+                    OL(s).Landmarks.Pelvis.([pelvisLM{lm} '_' OL(s).Subject(end)]);
+            end
+            pelvicBoneCSLM = fieldnames(data.T.Scale(1).boneCSLandmarks);
+            for lm=1:length(pelvicBoneCSLM)
+                data.S.Scale(1).boneCSLandmarks.(pelvicBoneCSLM{lm}) = ...
+                    OL(s).Landmarks.Pelvis.(pelvicBoneCSLM{lm});
+            end
+            % Femur skinning landmarks
+            femurLM = fieldnames(data.T.Scale(2).Landmarks);
+            for lm=1:length(femurLM)
+                data.S.Scale(2).Landmarks.(femurLM{lm}) = ...
+                    OL(s).Landmarks.Femur.([femurLM{lm} '_' OL(s).Subject(end)]);
+            end
+            % For scaling landmarks have to be mirrored to the right side as
+            % the cadavers are right sided.
+            switch OL(s).Subject(end)
+                case 'L'
+                    mirrorZTFM = eye(4); mirrorZTFM(3,3) = -1;
+                    data.S.Scale(1).Landmarks = structfun(@(x) ...
+                        transformPoint3d(x, mirrorZTFM), data.S.Scale(1).Landmarks,'uni',0);
+                    data.S.Scale(1).boneCSLandmarks = structfun(@(x) ...
+                        transformPoint3d(x, mirrorZTFM), data.S.Scale(1).boneCSLandmarks,'uni',0);
+                    data.S.Scale(2).Landmarks = structfun(@(x) ...
+                        transformPoint3d(x, mirrorZTFM), data.S.Scale(2).Landmarks,'uni',0);
+            end
         end
-        pelvicBoneCSLM = fieldnames(data.T.Scale(1).boneCSLandmarks);
-        for lm=1:length(pelvicBoneCSLM)
-            data.S.Scale(1).boneCSLandmarks.(pelvicBoneCSLM{lm}) = ...
-                OL(s).Landmarks.Pelvis.(pelvicBoneCSLM{lm});
-        end
+        
+        %% Scaling parameters
         % Pelvis scaling parameters
         data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
         data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
         data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
         data.S.Scale(1).PelvicDepth    = OL(s).PelvicDepth;
         
-        % Femur skinning landmarks
-        femurLM = fieldnames(data.T.Scale(2).Landmarks);
-        for lm=1:length(femurLM)
-            data.S.Scale(2).Landmarks.(femurLM{lm}) = ...
-                OL(s).Landmarks.Femur.([femurLM{lm} '_' OL(s).Subject(end)]);
-        end
         % Femur scaling parameters 
         data.S.Scale(2).FemoralLength  = OL(s).FemoralLength;
         data.S.Scale(2).FemoralWidth   = OL(s).FemoralWidth;
         data.S.Scale(2).FemoralVersion = OL(s).FemoralVersion;
         data.S.Scale(2).NeckLength     = OL(s).NeckLength;
         data.S.Scale(2).CCD            = OL(s).CCD;
-        
-        % For scaling landmarks have to be mirrored to the right side as
-        % the cadavers are right sided.
-        switch OL(s).Subject(end)
-            case 'L'
-                mirrorZTFM = eye(4); mirrorZTFM(3,3) = -1;
-                data.S.Scale(1).Landmarks = structfun(@(x) ...
-                    transformPoint3d(x, mirrorZTFM), data.S.Scale(1).Landmarks,'uni',0);
-                data.S.Scale(1).boneCSLandmarks = structfun(@(x) ...
-                    transformPoint3d(x, mirrorZTFM), data.S.Scale(1).boneCSLandmarks,'uni',0);
-                data.S.Scale(2).Landmarks = structfun(@(x) ...
-                    transformPoint3d(x, mirrorZTFM), data.S.Scale(2).Landmarks,'uni',0);
-        end
         
         %% Calculate HJF
         data = scaleTLEM2(data);

@@ -19,7 +19,8 @@ MusclePathModels=cell(size(MusclePaths));
 for i = 1:length(MusclePaths)
     mlIdx = find(strcmp(MusclePaths(i).Name(1:end-1),MuscleList(:,1)));
     if isempty(mlIdx)
-        error('Muscle is not part of the muscle list of the cadaver! Choose another cadaver!')
+        error([MusclePaths(i).Name(1:end-1) ' is not part of the ' ...
+            'muscle list of the cadaver! Choose another cadaver!'])
     else
         MuscleListIdx(i,1) = mlIdx;
     end
