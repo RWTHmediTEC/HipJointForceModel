@@ -1,0 +1,105 @@
+clearvars; close all;
+
+% Path of the data collection of the publication:
+% 2016 - Bergmann - Standardized Loads Acting in Hip Implants
+% https://orthoload.com/test-loads/standardized-loads-acting-at-hip-implants/
+% https://orthoload.com/wp-content/uploads/StandardLoads-Hip_CompleteData.zip
+dbPath = 'D:\Biomechanics\Hip\Database\StandardLoads-Hip_CompleteData\Data\';
+
+activities = {...
+    'Walking', 'Level Walking', 'LW';...
+    'Stance' , 'One-Legged Stance', 'OLS';...
+    'StandUp', 'StandingUp', 'SU'};
+
+% Implant side of the the OrthoLoad subjects
+sides = {'L','R','L','L','L','R','R','L','L','R'};
+
+visu = 1;
+
+pointProps.Marker='o';
+pointProps.MarkerSize=5;
+pointProps.MarkerEdgeColor='k';
+pointProps.MarkerFaceColor='k';
+pointProps.Color='none';
+
+for a=1:length(activities)
+    for s=1:10
+        sFile = dir([dbPath activities{a,1} '\' activities{a,1} '_H' num2str(s) '\' activities{a,1} '_H' num2str(s) '.xlsx']);
+        if length(sFile) == 1
+            OL_Data = xlsread(fullfile(sFile.folder, sFile.name),'BW'); % Read the BW sheet
+            % Import body weight [N]
+            avPFP.Weight_N = OL_Data(1,2);
+            assert(avPFP.Weight_N >= 300 && avPFP.Weight_N <= 2000)
+            % Import HJF [%BW]
+            sIdx = find(OL_Data(:,1)==0 & OL_Data(:,11) ==0);
+            assert(~isempty(sIdx))
+            eIdx = find(ismembertol(OL_Data(:,11),100));
+            assert(~isempty(eIdx))
+            avHJF = OL_Data(sIdx:eIdx,[11,2:5]);
+            % Find peak force phase
+            switch activities{a,1}
+                case 'Walking'
+                    % [~, pfpIdx] = findpeaks(avHJF(:,5),'MinPeakProminence',10);
+                    [~, pfpIdx] = findpeaks(avHJF(:,5),...
+                        'MinPeakHeight', 0.75*max(avHJF(:,5)),...
+                        'MinPeakProminence',10,...
+                        'NPeaks',1);
+                    assert(numel(pfpIdx) == 1)
+                    % [~, pfpIdx2] = findpeaks(-avHJF(:,5),...
+                    %     'MinPeakProminence',10,...
+                    %     'NPeaks',1);
+                    % assert(numel(pfpIdx) == 1)
+                    % Add -+ 2.5% values
+                    pfpIdx = ...
+                        pfpIdx-round(0.025*size(avHJF,1))+1: ...
+                        pfpIdx+round(0.025*size(avHJF,1));
+                case 'Stance'
+                    % Identify a rough estimation of force plateau during
+                    % stance phase. Keep all values above 75% of Fmax
+                    pfpIdx = find(avHJF(:,5) > 0.75*max(avHJF(:,5)));
+                    % Take all from first to last
+                    pfpIdx = pfpIdx(1):pfpIdx(end);
+                    % Take the median +- 25% of the cycle
+                    pfpIdx = ...
+                        round(median(pfpIdx))-round(0.25*size(avHJF,1))+1: ...
+                        round(median(pfpIdx))+round(0.25*size(avHJF,1));
+                case 'StandUp'
+                    % Find Fmax
+                    [~, pfpIdx] = max(avHJF(:,5));
+                    assert(numel(pfpIdx) == 1)
+                    % Add -+ 2.5% values
+                    pfpIdx = ...
+                        pfpIdx-round(0.025*size(avHJF,1))+1: ...
+                        pfpIdx+round(0.025*size(avHJF,1));
+                otherwise
+                    error([activities{a,1} ' not implemented yet!'])
+            end
+            avPFP.HJF_pBW = mean(avHJF(pfpIdx,2:4));
+            meanPFP = struct2table(avPFP);
+            save(['H' num2str(s) sides{s} '_' activities{a,3}],'meanPFP')
+            clearvars avPFP meanPFP
+            if visu
+                figH = figure('Name', sFile.name, 'NumberTitle', 'off',...
+                    'Color', 'w','Position', [100,400,1600,400]);
+                saxH(1) = subplot(1,4,1);
+                plot(avHJF(:,1),avHJF(:,2),'g'); grid on;
+                xlabel('Load Cycle [%]'); ylabel('Lateral Force F_x [%BW]')
+                saxH(2) = subplot(1,4,2);
+                plot(avHJF(:,1),avHJF(:,3),'b'); grid on;
+                xlabel('Load Cycle [%]'); ylabel('Anterior Force F_y [%BW]')
+                saxH(3) = subplot(1,4,3);
+                plot(avHJF(:,1),avHJF(:,4),'r'); grid on;
+                xlabel('Load Cycle [%]'); ylabel('Superior Force F_z [%BW]')
+                saxH(4) = subplot(1,4,4);
+                plot(avHJF(:,1),avHJF(:,5),'k'); grid on;
+                xlabel('Load Cycle [%]'); ylabel('Resultant Force F_{res} [%BW]')
+                for h=1:4
+                    hold(saxH(h),'on')
+                    plot(saxH(h), avHJF(pfpIdx,1),avHJF(pfpIdx,1+h),pointProps)
+                end
+            end
+        elseif isempty(sFile) || length(sFile) > 1
+            warning(['Check: '  activities{a,1} '_H' num2str(s) '.xlsx'])
+        end
+    end
+end

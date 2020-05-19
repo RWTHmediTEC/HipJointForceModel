@@ -344,8 +344,9 @@ models = dir('src\models\*.m');
 defaultModel=1;
 [~, models] = arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
 data.Model = models{defaultModel};
-postures ={}; default=nan;
+postures ={}; defaultPosture=nan;
 gui.ManualSelectedMuscles = 0;
+gui.ManualSelectedPosture = 0;
 updateModel()
 gui.Home.Model.ListBox_Model = uicontrol(...
     'Parent', gui.Home.Model.Panel_Model,...
@@ -366,7 +367,7 @@ gui.Home.Model.ListBox_Posture = uicontrol(...
     'BackgroundColor', 'w',...
     'Style', 'popupmenu',...
     'String', postures(:,1),...
-    'Value', default,...
+    'Value', defaultPosture,...
     'Callback', @onListSelection_Posture);
 
 % Panel muscle list
@@ -927,6 +928,7 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
         % User has selected a model from the list
         data.Model = models{get(src, 'Value')};
         gui.ManualSelectedMuscles = 0;
+        gui.ManualSelectedPosture = 0;
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -934,6 +936,7 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
     function onListSelection_Posture(src, ~)
         % User has selected a posture from the list
         data.Posture = postures{get(src, 'Value'), 2};
+        gui.ManualSelectedPosture = 1;
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1085,10 +1088,12 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
             [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
         end
         data.activeMuscles = parseActiveMuscles(data.activeMuscles, data.MuscleList);
-        [postures, default] = gui.Home.Model.modelHandle.Posture();
-        data.Posture = postures{default, 2};
-        if isfield(gui.Home.Model, 'ListBox_Posture') == 1
-            set(gui.Home.Model.ListBox_Posture, 'String', postures(:,1), 'Value', default);
+        if ~gui.ManualSelectedPosture
+            [postures, defaultPosture] = gui.Home.Model.modelHandle.Posture();
+            data.Posture = postures{defaultPosture, 2};
+            if isfield(gui.Home.Model, 'ListBox_Posture')
+                set(gui.Home.Model.ListBox_Posture, 'String', postures(:,1), 'Value', defaultPosture);
+            end
         end
     end
 

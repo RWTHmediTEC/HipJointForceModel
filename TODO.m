@@ -27,6 +27,4 @@
 % - Use EMS studies (OrthoLoad) to select muscles of the models
 
 % Validation
-% - Source of the OrthoLoad HJF data has to be documented
-% - Validation data should be the mean of on multiple trials for each
-%   subject
+% - Level Walking should be split in three peak force phases
