@@ -111,6 +111,21 @@ for s = 1:length(OL)
         gui = updateResults(data, gui);
         drawnow
         
+        % % Save subject-specific pelvis
+        % pelvis = data.S.LE(1).Mesh;
+        % switch OL(s).Subject(end)
+        %         case 'L'
+        %             pelvis = transformPoint3d(pelvis, mirrorZTFM);
+        % end
+        % stlWrite([OL(s).Subject '_' strrep(data.Cadaver, '_', '') '_Pelvis.stl'], pelvis)
+        % % Save subject-specific femur
+        % femur = data.S.LE(2).Mesh;
+        % switch OL(s).Subject(end)
+        %         case 'L'
+        %             femur = transformPoint3d(femur, mirrorZTFM);
+        % end
+        % stlWrite([OL(s).Subject '_' strrep(data.Cadaver, '_', '') '_Femur.stl'], femur)
+        
         HJF_Wu2002 = data.HJF.Femur.Wu2002.R; % In 'ASR'
         % Use the simulated HJF in the OrthoLoad CS [Bergmann 2016] for the 
         % comparison. Use the orientation 'ASR' instead of 'RAS'.
@@ -124,9 +139,6 @@ for s = 1:length(OL)
             case 'L'
                 HJF_Bergmann2016(3)=-HJF_Bergmann2016(3);
                 HJF_Wu2002(3)=-HJF_Wu2002(3);
-            case 'R'
-            otherwise
-                error('Invalid side identifier!')
         end
         
         Results(s).HJF_Wu2002          = HJF_Wu2002;
