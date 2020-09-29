@@ -126,9 +126,11 @@ for m = 1:length(muscleList)
     musclePCSA = unique(cell2mat(muscleData(:,5)));
     assert(length(musclePCSA)==1)
     muscleList{m,5} = muscleList{m,4} * musclePCSA * 100; % [cm²] to [mm²]
-    % add lines of action
     if isequal(lRaw(m,1), muscleList(m,1))
+        % add lines of action
         muscleList(m,6) = lRaw(m,3);
+        % Add mass
+        muscleList(m,7) = lRaw(m,6);
     end
 end
 
@@ -291,8 +293,8 @@ end
 
 % Automatically detected landmarks
 addpath('D:\Biomechanics\Hip\Code\AutomaticFemoralCoordinateSystem')
-[~, autoLMIdx] = automaticFemoralCS(LE(2).Mesh, 'r',...
-    'definition', 'Bergmann2016', 'visu', 1, 'verbose', 1);
+[~, autoLMIdx] = automaticFemoralCS(LE(2).Mesh, 'R', ...
+    'definition','Bergmann2016', 'visu',1, 'verbose',1, 'subject', 'TLEM2_0');
 autoLMfemur={'MedialPosteriorCondyle';'LateralPosteriorCondyle'};
 for lm = 1:size(autoLMfemur,1)
     LE(2).Landmarks.(autoLMfemur{lm}).Pos  = LE(2).Mesh.vertices(autoLMIdx.(autoLMfemur{lm})',:);
