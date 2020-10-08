@@ -25,7 +25,7 @@ data.Rot = data.Rot(1:3,1:3);
 data.wCyl = wrappingCyl(data);
 data.MusWrapSys(1) = initalizeWrapping(data, 'positive');
 data.MusWrapSys(2) = initalizeWrapping(data, 'negative');
-data.Newton = 0;
+data.Newton = 1;
 end
 
 function gui = createInterface(data)
@@ -77,7 +77,7 @@ gui.Settings.OriginX = uicontrol(...
 gui.Settings.Text_OriginX = uicontrol(...
     'Parent', gui.Settings.HBox_OriginX, ...
     'Style', 'Text', ...
-    'String', 'dsadsad');
+    'String', '-');
 
 gui.Settings.HBox_OriginY = uix.HBox(...
     'Parent', gui.Settings.Slider_Origin);
@@ -93,7 +93,7 @@ gui.Settings.OriginY = uicontrol(...
 gui.Settings.Text_OriginY = uicontrol(...
     'Parent', gui.Settings.HBox_OriginY, ...
     'Style', 'Text', ...
-    'String', 'dsadsad');
+    'String', '-');
 
 gui.Settings.HBox_OriginZ = uix.HBox(...
     'Parent', gui.Settings.Slider_Origin);
@@ -109,7 +109,7 @@ gui.Settings.OriginZ = uicontrol(...
 gui.Settings.Text_OriginZ = uicontrol(...
     'Parent', gui.Settings.HBox_OriginZ, ...
     'Style', 'Text', ...
-    'String', 'dsadsad');
+    'String', '-');
 
 % Insertion Panel
 
@@ -285,6 +285,7 @@ gui.Settings.Text_Vect2Ax = uicontrol(...
 gui.Settings.checkBox_ActivateNewtonStep = uicontrol( ...
     'Parent', gui.Settings.Text_Results, ...
     'Style', 'checkbox', ...
+    'Value', 1, ...
     'String', 'Show with Newton step', ...
     'Callback', @edit_Newton);
 
@@ -293,24 +294,68 @@ gui.Settings.Empty = uix.HBox(...
 
 set(gui.Settings.V_Left, 'Height', [-1, -1, -1, -2, -3]);
 
-%% Visulaization
-
+%% Visualization
 gui.Visualization.BoxPanel = uix.BoxPanel(...
     'Parent', gui.Layout, ...
     'Title', 'Visualzation');
 
+gui.Visualization.Layout_V = uix.VBox(...
+    'Parent', gui.Visualization.BoxPanel,...
+    'Spacing', 3);
+
+gui.Visualization.Panel = uix.Panel(...
+    'Parent', gui.Visualization.Layout_V);
+
 gui.Visualization.Axis = axes(...
-    'Parent', gui.Visualization.BoxPanel, ...
-    'ClippingStyle', '3dbox');
+    'Parent', uicontainer('Parent',gui.Visualization.Panel));
 
-axtoolbar({'export', 'pan', 'zoomin', 'zoomout', 'restoreview'});
+% Push buttons
+gui.Visualization.Layout_Grid = uix.Grid(...
+    'Parent', gui.Visualization.Layout_V,...
+    'Spacing', 1,...
+    'Padding', 2);
 
-xlabel(gui.Visualization.Axis, 'X');
-ylabel(gui.Visualization.Axis, 'Y');
-zlabel(gui.Visualization.Axis, 'Z');
+MC3D(:,:,1)=[ 1  0  0 0; 0  0 -1 0; 0  1  0 0; 0 0 0 1];
+MC3D(:,:,2)=[-1  0  0 0; 0  0  1 0; 0  1  0 0; 0 0 0 1];
+MC3D(:,:,3)=[ 0  0  1 0; 1  0  0 0; 0  1  0 0; 0 0 0 1];
+MC3D(:,:,4)=[ 0  0 -1 0;-1  0  0 0; 0  1  0 0; 0 0 0 1];
+MC3D(:,:,5)=[ 0  0  1 0; 0  1  0 0;-1  0  0 0; 0 0 0 1];
+MC3D(:,:,6)=[ 0  0  1 0; 0 -1  0 0; 1  0  0 0; 0 0 0 1];
+mouseControl3d(gui.Visualization.Axis, MC3D(:,:,2))
 
-axis equal;
-view([190 30]);
+uicontrol('Parent', gui.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Left',...
+    'Callback', {@onAnatomicalView, gui.Visualization.Axis, MC3D(:,:,1)});
+
+uicontrol('Parent', gui.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Right',...
+    'Callback', {@onAnatomicalView, gui.Visualization.Axis, MC3D(:,:,2)});
+
+uicontrol('Parent', gui.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Anterior',...
+    'Callback', {@onAnatomicalView, gui.Visualization.Axis, MC3D(:,:,3)});
+
+uicontrol('Parent', gui.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Posterior',...
+    'Callback',{@onAnatomicalView, gui.Visualization.Axis, MC3D(:,:,4)});
+
+uicontrol('Parent', gui.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Superior',...
+    'Callback', {@onAnatomicalView, gui.Visualization.Axis, MC3D(:,:,5)});
+
+uicontrol('Parent', gui.Visualization.Layout_Grid,...
+    'Style', 'PushButton',...
+    'String', 'Inferior',...
+    'Callback', {@onAnatomicalView, gui.Visualization.Axis, MC3D(:,:,6)});
+
+% Adjust layout
+set(gui.Visualization.Layout_V,    'Height', [-18, -1])
+set(gui.Visualization.Layout_Grid, 'Widths', [-1, -1, -1], 'Heights', [-1, -1])
 
 draw();
 
@@ -376,22 +421,27 @@ set(gui.Layout, 'Width', [-1, -4]);
         draw();
     end
 
+    function onAnatomicalView(~,~, axHandle, viewMatrix)
+        axes(axHandle)
+        mouseControl3d(axHandle, viewMatrix)
+    end
+
     function draw
-	%%DRAW plots lines and cylinder
-	
+        %%DRAW plots lines and cylinder
+        
         cla(gui.Visualization.Axis);
         hold on;
         lineProps.Marker = 'o';
         lineProps.Linestyle = '-';
         lineProps.MarkerSize = 2;
-		% plots two lines with different starting conditions
-        for i = 1:2
-            lineProps.Color = [1-i/2 1-i/2 1-i/2];
+        % plots two lines with different starting conditions
+        for i = 1:length(data.MusWrapSys)
+            lineProps.Color = [0+(i-1)/2 0+(i-1)/2 0+(i-1)/2];
             lineProps.MarkerEdgeColor = lineProps.Color;
             lineProps.MarkerFaceColor = lineProps.Color;
             if data.Newton
                 for z = 1:4
-                    data.MusWrapSys(i) = data.MusWrapSys(1).doNewtonStep();
+                    data.MusWrapSys(i) = data.MusWrapSys(i).doNewtonStep();
                 end
             end
             lineProps.MarkerEdgeColor = lineProps.Color;
@@ -406,8 +456,8 @@ set(gui.Layout, 'Width', [-1, -4]);
     end
 
     function updateText()
-	%%UPDATTEXT changes every text display in the GUI
-	
+        %%UPDATTEXT changes every text display in the GUI
+        
         gui.Settings.Text_OriginX.String = ['OriginX = ', num2str(round(data.O(1),3))];
         gui.Settings.Text_OriginY.String = ['OriginY = ', num2str(round(data.O(2),3))];
         gui.Settings.Text_OriginZ.String = ['OriginZ = ', num2str(round(data.O(3),3))];
@@ -424,21 +474,21 @@ set(gui.Layout, 'Width', [-1, -4]);
         gui.Settings.Text_Vect1Ax.String = num2str(round(data.MusWrapSys(1).q(3),3));
         gui.Settings.Text_Vect2Rad.String = num2str(round(data.MusWrapSys(2).q(2),3));
         gui.Settings.Text_Vect2Ax.String = num2str(round(data.MusWrapSys(2).q(3),3));
-        text(data.O(1)+5, data.O(2)+5, data.O(3)+5, 'Origin');
-        text(data.I(1)+5, data.I(2)+5, data.I(3)+5, 'Insertion');
-        text(data.MusWrapSys(1).straightLineSegments{1, 2}.startPoint(1)+5, ...
-             data.MusWrapSys(1).straightLineSegments{1, 2}.startPoint(2)+5, ...
-             data.MusWrapSys(1).straightLineSegments{1, 2}.startPoint(3)+5, ...
-             'Vector 1', 'Color', [0.5 0.5 0.5]);
-        text(data.MusWrapSys(2).straightLineSegments{1, 2}.startPoint(1)-5, ...
-             data.MusWrapSys(2).straightLineSegments{1, 2}.startPoint(2)-5, ...
-             data.MusWrapSys(2).straightLineSegments{1, 2}.startPoint(3)-5, ...
-             'Vector 2', 'Color', [0 0 0]);
+        text(data.O(1), data.O(2), data.O(3), 'Origin');
+        text(data.I(1), data.I(2), data.I(3), 'Insertion');
+        text(data.MusWrapSys(1).straightLineSegments{1, 2}.startPoint(1), ...
+            data.MusWrapSys(1).straightLineSegments{1, 2}.startPoint(2), ...
+            data.MusWrapSys(1).straightLineSegments{1, 2}.startPoint(3), ...
+            'Vector 1', 'Color', [0 0 0]);
+        text(data.MusWrapSys(2).straightLineSegments{1, 2}.startPoint(1), ...
+            data.MusWrapSys(2).straightLineSegments{1, 2}.startPoint(2), ...
+            data.MusWrapSys(2).straightLineSegments{1, 2}.startPoint(3), ...
+            'Vector 2', 'Color', [0.5 0.5 0.5]);
     end
 
     function update()
-	%%UPDATE updates wrapping
-	
+        %%UPDATE updates wrapping
+        
         data.Axis = normalize(data.Axis);
         data.mCyl = matGeomCyl(data);
         data.Rot = createRotationVector3d([0 0 1], data.Axis);
@@ -457,48 +507,48 @@ end
 function cCylinder = matGeomCyl(data)
 %%MATGEOMCYL initializes cylinder for MatGeom
 
-    Start = data.Pos + data.Axis * data.Length;
-    End = data.Pos - data.Axis * data.Length;
-    cCylinder = [Start, End, data.Radius];
+Start = data.Pos + data.Axis * data.Length;
+End = data.Pos - data.Axis * data.Length;
+cCylinder = [Start, End, data.Radius];
 end
 
 function cCylinder = wrappingCyl(data)
-%%WRAPPINGCYL initializes cylinder for wrapping
+%WRAPPINGCYL initializes cylinder for wrapping
 
-    cCylinder = Cylinder(data.Pos', ...
-        data.Rot, ...
-        [0 0 0]', ...
-        [0 0 0]', ...
-        data.Radius, ...
-        data.Length);
+cCylinder = Cylinder(data.Pos', ...
+    data.Rot, ...
+    [0 0 0]', ...
+    [0 0 0]', ...
+    data.Radius, ...
+    data.Length);
 end
 
 function muscleWrappingSystem = initalizeWrapping(data, varargin)
-%%INITALIZEWRAPPING creates data for wrapping
-    [~, theta, height, arcLength, vector] = startingPoint3d(data.mCyl, data.O, data.I, data.Pos, data.Axis);
-    if isequal(varargin{1}, 'positive')
-        initialConditions = [theta height vector(1) vector(2) arcLength];
-    elseif isequal(varargin{1}, 'negative')
-        initialConditions = [theta height -vector(1) vector(2) arcLength];
-    end
-    wrappingCylinder = WrappingObstacle(data.wCyl);
-    muscleWrappingSystem = MuscleWrappingSystem(data.O', data.I');
-    muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCylinder, initialConditions);
+%INITALIZEWRAPPING creates data for wrapping
+[~, theta, height, arcLength, vector] = startingPoint3d(data.mCyl, data.O, data.I, data.Pos, data.Axis);
+if isequal(varargin{1}, 'positive')
+    initialConditions = [theta height vector(1) vector(2) arcLength];
+elseif isequal(varargin{1}, 'negative')
+    initialConditions = [theta height -vector(1) vector(2) arcLength];
+end
+wrappingCylinder = WrappingObstacle(data.wCyl);
+muscleWrappingSystem = MuscleWrappingSystem(data.O', data.I');
+muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCylinder, initialConditions);
 end
 
 function [points, thetaO, heightO, length, vector] = startingPoint3d(cyl, O, I, Center, Axis)
 %STARTINGPOINT3D creates starting point for geodesic element
 
-    line = createLine3d(O, I);
-    points = intersectLineCylinder(line, cyl, 'checkBounds', false);
-    rot = createRotationVector3d(Axis, [0 0 1]);
-    rot(1:3,4) = Center;
-    points(1,:) = points(1,:) - Center;
-    points(1,:) = transformPoint3d(points(1,:), rot(1:3,1:3));
-    points(2,:) = points(2,:) - Center;
-    points(2,:) = transformPoint3d(points(2,:), rot(1:3,1:3));
-    length = distancePoints3d(points(2,:),points(1,:));
-    [thetaO,~,heightO] = cart2cyl(points(1,:));
-    [thetaI,~,heightI] = cart2cyl(points(2,:));
-    vector = normalizeVector3d([thetaI-thetaO, heightI-heightO]);
+line = createLine3d(O, I);
+points = intersectLineCylinder(line, cyl, 'checkBounds', false);
+rot = createRotationVector3d(Axis, [0 0 1]);
+rot(1:3,4) = Center;
+points(1,:) = points(1,:) - Center;
+points(1,:) = transformPoint3d(points(1,:), rot(1:3,1:3));
+points(2,:) = points(2,:) - Center;
+points(2,:) = transformPoint3d(points(2,:), rot(1:3,1:3));
+length = distancePoints3d(points(2,:),points(1,:));
+[thetaO,~,heightO] = cart2cyl(points(1,:));
+[thetaI,~,heightI] = cart2cyl(points(2,:));
+vector = normalizeVector3d([thetaI-thetaO, heightI-heightO]);
 end
