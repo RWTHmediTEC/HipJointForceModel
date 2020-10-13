@@ -1,5 +1,5 @@
 function data = musclePathsTLEM2(data)
-%MUSCLEPATHSTLEM2 constructs the lines of action of the active muscles
+%MUSCLEPATHSTLEM2 constructs the paths of the active muscles
 
 %% create the muscle paths
 tStart = tic;
@@ -46,23 +46,10 @@ for i = 1:length(MusclePaths)
             if any(iIdx)
                 Insertion = LE(b).Muscle.(MusclePaths(i).Name).Pos(iIdx,:); % get Insertion
             end
-            % Find most distal via point of pelvis an most
-            % proximal point for femur. If muscle isn't
-            % located on pelvis and/or femur, returns 0
-            if b == 1
-                [~, idxPelvis] = min(LE(1).Muscle.(MusclePaths(i).Name).Pos(:,2));
-            elseif b == 2
-                [~, idxFemur] = max(LE(2).Muscle.(MusclePaths(i).Name).Pos(:,2));
-            elseif b ~= 1 || b ~= 2
-                idxPelvis = 0;
-                idxFemur = 0;
-            end
         end
     end % b changes
     MusclePaths(i).Points = [Origin; Via; Insertion];
     MusclePaths(i).Surface = {};
-    MusclePaths(i).idxPelvis = idxPelvis;
-    MusclePaths(i).idxFemur = idxFemur;
 end
 
 % Update MusclePaths struct for Wrapping model
@@ -151,7 +138,7 @@ if strcmp(MusclePathModel,'Wrapping')
                                 cAxis = LE(b).Surface.(Surface{s}).Axis; % Axis of Cylinder
                                 cStart = cCenter + cAxis; % Start point of Cylinder
                                 cEnd = cCenter - cAxis; % End point of Cylinder
-                                % Origin of Gastrocnemius Lateralis lays in the cylinder. Hence, the radius of 
+                                % Origin of Gastrocnemius Lateralis lays in the cylinder. Hence, the radius of
                                 % the cylinder is made smaller for this muscle that origin is outside the cylinder.
                                 if isequal(MusclePaths(i).Name(1:end-1),'GastrocnemiusLateralis')
                                     axisLine = createLine3d(cStart, cEnd);
@@ -193,7 +180,7 @@ if strcmp(MusclePathModel,'Wrapping')
                     end % s changes
                 end % b changes
             end
-
+            
             if ~isempty(muscleWrappingSystem)
                 for z = 1:4
                     % solves a root finding problem to find the shortest path over the cylinder
@@ -207,90 +194,40 @@ if strcmp(MusclePathModel,'Wrapping')
     end % i changes
 end
 
-%% Create the points to visualize the muscles
+%% Create the points representing the muscles in case of wrapping
 for m = 1:length(MusclePaths)
     if ~isempty(MusclePaths(m).Surface)
-        plotPoints = [];
+        musclePoints = [];
         MWS = MusclePaths(m).Surface;
         % Check if there are additional via points before the wrapping
         viaStartIdx = find(ismembertol(MusclePaths(m).Points, ...
             MWS.straightLineSegments{1}.startPoint', 'ByRows',1));
         if viaStartIdx ~= 1
-           plotPoints = [plotPoints; MusclePaths(m).Points(1:viaStartIdx-1,:)];           %#ok<AGROW>
+            musclePoints = [musclePoints; MusclePaths(m).Points(1:viaStartIdx-1,:)]; %#ok<AGROW>
         end
         % Add wrapping points
         for ws = 1:length(MWS.wrappingObstacles)
             % StraightLine
-            plotPoints = [plotPoints; ...
+            musclePoints = [musclePoints; ...
                 MWS.straightLineSegments{ws}.startPoint'; MWS.straightLineSegments{ws}.endPoint']; %#ok<AGROW>
             % Wrapping
             MWS.geodesics{ws} = MWS.geodesics{ws}.computeCurveInGlobalCoordinates;
-            plotPoints = [plotPoints; MWS.geodesics{ws}.xGlobal']; %#ok<AGROW>
+            musclePoints = [musclePoints; MWS.geodesics{ws}.xGlobal']; %#ok<AGROW>
         end
-        plotPoints = [plotPoints; ...
+        musclePoints = [musclePoints; ...
             MWS.straightLineSegments{ws+1}.startPoint'; MWS.straightLineSegments{ws+1}.endPoint']; %#ok<AGROW>
         % Check if there are additional via points after the wrapping
         viaEndIdx = find(ismembertol(MusclePaths(m).Points, ...
             MWS.straightLineSegments{ws+1}.endPoint', 'ByRows',1));
         if viaEndIdx ~= size(MusclePaths(m).Points,1)
-           plotPoints = [plotPoints; MusclePaths(m).Points(viaEndIdx+1:end,:)];           %#ok<AGROW>
+            musclePoints = [musclePoints; MusclePaths(m).Points(viaEndIdx+1:end,:)]; %#ok<AGROW>
         end
-        MusclePaths(m).PlotPoints = plotPoints;
+        MusclePaths(m).Points = musclePoints;
     end
 end
 
-%% Create the lines of action for the muscle path models
-% Contains origin and direction vector for each model
-for i = 1:length(MusclePaths)
-    MusclePaths(i).StraightLine = [];
-    MusclePaths(i).ViaPoint = [];
-    MusclePaths(i).Wrapping = [];
-    % Creates line of action for StraightLine
-    NormStraight = normalizeVector3d(MusclePaths(i).Points(end,:) - MusclePaths(i).Points(1,:));
-    MusclePaths(i).StraightLine = [MusclePaths(i).Points(1,:) NormStraight];
-    % Creates line of action for ViaPoint without Wrapping 
-    if size(MusclePaths(i).Points,1) > 2 && isempty(MusclePaths(i).Surface)
-        if MusclePaths(i).idxFemur && MusclePaths(i).idxPelvis % checks if muscle is located on femur and pelvis
-            NormVia = normalizeVector3d( ...
-                LE(2).Muscle.(MusclePaths(i).Name).Pos(MusclePaths(i).idxFemur,:) - ...
-                LE(1).Muscle.(MusclePaths(i).Name).Pos(MusclePaths(i).idxPelvis,:));
-        else
-            NormVia = normalizeVector3d(MusclePaths(i).Points(2,:) - MusclePaths(i).Points(1,:));
-        end
-        MusclePaths(i).ViaPoint = [MusclePaths(i).Points(1,:) NormVia];
-    % Creates line of action for Wrapping without ViaPoint
-    elseif size(MusclePaths(i).Points,1) == 2 && ~isempty(MusclePaths(i).Surface)
-        NormWrap = MusclePaths(i).Surface.straightLineSegments{1}.e';
-        MusclePaths(i).Wrapping = [MusclePaths(i).Surface.straightLineSegments{1}.startPoint' NormWrap];
-    % Creates line of action for Wrapping with ViaPoint and checks if 
-    % wrapping occurs between first two points of muscle or not
-    elseif size(MusclePaths(i).Points,1) > 2 && ~isempty(MusclePaths(i).Surface)
-        % Checks if muscle starts with wrapping
-        if ~isequal(MusclePaths(i).Points(1,:), MusclePaths(i).Surface.straightLineSegments{1}.startPoint')
-            % Checks if muscle is located on femur and pelvis
-            if MusclePaths(i).idxFemur && MusclePaths(i).idxPelvis
-                NormWrap = normalizeVector3d( ...
-                    LE(2).Muscle.(MusclePaths(i).Name).Pos(MusclePaths(i).idxFemur,:) - ...
-                    LE(1).Muscle.(MusclePaths(i).Name).Pos(MusclePaths(i).idxPelvis,:));
-            else
-                NormWrap = normalizeVector3d(MusclePaths(i).Points(2,:) - MusclePaths(i).Points(1,:));
-            end
-            MusclePaths(i).Wrapping = [MusclePaths(i).Surface.straightLineSegments{1}.startPoint' NormWrap];
-            % Checks if muscle starts with straight line from via points
-        else
-            NormWrap = MusclePaths(i).Surface.straightLineSegments{1}.e';
-            MusclePaths(i).Wrapping = [MusclePaths(i).Surface.straightLineSegments{1}.startPoint' NormWrap];
-        end
-    end
-    if isempty(MusclePaths(i).ViaPoint)
-        MusclePaths(i).ViaPoint = MusclePaths(i).StraightLine;
-    end
-    if isempty(MusclePaths(i).Wrapping)
-        MusclePaths(i).Wrapping = MusclePaths(i).ViaPoint;
-    end
-end
-MusclePaths = rmfield(MusclePaths, 'idxPelvis');
-MusclePaths = rmfield(MusclePaths, 'idxFemur');
+%% % Create the lines of action for the muscle path models
+MusclePaths = linesOfActionLE(LE, MusclePaths);
 
 data.S.MusclePaths = MusclePaths;
 mpTime = toc(tStart);

@@ -99,7 +99,7 @@ if ~isempty(Muscles)
                     drawPoint3d(axH, Muscles(m).Points, lineProps);
             end
         else
-            drawPoint3d(axH, Muscles(m).PlotPoints, lineProps);
+            drawPoint3d(axH, Muscles(m).Points, lineProps);
         end
         % Draw vectors for the lines of action
         if MusclePathModel
