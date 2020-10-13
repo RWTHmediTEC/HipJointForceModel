@@ -77,7 +77,7 @@ if visJoints
     end
 end
 
-%% Visualize muscles initialisation
+%% Visualize muscles
 if ~isempty(Muscles)
     lineProps.Marker = 'o';
     lineProps.Linestyle = '-';
@@ -98,21 +98,8 @@ if ~isempty(Muscles)
                 case {'ViaPoint', 'Wrapping'}
                     drawPoint3d(axH, Muscles(m).Points, lineProps);
             end
-        elseif size(Muscles(m).Points,1) <= 2
-            % draws wrapped muscles between Origin and Insertion
-            Muscles(m).Surface.plotWrappingSystem(lineProps, axH);
-        elseif size(Muscles(m).Points,2) > 2
-            % draws wrapped muscles between two Via Points and the rest of
-            % the points between which no wrapping occurs
-            Muscles(m).Surface.plotWrappingSystem(lineProps, axH);
-            for p = 1:size(Muscles(m).Points,1)
-                if isequal(Muscles(m).Points(p,:), Muscles(m).Surface.straightLineSegments{1}.startPoint')
-                    pIdx = p;
-                    break;
-                end
-            end
-            drawPoint3d(axH, Muscles(m).Points(1:pIdx,:), lineProps);
-            drawPoint3d(axH, Muscles(m).Points(pIdx+1:end,:), lineProps);
+        else
+            drawPoint3d(axH, Muscles(m).PlotPoints, lineProps);
         end
         % Draw vectors for the lines of action
         if MusclePathModel
