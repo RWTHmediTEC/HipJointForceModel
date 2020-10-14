@@ -50,18 +50,18 @@ switch Cadaver
         data.T.BodyWeight = 45; % Cadavers's body weight [kg] [Carbone 2015]
         % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
         data.T.BodyHeight = 813/10/0.53; % [cm]
-        data.SurfaceData=true;
+        data.SurfaceData = true;
     case 'Dostal1981'
         [LE, Scale] = Dostal1981;
         muscleList = Johnston1979toDostal1981(Johnston1979, Dostal1981);
         data.T.BodyWeight = 77; % Generic body weight [kg] [Destatis 2018]
         data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
-        data.SurfaceData=false;
+        data.SurfaceData = false;
     case 'Fick1850'
         [LE, muscleList] = Fick1850;
         data.T.BodyWeight = 77; % Generic body weight [kg] [Destatis 2018]
         data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
-        data.SurfaceData=false;
+        data.SurfaceData = false;
     otherwise
         error('No valid TLEM version')
 end

@@ -125,7 +125,7 @@ function [R_FP_MA, R_FP_Angle] = derivationFromFick1850(varargin)
 % Parsing
 p = inputParser;
 logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
-addParameter(p,'visualization', 1, logParValidFunc);
+addParameter(p,'visualization', false, logParValidFunc);
 parse(p,varargin{:});
 visu = p.Results.visualization;
 

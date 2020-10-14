@@ -668,6 +668,25 @@ gui.Validation.Settings.RadioButton_Bergmann2016 = uicontrol(...
 gui.Validation.Settings.RadioButton_Bergmann2016.Value=1;
 gui.Validation.Settings.FemoralCS='Bergmann2016';
 
+%% Error
+gui.Validation.Settings.Panel_Error = uix.Panel(...
+    'Parent', gui.Validation.Settings.Layout_H,...
+    'Title', 'Error');
+
+gui.Validation.Settings.Layout_Error = uix.HBox(...
+    'Parent', gui.Validation.Settings.Panel_Error,...
+    'Spacing', 3);
+
+gui.Validation.Settings.Label_MAE_Mag = uicontrol(...
+    'Parent', gui.Validation.Settings.Layout_Error,...
+    'Style', 'text',...
+    'String', 'MAE Magnitude [%BW]: - ');
+
+gui.Validation.Settings.Label_MAE_Dir = uicontrol(...
+    'Parent', gui.Validation.Settings.Layout_Error,...
+    'Style', 'text',...
+    'String', 'MAE Direction [°]: - ');
+
 %% Results Grid
 gui.Validation.Panel.post_antHJFpercBWsingle = uix.Panel(...
     'Parent',gui.Validation.Layout_Grid,...
@@ -1150,18 +1169,23 @@ end
     end
 
     function updateValidationTab
+        % Invivo (i) and Simulated (s)
+        femoralCS = gui.Validation.Settings.FemoralCS;
+        iHJF    = reshape([data.Results.(['OL_HJF_' femoralCS])],[3,10])';
+        sHJF = reshape([data.Results.(['HJF_' femoralCS])],[3,10])';
+        iAngles = calculateHJFangles(iHJF);
+        sAngles = calculateHJFangles(sHJF);
+        
+        gui.Validation.Settings.Label_MAE_Mag.String = ...
+            ['MAE Magnitude [%BW]: ' num2str(mean(abs(vectorNorm3d(sHJF)-vectorNorm3d(iHJF))))];
+        gui.Validation.Settings.Label_MAE_Dir.String = ...
+            ['MAE Direction [°]: ' num2str(mean(rad2deg(vectorAngle3d(sHJF,iHJF))))];
+        
         % Reset x axes
         structfun(@(x) delete(x.Children), gui.Validation.Axes)
         structfun(@(x) set(x,'XTick',1:length(data.Results)), gui.Validation.Axes)
         structfun(@(x) set(x,'XTickLabel',{data.Results.Subject}), gui.Validation.Axes)
         structfun(@(x) set(x,'XLim',[0.5, length(data.Results) + 0.5]), gui.Validation.Axes)
-        
-        % Invivo (i) and Simulated (s)
-        femoralCS=gui.Validation.Settings.FemoralCS;
-        iHJF    = reshape([data.Results.(['OL_HJF_' femoralCS])],[3,10])';
-        sHJF = reshape([data.Results.(['HJF_' femoralCS])],[3,10])';
-        iAngles = calculateHJFangles(iHJF);
-        sAngles = calculateHJFangles(sHJF);
         
         % Panel posterior anterior HJF [%BW]
         plotValidationResults(gui.Validation.Axes.post_antHJFpercBWsingle,...

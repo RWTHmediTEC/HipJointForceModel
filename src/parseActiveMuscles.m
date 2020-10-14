@@ -1,5 +1,10 @@
 function activeFascicles = parseActiveMuscles(activeMuscles, muscleList)
 
+% Workaround for some older models with additonal info in the muscle list
+if size(activeMuscles,2) > 1
+    activeFascicles = activeMuscles;
+    return
+end
 
 if all(cellfun(@(x) isempty(regexp(x,'\d$','once')), activeMuscles))
     % If active muscles are not passed as fascicles (with a number at the end)
