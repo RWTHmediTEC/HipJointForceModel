@@ -323,68 +323,68 @@ uicontrol('Parent', gui.Visualization.Layout_Grid,...
 set(gui.Visualization.Layout_V,    'Height', [-18, -1])
 set(gui.Visualization.Layout_Grid, 'Widths', [-1, -1, -1], 'Heights', [-1, -1])
 
-draw();
+drawWrapping();
 
 set(gui.Layout, 'Width', [-1, -4]);
 
     function onEdit_OriginX(src, ~)
         data.O(1) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onEdit_OriginY(src, ~)
         data.O(2) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onEdit_OriginZ(src, ~)
         data.O(3) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onEdit_InsertionX(src, ~)
         data.I(1) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onEdit_InsertionY(src, ~)
         data.I(2) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onEdit_InsertionZ(src, ~)
         data.I(3) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onEdit_AxisX(src, ~)
         data.Axis(1) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onEdit_AxisY(src, ~)
         data.Axis(2) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onEdit_AxisZ(src, ~)
         data.Axis(3) = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function edit_Newton(src, ~)
         data.Newton = src.Value;
         update();
-        draw();
+        drawWrapping();
     end
 
     function onAnatomicalView(~,~, axHandle, viewMatrix)
@@ -392,27 +392,21 @@ set(gui.Layout, 'Width', [-1, -4]);
         mouseControl3d(axHandle, viewMatrix)
     end
 
-    function draw
+    function drawWrapping
         %DRAW plots lines and cylinder
         
-        cla(gui.Visualization.Axis);
-        hold on;
-        lineProps.Marker = 'o';
-        lineProps.Linestyle = '-';
-        lineProps.MarkerSize = 2;
+        cla(gui.Visualization.Axis)
+        hold on
         % plots two lines with different starting conditions
+        axes(gui.Visualization.Axis)
+        lineWidth(1) = 3; lineWidth(2) = 1;
         for i = 1:length(data.MusWrapSys)
-            lineProps.Color = [0+(i-1)/2 0+(i-1)/2 0+(i-1)/2];
-            lineProps.MarkerEdgeColor = lineProps.Color;
-            lineProps.MarkerFaceColor = lineProps.Color;
             if data.Newton
                 for z = 1:4
                     data.MusWrapSys(i) = data.MusWrapSys(i).doNewtonStep();
                 end
             end
-            lineProps.MarkerEdgeColor = lineProps.Color;
-            lineProps.MarkerFaceColor = lineProps.Color;
-            data.MusWrapSys(i).plotWrappingSystem(lineProps, gui.Visualization.Axis);
+            data.MusWrapSys(i).plotWrappingSystem('r','--k','-k',lineWidth(i),0.99);
         end
         drawCylinder(gui.Visualization.Axis, data.mCyl, 'open', ...
             'FaceColor', 'red', ...

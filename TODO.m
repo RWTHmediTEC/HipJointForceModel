@@ -2,7 +2,6 @@
 % - TLEM2: Review lines of action: rectusfemoris, tensorfasciaelatae
 % - TLEM2: Review via points: sartorius
 % - TLEM2: Move origin of the femur mesh (from the EC midpoint) to the HJC
-% - Scale cadaver to the mean male/female?
 
 % Scaling laws
 % - Add caching for skinning weights
@@ -14,8 +13,9 @@
 % 		- OptimalFiberLength (Lopt)
 
 % Muscle path models
-% - Muscle moment arm calculation for wrapping?
-% - Scaling of wrapping surfaces?
+% - Improve scaling of wrapping surfaces
+% - Improve inital wrapping paramters for better robustness of wrapping for
+%   scaling and different postures
 
 % HJF models
 % - Implement other one-leg stance models

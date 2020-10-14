@@ -572,12 +572,12 @@ classdef MuscleWrappingSystem
         
         
         
-        function [] = plotWrappingSystem(obj, lineProps, axH)
-%                                          surfaceColor, ...
-%                                          straightLineSegmentStyle, ...
-%                                          geodesicSegmentStyle, ...
-%                                          pathLineWidth, ... 
-%                                          surfaceScale)
+        function [] = plotWrappingSystem(obj, ... 
+                                         surfaceColor, ...
+                                         straightLineSegmentStyle, ...
+                                         geodesicSegmentStyle, ...
+                                         pathLineWidth, ... 
+                                         surfaceScale)
             
             n = length(obj.wrappingObstacles);
             
@@ -586,42 +586,32 @@ classdef MuscleWrappingSystem
                 for i=1:n
                     
                     % Surfaces
-%                     edgeColor = 'black';
-%                     surfaceColor = 'white';
-%                     surfaceScale = 1.0;
-%                     obj.wrappingObstacles{i}.surface.plotSurface(surfaceColor, edgeColor, surfaceScale, axH);
+                    edgeColor = 'default';
+                    obj.wrappingObstacles{i}.surface.plotSurface(surfaceColor, edgeColor, surfaceScale);
                 
                     % Geodesics
-                    obj.geodesics{i}.plotGeodesicSegment(lineProps, axH);
+                    obj.geodesics{i}.plotGeodesicSegment(geodesicSegmentStyle, pathLineWidth);
                     
-%                     obj.geodesics{i}.KP.plotBoundaryPointFrame();
-%                     obj.geodesics{i}.KQ.plotBoundaryPointFrame()
+                    obj.geodesics{i}.KP.plotBoundaryPointFrame();
+                    obj.geodesics{i}.KQ.plotBoundaryPointFrame()
                     
                     % Straight-line segments
-                    obj.straightLineSegments{i}.plotStraightLineSegment(lineProps, axH);
+                    obj.straightLineSegments{i}.plotStraightLineSegment(straightLineSegmentStyle, pathLineWidth);
                     
                 end
                 
-                obj.straightLineSegments{i+1}.plotStraightLineSegment(lineProps, axH);
+                obj.straightLineSegments{i+1}.plotStraightLineSegment(straightLineSegmentStyle, pathLineWidth);
            
             else
                 
-                obj.straightLineSegments{1}.plotStraightLineSegment(lineProps, axH);
+                obj.straightLineSegments{1}.plotStraightLineSegment(straightLineSegmentStyle, pathLineWidth);
                 
             end
             
             % Origin and insertion
-            plot3(axH, obj.O(1,1), obj.O(2,1), obj.O(3,1),      ...
-                  'Marker', lineProps.Marker,                   ...
-                  'MarkerSize', lineProps.MarkerSize,           ...
-                  'MarkerEdgeColor', lineProps.MarkerEdgeColor, ...
-                  'MarkerFaceColor', lineProps.MarkerFaceColor);
-            plot3(axH, obj.I(1,1), obj.I(2,1), obj.I(3,1),      ...
-                  'Marker', lineProps.Marker,                   ...
-                  'MarkerSize', lineProps.MarkerSize,           ...
-                  'MarkerEdgeColor', lineProps.MarkerEdgeColor, ...
-                  'MarkerFaceColor', lineProps.MarkerFaceColor);
-            
+            plot3(obj.O(1,1), obj.O(2,1), obj.O(3,1), 'og');
+            plot3(obj.I(1,1), obj.I(2,1), obj.I(3,1), 'or');
+           
         end
       
     end
