@@ -22,26 +22,34 @@ for c = 1:length(cadavers)
         modelHandle = str2func(data.Model);
         gui.Home.Model.modelHandle = modelHandle();
         [postures, defaultPosture] = gui.Home.Model.modelHandle.Posture();
-        data.Posture = postures{defaultPosture,2};
-        
-        data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
-        data.activeMuscles = parseActiveMuscles(data.activeMuscles, data.MuscleList);
-        
-        results{c,m} = validateTLEM2(data, gui);
+        for p = 1:length(postures)
+            data.Posture = postures{p,2};
+            
+            data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
+            data.activeMuscles = parseActiveMuscles(data.activeMuscles, data.MuscleList);
+            
+            results{c,m,p} = validateTLEM2(data, gui);
+        end
     end
 end
 
 %% Evaluate results
-compTab = cell(1+length(cadavers),1+2*length(models));
-for c = 1:length(cadavers)
-    compTab{1+c,1} = cadavers{c};
-    for m=1:length(models)
-        if mod(1,2); compTab{1,1+m*2-1} = models{m}; end
-        if ~isempty(results{c,m})
-            sHJF = reshape([results{c,m}.HJF_Wu2002],[3,10])';
-            iHJF = reshape([results{c,m}.OL_HJF_Wu2002],[3,10])';
-            compTab{1+c,1+m*2-1} = mean(abs(vectorNorm3d(sHJF)-vectorNorm3d(iHJF)));
-            compTab{1+c,1+m*2}   = mean(rad2deg(vectorAngle3d(sHJF, iHJF)));
+compTab = cell(2+length(cadavers),1+2*length(models));
+errorNames = {'MAE Mag.','MAE Dir.'};
+NoE = length(errorNames);
+for p = 1:length(postures)
+    for c = 1:length(cadavers)
+        compTab{2+c,1,p} = cadavers{c};
+        for m=1:length(models)
+            compTab{1,2+(m-1)*NoE,p} = models{m};
+            compTab(2,2+(m-1)*NoE:1+m*NoE,p) = errorNames;
+            if ~isempty(results{c,m})
+                sHJF = reshape([results{c,m,p}.HJF_Wu2002],[3,10])';
+                iHJF = reshape([results{c,m,p}.OL_HJF_Wu2002],[3,10])';
+                compTab(2+c,2+(m-1)*NoE,p) = medianStats(abs(vectorNorm3d(sHJF)-vectorNorm3d(iHJF)),'format','short');
+                compTab(2+c,1+m*NoE,p)     = medianStats(rad2deg(vectorAngle3d(sHJF, iHJF)),'format','short');
+            end
         end
     end
+    writecell(compTab(:,:,p),'compareCadavers.xlsx','Sheet',postures{p,2},'Range','B2')
 end

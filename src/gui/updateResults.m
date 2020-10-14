@@ -48,9 +48,9 @@ if gui.IsUpdated
     drawArrow3d(gui.Home.Results.Axis_SagittalView,   -rDir*Dist2HJC, rDir*55, 'r')
     drawArrow3d(gui.Home.Results.Axis_TransverseView, -rDir*Dist2HJC, rDir*55, 'r')
     
-    set(gui.Home.Results.Label_post_antHJFpercBW, 'String', round(HJF(1)));
-    set(gui.Home.Results.Label_inf_supHJFpercBW,  'String', round(HJF(2)));
-    set(gui.Home.Results.Label_med_latHJFpercBW,  'String', round(HJF(3)));
+    set(gui.Home.Results.Label_pos_antHJFpercBW, 'String', round(HJF(1)));
+    set(gui.Home.Results.Label_inf_supHJFpercBW, 'String', round(HJF(2)));
+    set(gui.Home.Results.Label_med_latHJFpercBW, 'String', round(HJF(3)));
     angles = calculateHJFangles(HJF);
     set(gui.Home.Results.Label_FrontalAngle,    'String', round(angles(1)));
     set(gui.Home.Results.Label_SagittalAngle,   'String', round(angles(2)));
