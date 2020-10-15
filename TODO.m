@@ -1,7 +1,6 @@
 % Cadaver
-% - TLEM2: Review lines of action: rectusfemoris, tensorfasciaelatae
-% - TLEM2: Review via points: sartorius
 % - TLEM2: Move origin of the femur mesh (from the EC midpoint) to the HJC
+% - Include additonal cadaver from https://github.com/anmuller/CusToM
 
 % Scaling laws
 % - Add caching for skinning weights
@@ -17,14 +16,14 @@
 % - Improve inital wrapping paramters for better robustness of wrapping for
 %   scaling and different postures
 
-% HJF models
-% - Implement other one-leg stance models
-% - Parameter / sensitivity study of the HJF models
-% - Implement models for other ADLs
-
 % Muscle recruitment
 % - Implement common muscle recruitment criteria
 % - Use EMS studies (OrthoLoad) to select muscles of the models
 
+% HJF models
+% - Implement other one-leg stance models
+% - Implement models for other ADLs
+
 % Validation
-% - Level Walking should be split in three peak force phases
+% - Level Walking could be split in three peak force phases
+% - Move postures selection to validation tab
