@@ -34,6 +34,9 @@ for c = 1:length(cadavers)
 end
 
 %% Evaluate results
+E_Mag = cell(length(cadavers), length(models), length(postures));
+E_Dir = cell(length(cadavers), length(models), length(postures));
+PE_Mag = cell(length(cadavers), length(models), length(postures));
 compTab = cell(2+length(cadavers),1+2*length(models));
 errorNames = {'MAE Mag.','MAE Dir.'};
 NoE = length(errorNames);
@@ -46,8 +49,16 @@ for p = 1:length(postures)
             if ~isempty(results{c,m})
                 sHJF = reshape([results{c,m,p}.HJF_Wu2002],[3,10])';
                 iHJF = reshape([results{c,m,p}.OL_HJF_Wu2002],[3,10])';
-                compTab(2+c,2+(m-1)*NoE,p) = medianStats(abs(vectorNorm3d(sHJF)-vectorNorm3d(iHJF)),'format','short');
-                compTab(2+c,1+m*NoE,p)     = medianStats(rad2deg(vectorAngle3d(sHJF, iHJF)),'format','short');
+                % Error magnitude
+                E_Mag{c,m,p} = vectorNorm3d(sHJF)-vectorNorm3d(iHJF);
+                % Error direction
+                E_Dir{c,m,p} = vectorAngle3d(sHJF, iHJF);
+                % Percentage error magnitude
+                PE_Mag{c,m,p} = (vectorNorm3d(sHJF)-vectorNorm3d(iHJF))./vectorNorm3d(iHJF);
+                
+                % Final small table
+                compTab(2+c,2+(m-1)*NoE,p) = medianStats(abs(E_Mag{c,m,p}),'format','short');
+                compTab(2+c,1+m*NoE,p)     = medianStats(rad2deg(E_Dir{c,m,p}),'format','short');
             end
         end
     end
