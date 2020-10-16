@@ -34,9 +34,7 @@ for s = 1:length(scalingLaws)
 end
 
 %% Evaluate results
-E_Mag = cell(length(scalingLaws), length(models), length(postures));
-E_Dir = cell(length(scalingLaws), length(models), length(postures));
-PE_Mag = cell(length(scalingLaws), length(models), length(postures));
+[E_Mag, E_Dir, PE_Mag] = deal(cell(length(scalingLaws), length(models), length(postures)));
 compTab = cell(2+length(scalingLaws),1+2*length(models));
 errorNames = {'MAE Mag.','MAE Dir.'};
 NoE = length(errorNames);

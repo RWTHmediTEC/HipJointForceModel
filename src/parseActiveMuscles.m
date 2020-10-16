@@ -1,6 +1,6 @@
 function activeFascicles = parseActiveMuscles(activeMuscles, muscleList)
 
-% Workaround for some older models with additonal info in the muscle list
+% Workaround for some older models with additonal info (columns) in the active muscle variable
 if size(activeMuscles,2) > 1
     activeFascicles = activeMuscles;
     return

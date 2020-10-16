@@ -34,9 +34,7 @@ for c = 1:length(cadavers)
 end
 
 %% Evaluate results
-E_Mag = cell(length(cadavers), length(models), length(postures));
-E_Dir = cell(length(cadavers), length(models), length(postures));
-PE_Mag = cell(length(cadavers), length(models), length(postures));
+[E_Mag, E_Dir, PE_Mag] = deal(cell(length(cadavers), length(models), length(postures)));
 compTab = cell(2+length(cadavers),1+2*length(models));
 errorNames = {'MAE Mag.','MAE Dir.'};
 NoE = length(errorNames);
