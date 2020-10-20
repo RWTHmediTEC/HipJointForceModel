@@ -95,7 +95,7 @@ HJC_CL  = OL(s).Landmarks.Pelvis.(['HJC_' Side_CL]);
 PSIS_IL = OL(s).Landmarks.Pelvis.(['PSIS_' Side_IL]);
 
 OL(s).HipJointWidth = abs(HJC_IL(3)  - HJC_CL(3));
-OL(s).PelvicWidth   = abs(ASIS_IL(3) - ASIS_CL(3));
+OL(s).ASISWidth     = abs(ASIS_IL(3) - ASIS_CL(3));
 OL(s).PelvicHeight  = abs(ASIS_IL(2) - HJC_IL(2));
 OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
 
