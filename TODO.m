@@ -10,6 +10,7 @@
 %     by a scaling law. The data of TLEM1 [Klein Horsman] is used:
 % 		- MuscleVolume = Mass/1.056 (MuscleDensity) 
 % 		- OptimalFiberLength (Lopt)
+% Revise scaling law of Sedghi2017
 
 % Muscle path models
 % - Improve scaling of wrapping surfaces

@@ -40,9 +40,9 @@ for s = 1:length(OL)
         end
         
         % Biometric
-        data.S.Side       = OL(s).Subject(end);
-        data.S.BodyWeight = OL(s).BodyWeight;
-        data.S.BodyHeight = OL(s).BodyHeight;
+        data.S.Side       = OL(s).Subject(end); % 'R' or 'L'
+        data.S.BodyWeight = OL(s).BodyWeight; % [kg]
+        data.S.BodyHeight = OL(s).BodyHeight; % [cm]
         
         % Functional pelvic parameters
         data.S.PelvicTilt = 0; % Not available for OrthoLoad subjects

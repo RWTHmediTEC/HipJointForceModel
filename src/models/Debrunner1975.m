@@ -65,7 +65,7 @@ T = [0, GreaterTrochanter(2:3)]; % Coordinates of the greater trochanter in fron
 bD = MostLateral(3) - MostMedial(3); % Width of the iliac bone along the Z-axis
 hD = MostCranial(2) - AcetabularRoof(2); % Height of the iliac bone along the Y-axis
 A = [0, AcetabularRoof(2) + 2/3 * hD, MostLateral(3) - 2/5 * bD]; % Coordinates of the muscle origin in frontal plane
-% h = norm(cross(A-T, Z-T)) / norm(A-T); % Lever arm of the muscle force around the hip joint center
+h = norm(cross(A-T, Z-T)) / norm(A-T); %#ok<NASGU> % Lever arm of the muscle force around the hip joint center
 
 % Number of active muscles
 Noam = size(activeMuscles,1);
@@ -99,7 +99,7 @@ T_TLEM = [0,...
           sum(insertion(:,3)) / length(activeMuscles)];
 h_TLEM = norm(cross(A_TLEM-T_TLEM, Z-T_TLEM)) / norm(A_TLEM-T_TLEM);
 
-disp(['Difference between A and A_TLEM: ' num2str(A-A_TLEM)])
+disp(['Difference between A and A_TLEM: ' num2str(A-A_TLEM)]) 
 disp(['Difference between T and T_TLEM: ' num2str(T-T_TLEM)])
 
 M_TLEM_direction = (T_TLEM - A_TLEM)/norm(T_TLEM - A_TLEM);
@@ -124,6 +124,9 @@ eq3     = G5_Force(3) + M(3) + RzSym; % Force equilibrium in the direction of Z
 Results = solve(check, eq1, eq2, eq3);
 
 MuscleForce = double(Results.M_TLEM_magnitude);
+if MuscleForce < 0
+    warning(['Unphysiolocial / negative value of the muscle force M (' num2str(MuscleForce,1) ')!'])
+end
 rX = double(Results.RxSym);
 rY = double(Results.RySym);
 rZ = double(Results.RzSym);
