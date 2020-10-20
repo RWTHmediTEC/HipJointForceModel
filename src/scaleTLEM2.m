@@ -16,12 +16,8 @@ switch data.ScalingLaw
     case 'NonuniformSedghi2017'
         PD = 1;
         PH = data.S.Scale(1).PelvicHeight / data.T.Scale(1).PelvicHeight;
-        % !!! Sedghi2017's definition of the pelvic width is based on the 
-        % most lateral points of the pelvis, whereas the definition of the 
-        % ASISDistance used here is based on the ASIS points 
-        % (see createDataTLEM2.m) !!!
-        PW = (data.S.Scale(1).ASISDistance - data.S.Scale(1).HipJointWidth) / ...
-             (data.T.Scale(1).ASISDistance - data.T.Scale(1).HipJointWidth);
+        PW = (data.S.Scale(1).PelvicWidth - data.S.Scale(1).HipJointWidth) / ...
+             (data.T.Scale(1).PelvicWidth - data.T.Scale(1).HipJointWidth);
         FemoralLength = (0.53-0.285)*data.S.BodyHeight*10; % [cm] to [mm] [Winter 2009, S.83, Fig.4.1]
         FL = FemoralLength / data.T.Scale(2).FemoralLength;
         % !!! Sedghi2017 used a slightly different definition than the one implemented here !!!

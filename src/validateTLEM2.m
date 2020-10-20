@@ -84,6 +84,7 @@ for s = 1:length(OL)
         % Pelvis scaling parameters
         data.S.Scale(1).HipJointWidth  = OL(s).HipJointWidth;
         data.S.Scale(1).ASISDistance   = OL(s).ASISDistance;
+        data.S.Scale(1).PelvicWidth    = OL(s).PelvicWidth;
         data.S.Scale(1).PelvicHeight   = OL(s).PelvicHeight;
         data.S.Scale(1).PelvicDepth    = OL(s).PelvicDepth;
         

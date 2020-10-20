@@ -93,9 +93,14 @@ ASIS_CL = OL(s).Landmarks.Pelvis.(['ASIS_' Side_CL]);
 HJC_IL  = OL(s).Landmarks.Pelvis.(['HJC_' Side_IL]);
 HJC_CL  = OL(s).Landmarks.Pelvis.(['HJC_' Side_CL]);
 PSIS_IL = OL(s).Landmarks.Pelvis.(['PSIS_' Side_IL]);
+IT_IL = OL(s).Landmarks.Pelvis.(['IT_' Side_IL]);
+MP_IL = OL(s).Landmarks.Pelvis.(['MP_' Side_IL]);
 
+% See createDataTLEM2.m for the exact definitions
 OL(s).HipJointWidth = abs(HJC_IL(3)  - HJC_CL(3));
 OL(s).ASISDistance  = distancePoints3d(ASIS_IL, ASIS_CL);
+% !!! Assuming symmetry of the pelvis. No consideration of the width of the pubic symphysis !!!
+OL(s).PelvicWidth   = 2 * abs(IT_IL(3) - MP_IL(3));
 OL(s).PelvicHeight  = abs(ASIS_IL(2) - HJC_IL(2));
 OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
 
