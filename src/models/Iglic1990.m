@@ -152,4 +152,6 @@ end
 
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
+% Clear assumptions
+assume(f, 'clear');
 end
