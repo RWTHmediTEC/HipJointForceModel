@@ -6,11 +6,11 @@ scaleTFM = repmat(eye(4), 1, 1, 6);
 %% Scale factors
 switch data.ScalingLaw
     case 'NonuniformEggert2018'
-        % Patient specific scaling of TLEM2 by ASIS width, pelvic height,
+        % Patient specific scaling of TLEM2 by ASISDistance, pelvic height,
         % pelvic depth and femoral length
         PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
         PH = data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight;
-        PW = data.S.Scale(1).ASISWidth     / data.T.Scale(1).ASISWidth;
+        PW = data.S.Scale(1).ASISDistance  / data.T.Scale(1).ASISDistance;
         FL = data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength;
         FW = 1;
     case 'NonuniformSedghi2017'
@@ -18,10 +18,10 @@ switch data.ScalingLaw
         PH = data.S.Scale(1).PelvicHeight / data.T.Scale(1).PelvicHeight;
         % !!! Sedghi2017's definition of the pelvic width is based on the 
         % most lateral points of the pelvis, whereas the definition of the 
-        % ASISWidth used here is based on the ASIS points 
+        % ASISDistance used here is based on the ASIS points 
         % (see createDataTLEM2.m) !!!
-        PW = (data.S.Scale(1).ASISWidth - data.S.Scale(1).HipJointWidth) / ...
-             (data.T.Scale(1).ASISWidth - data.T.Scale(1).HipJointWidth);
+        PW = (data.S.Scale(1).ASISDistance - data.S.Scale(1).HipJointWidth) / ...
+             (data.T.Scale(1).ASISDistance - data.T.Scale(1).HipJointWidth);
         FemoralLength = (0.53-0.285)*data.S.BodyHeight*10; % [cm] to [mm] [Winter 2009, S.83, Fig.4.1]
         FL = FemoralLength / data.T.Scale(2).FemoralLength;
         % !!! Sedghi2017 used a slightly different definition than the one implemented here !!!
@@ -29,7 +29,7 @@ switch data.ScalingLaw
     case 'ParameterSkinningFischer2018'
         PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
         PH = data.S.Scale(1).PelvicHeight  / data.T.Scale(1).PelvicHeight;
-        PW = data.S.Scale(1).ASISWidth   / data.T.Scale(1).ASISWidth;
+        PW = data.S.Scale(1).ASISDistance   / data.T.Scale(1).ASISDistance;
         FL = 1;
         FW = 1;
     case {'None','LandmarkSkinningFischer2018'}
