@@ -6,7 +6,7 @@ set(gui.Home.Parameters.EditText.HipJointWidth,  'String', data.S.Scale(1).HipJo
 set(gui.Home.Parameters.EditText.PelvicTilt,     'String', data.S.PelvicTilt);
 set(gui.Home.Parameters.EditText.ASISDistance,   'String', data.S.Scale(1).ASISDistance);
 set(gui.Home.Parameters.EditText.PelvicWidth,    'String', data.S.Scale(1).PelvicWidth);
-set(gui.Home.Parameters.EditText.PelvicHeight,   'String', data.S.Scale(1).PelvicHeight);
+set(gui.Home.Parameters.EditText.HJCASISHight,   'String', data.S.Scale(1).HJCASISHight);
 set(gui.Home.Parameters.EditText.PelvicDepth,    'String', data.S.Scale(1).PelvicDepth);
 set(gui.Home.Parameters.EditText.FemoralLength,  'String', data.S.Scale(2).FemoralLength);
 set(gui.Home.Parameters.EditText.FemoralWidth,   'String', data.S.Scale(2).FemoralWidth);

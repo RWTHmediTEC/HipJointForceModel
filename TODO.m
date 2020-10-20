@@ -27,4 +27,6 @@
 
 % Validation
 % - Level Walking could be split in three peak force phases
+
+% GUI
 % - Move postures selection to validation tab
