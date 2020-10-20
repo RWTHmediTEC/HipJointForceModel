@@ -156,14 +156,15 @@ HM = transformTLEM2(HM, scaleTFM);
 Scale(1).HipJointWidth = abs(...
     HM(1).Landmarks.RightHipJointCenter.Pos(3)-...
     HM(1).Landmarks.LeftHipJointCenter.Pos(3));
-Scale(1).PelvicWidth = 28.6*10; % Table 3 [cm] to [mm]
 Scale(1).ASISDistance  = distancePoints3d(...
     HM(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos,...
     HM(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos);
-Scale(1).HJCASISHight = abs(... % mean([23.0 23.4]); % Table 3
+Scale(1).HJCASISHeight = abs(... % mean([23.0 23.4]); % Table 3
     HM(1).Landmarks.RightHipJointCenter.Pos(2)-...
     HM(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(2));
-Scale(1).PelvicDepth =  mean([16.5 16.3]*10); % Table 3 [cm] to [mm]
+Scale(1).PelvicWidth  = 28.6 * 10; % Table 3 [cm] to [mm]
+Scale(1).PelvicHeight = 23.0 * 10; % Table 3 [cm] to [mm]
+Scale(1).PelvicDepth  = 16.5 * 10; % Table 3 [cm] to [mm]
 Scale(2).FemoralLength = abs(HM(2).Landmarks.MedialEpicondyle.Pos(2));
 
 end

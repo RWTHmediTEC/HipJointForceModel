@@ -5,27 +5,27 @@ scaleTFM = repmat(eye(4), 1, 1, 6);
 
 %% Scale factors
 switch data.ScalingLaw
-    case 'NonuniformEggert2018'
-        % Patient specific scaling of TLEM2 by ASISDistance, HJCASISHight,
-        % pelvic depth and femoral length
-        PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
-        PH = data.S.Scale(1).HJCASISHight  / data.T.Scale(1).HJCASISHight;
-        PW = data.S.Scale(1).ASISDistance  / data.T.Scale(1).ASISDistance;
-        FL = data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength;
-        FW = 1;
     case 'NonuniformSedghi2017'
         PD = 1;
-        PH = data.S.Scale(1).HJCASISHight / data.T.Scale(1).HJCASISHight;
+        PH =  data.S.Scale(1).PelvicHeight / data.T.Scale(1).PelvicHeight;
         PW = (data.S.Scale(1).PelvicWidth - data.S.Scale(1).HipJointWidth) / ...
              (data.T.Scale(1).PelvicWidth - data.T.Scale(1).HipJointWidth);
         FemoralLength = (0.53-0.285)*data.S.BodyHeight*10; % [cm] to [mm] [Winter 2009, S.83, Fig.4.1]
         FL = FemoralLength / data.T.Scale(2).FemoralLength;
         % !!! Sedghi2017 used a slightly different definition than the one implemented here !!!
         FW = data.S.Scale(2).FemoralWidth / data.T.Scale(2).FemoralWidth;
+    case 'NonuniformEggert2018'
+        % Patient specific scaling of TLEM2 by ASISDistance, HJCASISHeight,
+        % pelvic depth and femoral length
+        PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
+        PH = data.S.Scale(1).HJCASISHeight / data.T.Scale(1).HJCASISHeight;
+        PW = data.S.Scale(1).ASISDistance  / data.T.Scale(1).ASISDistance;
+        FL = data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength;
+        FW = 1;
     case 'ParameterSkinningFischer2018'
-        PD = data.S.Scale(1).PelvicDepth  / data.T.Scale(1).PelvicDepth;
-        PH = data.S.Scale(1).HJCASISHight / data.T.Scale(1).HJCASISHight;
-        PW = data.S.Scale(1).ASISDistance / data.T.Scale(1).ASISDistance;
+        PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
+        PH = data.S.Scale(1).HJCASISHeight / data.T.Scale(1).HJCASISHeight;
+        PW = data.S.Scale(1).ASISDistance  / data.T.Scale(1).ASISDistance;
         FL = 1;
         FW = 1;
     case {'None','LandmarkSkinningFischer2018'}
