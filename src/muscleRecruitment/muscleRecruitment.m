@@ -1,13 +1,19 @@
-function force = muscleRecruitment(z,side,a,w,NoAM,r,s,A,muscleRecruitmentCriteria,fascicleMass,NoAF,muscleList,musclePaths)
-% z = Location of hip joint center; side = Which leg (right or left) was chosen;
-% a = lever arm of bodyweight force; w = Bodyweight force; NoAM = Number of active fascicles; 
-% r = Origin of muscle at pelvis; s = Orientation unit vectors of muscles; A = PCSA of fascicles;
-% muscleRecruitmentCriteria = Criteria for optimization of muscle/fascicle
-% forces; fascicleMass = Mass of fascicle; NoAF = List of fascicle names; 
-% muscleList = Data of muscles; muscle Paths = Data of muscle paths 
-%% Inputs
+function force = muscleRecruitment(a, w, r, s, PCSA, data)
+% z = Location of hip joint center;
+% side = Which leg (right or left) was chosen;
+% a = lever arm of bodyweight force;
+% w = Bodyweight force;  
+% r = Origin of muscle at pelvis;
+% s = Orientation unit vectors of muscles;
+% A = Physiological cross sectional area of fascicles [mm²]
+
 tStart = tic;
-PCSA = A;                                           % Physiological cross sectional area of fascicles [mm²]
+%% Inputs
+side          = data.S.Side;
+muscleList    = data.MuscleList;
+musclePaths   = data.S.MusclePaths;
+MRC           = data.MuscleRecruitmentCriteria;
+z             = data.S.LE(1).Joints.Hip.Pos;
 
 %% Parameters
 DP = 3;                                             % Default value of power of polynomial criteria
@@ -22,20 +28,35 @@ switch n
     N = PCSA;
 end
 
+NoAM = length(musclePaths);                         % Number of active muscles
 F_0 = zeros(NoAM,1);                                % Initial value of optimization 
 F_MIN = zeros(size(F_0));                           % Minimum fasicle strength [N]
 aeq = zeros(3,NoAM);
-OPTIONS = optimoptions(@fmincon,'Algorithm','sqp','Display','off','GradObj','off',...
-    'GradConstr','off','TolFun',1e-9,'MaxFunctionEvaluations',1000000,'TolX',1e-9,...
-    'StepTolerance',1e-15,'FunctionTolerance',1e-10,'MaxIterations',5000);
+opts = optimoptions(@fmincon,...
+    'Algorithm','sqp',...
+    'Display','off',...
+    'GradObj','off',...
+    'GradConstr','off',...
+    'TolFun',1e-9,...
+    'MaxFunctionEvaluations',1000000,...
+    'TolX',1e-9,...
+    'StepTolerance',1e-15,...
+    'FunctionTolerance',1e-10,...
+    'MaxIterations',5000);
 [nbFas,fMaxM] = deal(zeros(NoAM,1));
 muscleNames = '';
+
+% Names of active fascicles
+activeFascicles = '';
+for i = 1:NoAM
+    activeFascicles{i} = musclePaths(i).Name;
+end
 
 %% Calculation of Resultant Muscle Force
 % Get Fmax of each muscle
 for m = 1:NoAM
     tempIdx = strcmp(musclePaths(m).Name(1:end-1),muscleList(:,1));     % Find Index of active fascicle
-    muscleNames{m} =cellstr(muscleList(tempIdx,1));    
+    muscleNames{m} = cellstr(muscleList(tempIdx,1));    
     nbFas(m) = muscleList{tempIdx,4};                                  
     fMaxM(m) = muscleList{tempIdx,5}*SIGMA;                                              
 end
@@ -56,19 +77,33 @@ aeq(1,:) = leverArm;                                % Lever arms of all active m
 beq = -momentW';                                    % Negative moment of external forces around hip joint center
 
 % Optimization of muscle forces
-switch muscleRecruitmentCriteria    
+switch MRC    
     case 'MinMax'                                   % MinMax muscle recruitment criteria
-        fascicleForce = muscleRecruitmentMinMax(F_0,F_MIN,fMax,aeq,beq,N,OPTIONS);
+        fascicleForce = muscleRecruitmentMinMax(F_0,F_MIN,fMax,aeq,beq,N,opts);
     case 'Polynom2'                                 % Polynomial muscle recruitment criteria with power = 2
         DP = 2;
-        fascicleForce = muscleRecruitmentPoly(DP,F_0,F_MIN,fMax,aeq,beq,N,OPTIONS);
+        fascicleForce = muscleRecruitmentPoly(DP,F_0,F_MIN,fMax,aeq,beq,N,opts);
     case 'Polynom3'                                 % Polynomial muscle recruitment criteria with power = 3
-        fascicleForce = muscleRecruitmentPoly(DP,F_0,F_MIN,fMax,aeq,beq,N,OPTIONS);
+        fascicleForce = muscleRecruitmentPoly(DP,F_0,F_MIN,fMax,aeq,beq,N,opts);
     case 'Polynom5'                                 % Polynomial muscle recruitment criteria with power = 5
         DP = 5;
-        fascicleForce = muscleRecruitmentPoly(DP,F_0,F_MIN,fMax,aeq,beq,N,OPTIONS);
+        fascicleForce = muscleRecruitmentPoly(DP,F_0,F_MIN,fMax,aeq,beq,N,opts);
     case 'Energy'                                   % Energy muscle recruitment criteria
-        fascicleForce = muscleRecruitmentEnergy(C1,F_0,F_MIN,fMax,aeq,beq,PCSA,OPTIONS,fascicleMass);
+        if size(muscleList,2) >= 7
+            % Get physiological cross-sectional masses
+            fascicleMass = zeros(NoAM,1);
+            for m = 1:NoAM
+                % Mass of each fascicle
+                PCSA_Idx = strcmp(musclePaths(m).Name(1:end-1), muscleList(:,1));
+                fascicleMass(m) = muscleList{PCSA_Idx,7} / muscleList{PCSA_Idx,4};
+            end
+        else
+            errMessage = ['No muscle mass available for the selected cadaver. '...
+                'Choose another cadaver to use this muscle recruitment criterion!'];
+            msgbox(errMessage,mfilename,'error')
+            error(errMessage)
+        end
+        fascicleForce = muscleRecruitmentEnergy(C1,F_0,F_MIN,fMax,aeq,beq,PCSA,opts,fascicleMass);
 end
 
 force = s'*diag(fascicleForce);                     % Get force matrix by multiplying force diagonal matrix with matrix of unit force orientation vector
@@ -76,7 +111,7 @@ force = s'*diag(fascicleForce);                     % Get force matrix by multip
 % Check if optimization was succesful
 momF = leverArm*fascicleForce;
 sm = sum(momF);
-check = isequal(round(sm,4),round(-momentW(1),4));  % Check whether moments are iqual
+check = isequal(round(sm,4),round(-momentW(1),4));  % Check whether moments are equal
 if check == 0
 uiwait(msgbox({'Unphysiolocial!';'Imbalance of moments!';...
     [num2str(round(sm,4)),' = ',num2str(round(-momentW(1),4))]},'Warning','warn','modal'));
@@ -97,6 +132,6 @@ end
 
 fascicleActivation = fascicleForce./fMax;           % Activation of each fascicle
 muscleActivation = muscleForce./fMaxM;              % Activation of each muscle
-plotActivation(NoAM,muscleRecruitmentCriteria,fascicleActivation,NoAF,muscleActivation,muscleNames);
+plotActivation(NoAM,MRC,fascicleActivation,activeFascicles,muscleActivation,muscleNames);
 disp(['Muscle recruitment took ' num2str(toc(tStart),'%.1f') ' seconds.'])
 end

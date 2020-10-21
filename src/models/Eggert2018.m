@@ -14,7 +14,8 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
+postures = {...
+    'OneLeggedStance' 'OLS';
     'LevelWalking' 'LW'};
 
 end
@@ -62,8 +63,7 @@ Side            = data.S.Side;
 MuscleList      = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
-muscleRecruitmentCriteria = data.MuscleRecruitmentCriteria;
-HJC             = data.S.LE(1).Joints.Hip.Pos;
+MRC             = data.MuscleRecruitmentCriteria;
 
 %% Define Parameters
 g = -data.g;                       % weight force
@@ -104,7 +104,7 @@ end
 
 syms RxSym RySym RzSym
 
-switch muscleRecruitmentCriteria
+switch MRC
     case 'None'
         % [Iglic 1990, S.37, Equ.2]
         f = cell2sym(repmat({'f'}, NoAM,1));
@@ -133,21 +133,8 @@ switch muscleRecruitmentCriteria
         % Clear assumptions
         assume(f, 'clear');
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
-        if size(MuscleList,2) >= 7
-            % Get physiological cross-sectional masses
-            m_f = zeros(NoAM,1);
-            for m = 1:NoAM
-                % Mass of each fascicle
-                m_f(m) = MuscleList{A_Idx,7} / MuscleList{A_Idx,4};
-            end
-        else
-            errMessage = ['No muscle mass available for the selected cadaver. '...
-                'Choose another cadaver to use this muscle recruitment criterion!'];
-            msgbox(errMessage,mfilename,'error')
-            error(errMessage)
-        end
         
-        F = muscleRecruitment(HJC,Side,a,W,NoAM,r,s,A,muscleRecruitmentCriteria,m_f,NoAF,MuscleList,MusclePaths);
+        F = muscleRecruitment(a, W, r, s, A, data);
         
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + W(1);

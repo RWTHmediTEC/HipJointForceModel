@@ -85,8 +85,7 @@ MuscleList      = data.MuscleList;
 activeMuscles   = data.activeMuscles;
 MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
-muscleRecruitmentCriteria = data.MuscleRecruitmentCriteria;
-HJC             = data.S.LE(1).Joints.Hip.Pos;
+MRC             = data.MuscleRecruitmentCriteria;
 
 %% Define Parameters
 G = -data.g;                       % weight force
@@ -107,8 +106,6 @@ d = 0;                             % antero-posterior moment arm of 'WB - WL' [I
 
 % Number of active muscles
 NoAM = length(MusclePaths);
-% Names of active fascicles
-NoAF = '';
 
 % Get muscle origin points
 r=nan(NoAM,3);
@@ -117,7 +114,6 @@ s=nan(NoAM,3);
 for i = 1:NoAM
     r(i,:) = MusclePaths(i).(MusclePathModel)(1:3);
     s(i,:) = MusclePaths(i).(MusclePathModel)(4:6);
-    NoAF{i} = MusclePaths(i).Name;
 end
 
 A = zeros(NoAM,1);
@@ -130,7 +126,7 @@ end
 
 syms RxSym RySym RzSym
 
-switch muscleRecruitmentCriteria
+switch MRC
     case 'None'
         % [Iglic 1990, S.37, Equ.2]
         f = cell2sym(activeMuscles(:,2));
@@ -152,7 +148,6 @@ switch muscleRecruitmentCriteria
         eq1 =  sum(F(:,1)) + RxSym + W(1); % [Iglic 1990, S.37, Equ.4]
         eq2 =  sum(F(:,2)) + RySym + W(2); % [Iglic 1990, S.37, Equ.4]
         eq3 =  sum(F(:,3)) + RzSym + W(3); % [Iglic 1990, S.37, Equ.4]
-        
         eq4 = sum(momentF(:,1)) + momentW(1); % [Iglic 1990, S.37, Equ.5]
         eq5 = sum(momentF(:,2)) + momentW(2); % [Iglic 1990, S.37, Equ.5]
         eq6 = sum(momentF(:,3)) + momentW(3); % [Iglic 1990, S.37, Equ.5]
@@ -168,21 +163,9 @@ switch muscleRecruitmentCriteria
         end
         
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
-        if size(MuscleList,2) >= 7
-            % Get physiological cross-sectional masses
-            m_f = zeros(NoAM,1);
-            for m = 1:NoAM
-                % Mass of each fascicle
-                m_f(m) = MuscleList{A_Idx,7} / MuscleList{A_Idx,4};
-            end
-        else
-            errMessage = ['No muscle mass available for the selected cadaver. '...
-                'Choose another cadaver to use this muscle recruitment criterion!'];
-            msgbox(errMessage,mfilename,'error')
-            error(errMessage)
-        end
         
-        F = muscleRecruitment(HJC,side,a,W,NoAM,r,s,A,muscleRecruitmentCriteria,m_f,NoAF,MuscleList,MusclePaths);
+        F = muscleRecruitment(a, W, r, s, A, data);
+        
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + W(1);
         eq2 =  sum(F(2,:)) + RySym + W(2);

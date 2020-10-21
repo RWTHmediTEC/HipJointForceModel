@@ -80,14 +80,12 @@ end
 function data = Calculation(data)
 
 % Inputs
-BW                = data.S.BodyWeight;
-hipJointWidth     = data.S.Scale(1).HipJointWidth;
-side              = data.S.Side;
-muscleList        = data.MuscleList;
-musclePathModel   = data.MusclePathModel;
-musclePaths       = data.S.MusclePaths;
-muscleRecruitmentCriteria = data.MuscleRecruitmentCriteria;
-HJC               = data.S.LE(1).Joints.Hip.Pos;
+BW              = data.S.BodyWeight;
+hipJointWidth   = data.S.Scale(1).HipJointWidth;
+muscleList      = data.MuscleList;
+musclePathModel = data.MusclePathModel;
+musclePaths     = data.S.MusclePaths;
+MRC             = data.MuscleRecruitmentCriteria;
 
 %% Define Parameters
 g = -data.g;                       % weight force
@@ -105,8 +103,6 @@ a = (wb * c - wl * b) / (wb - wl); % medio-lateral moment arm of 'WB - WL' [Igli
 
 % Number of active muscles
 NoAM = length(musclePaths);
-% Names of active fascicles
-NoAF = '';
 
 % Get muscle origin points
 r=nan(NoAM,3);
@@ -116,26 +112,24 @@ s=nan(NoAM,3);
 for i = 1:NoAM
     r(i,:) = musclePaths(i).(musclePathModel)(1:3);
     s(i,:) = musclePaths(i).(musclePathModel)(4:6);
-    NoAF{i} = musclePaths(i).Name;
 end
 
-[A,fasMass] = deal(zeros(NoAM,1));
+PCSA = zeros(NoAM,1);
 % Get physiological cross-sectional areas and masses
 for m = 1:NoAM
     % Physiological cross-sectional areas of each fascicle
     A_Idx = strcmp(musclePaths(m).Name(1:end-1), muscleList(:,1));
-    A(m) = muscleList{A_Idx,5} / muscleList{A_Idx,4};
-    % Mass of each fascicle
-    fasMass(m) = muscleList{A_Idx,7} / muscleList{A_Idx,4};
+    PCSA(m) = muscleList{A_Idx,5} / muscleList{A_Idx,4};
 end
 
 syms RxSym RySym RzSym
 
-switch muscleRecruitmentCriteria
+switch MRC
     case 'None'
-        msgbox('Please select a muscle recruitment criteria!','Muscle recruitment','error');
+        msgbox('Please select a muscle recruitment criterion!','Muscle recruitment','error');
+        
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
-        F = muscleRecruitment(HJC,side,a,w,NoAM,r,s,A,muscleRecruitmentCriteria,fasMass,NoAF,muscleList,musclePaths);
+        F = muscleRecruitment(a, w, r, s, PCSA, data);
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + w(1);
         eq2 =  sum(F(2,:)) + RySym + w(2);
