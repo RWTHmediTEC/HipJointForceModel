@@ -1,5 +1,5 @@
 function funcHandles = Eggert2018
-% Based on the model of [Iglic 1990] but using the TLEM2 cadaver data 
+% Based on the model of [Iglic 1990] but using the TLEM2 cadaver data
 % instead of Dostal's cadaver data. Grouping of the muscles was removed to
 % avoid unphysiological / negative muscle forces.
 
@@ -15,7 +15,7 @@ function [postures, default] = Posture()
 
 default = 1;
 postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+    'LevelWalking' 'LW'};
 
 end
 
@@ -62,6 +62,8 @@ Side            = data.S.Side;
 MuscleList      = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
+muscleRecruitmentCriteria = data.MuscleRecruitmentCriteria;
+HJC             = data.S.LE(1).Joints.Hip.Pos;
 
 %% Define Parameters
 g = -data.g;                       % weight force
@@ -75,10 +77,12 @@ W = [0, WB - WL, 0];               % 'WB - WL'
 
 b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
 c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
-a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]           
+a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
 
 % Number of active muscles
 NoAM = length(MusclePaths);
+% Names of active fascicles
+NoAF = '';
 
 % Get muscle origin points
 r=nan(NoAM,3);
@@ -87,6 +91,7 @@ s=nan(NoAM,3);
 for i = 1:NoAM
     r(i,:) = MusclePaths(i).(MusclePathModel)(1:3);
     s(i,:) = MusclePaths(i).(MusclePathModel)(4:6);
+    NoAF{i} = MusclePaths(i).Name;
 end
 
 A = zeros(NoAM,1);
@@ -97,31 +102,60 @@ for m = 1:NoAM
     A(m) = MuscleList{A_Idx,5} / MuscleList{A_Idx,4};
 end
 
-% [Iglic 1990, S.37, Equ.2]
-f = cell2sym(repmat({'f'}, NoAM,1));
-assume(f >= 0);
-F = f .* A .* s;
-
-% Moment of F around hip rotation center
-momentF = cross(r, F);
-
-switch Side
-    case 'R'
-        momentW = cross([0 0 -a], W); % Moment of bodyweight force around hip rotation center
-    case 'L'
-        momentW = cross([0 0  a], W); % Moment of bodyweight force around hip rotation center
-end
-
-% Calculate hip joint reaction force R
 syms RxSym RySym RzSym
 
-eq1 =  sum(F(:,1)) + RxSym + W(1); % [Iglic 1990, S.37, Equ.4]
-eq2 =  sum(F(:,2)) + RySym + W(2); % [Iglic 1990, S.37, Equ.4]
-eq3 =  sum(F(:,3)) + RzSym + W(3); % [Iglic 1990, S.37, Equ.4]
-
-eq4 = sum(momentF(:,1)) + momentW(1); % [Iglic 1990, S.37, Equ.5]
-
-R = solve(eq1, eq2, eq3, eq4);
+switch muscleRecruitmentCriteria
+    case 'None'
+        % [Iglic 1990, S.37, Equ.2]
+        f = cell2sym(repmat({'f'}, NoAM,1));
+        assume(f >= 0);
+        F = f .* A .* s;
+        
+        % Moment of F around hip rotation center
+        momentF = cross(r, F);
+        
+        switch Side
+            case 'R'
+                momentW = cross([0 0 -a], W); % Moment of bodyweight force around hip rotation center
+            case 'L'
+                momentW = cross([0 0  a], W); % Moment of bodyweight force around hip rotation center
+        end
+        
+        % Calculate hip joint force R
+        eq1 =  sum(F(:,1)) + RxSym + W(1); % [Iglic 1990, S.37, Equ.4]
+        eq2 =  sum(F(:,2)) + RySym + W(2); % [Iglic 1990, S.37, Equ.4]
+        eq3 =  sum(F(:,3)) + RzSym + W(3); % [Iglic 1990, S.37, Equ.4]
+        
+        eq4 = sum(momentF(:,1)) + momentW(1); % [Iglic 1990, S.37, Equ.5]
+        
+        R = solve(eq1, eq2, eq3, eq4);
+        
+        % Clear assumptions
+        assume(f, 'clear');
+    case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
+        if size(MuscleList,2) >= 7
+            % Get physiological cross-sectional masses
+            m_f = zeros(NoAM,1);
+            for m = 1:NoAM
+                % Mass of each fascicle
+                m_f(m) = MuscleList{A_Idx,7} / MuscleList{A_Idx,4};
+            end
+        else
+            errMessage = ['No muscle mass available for the selected cadaver. '...
+                'Choose another cadaver to use this muscle recruitment criterion!'];
+            msgbox(errMessage,mfilename,'error')
+            error(errMessage)
+        end
+        
+        F = muscleRecruitment(HJC,Side,a,W,NoAM,r,s,A,muscleRecruitmentCriteria,m_f,NoAF,MuscleList,MusclePaths);
+        
+        % Calculate hip joint reaction force R
+        eq1 =  sum(F(1,:)) + RxSym + W(1);
+        eq2 =  sum(F(2,:)) + RySym + W(2);
+        eq3 =  sum(F(3,:)) + RzSym + W(3);
+        
+        R = solve(eq1, eq2, eq3);
+end
 
 rX = double(R.RxSym);
 rY = double(R.RySym);
@@ -129,6 +163,4 @@ rZ = double(R.RzSym);
 
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
-% Clear assumptions
-assume(f, 'clear');
 end

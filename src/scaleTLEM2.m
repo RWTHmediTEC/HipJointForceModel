@@ -1,7 +1,7 @@
 function data = scaleTLEM2(data)
 
 % Create scaling matrices
-scaleTFM = repmat(eye(4), 1, 1, 6);
+scaleTFM = repmat(eye(4), 1, 1, length(data.T.LE));
 
 %% Scale factors
 switch data.ScalingLaw
@@ -35,7 +35,7 @@ switch data.ScalingLaw
 end
 
 if any(isnan([PD, PH, PW, FL, FW]))
-    errMessage = ['At least one of the scaling parameters is nan! '...
+    errMessage = ['At least one of the scaling parameters is nan. '...
         'Choose another cadaver to use this scaling law!'];
     msgbox(errMessage,mfilename,'error')
     error(errMessage)
@@ -52,12 +52,14 @@ scaleTFM(2,2,2) = FL;
 scaleTFM(3,3,2) = FW;
 
 % Scaling of patella, tibia, talus and foot by femoral length
-scaleTFM(2,2,3:6) = data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength;
+if size(scaleTFM,3) > 2 && ~isnan(data.T.Scale(2).FemoralLength)
+    scaleTFM(2,2,3:end) = data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength;
+end
 
 %% Scale
 data.S.LE = transformTLEM2(data.T.LE, scaleTFM);
 
-%% Femoral skinning
+%% Skinning
 switch data.ScalingLaw
     case 'ParameterSkinningFischer2018'
         data = skinFemurLEM(data,'ParameterBased');

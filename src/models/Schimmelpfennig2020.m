@@ -87,7 +87,7 @@ muscleList        = data.MuscleList;
 musclePathModel   = data.MusclePathModel;
 musclePaths       = data.S.MusclePaths;
 muscleRecruitmentCriteria = data.MuscleRecruitmentCriteria;
-z                 = data.S.LE(1).Joints.Hip.Pos;
+HJC               = data.S.LE(1).Joints.Hip.Pos;
 
 %% Define Parameters
 g = -data.g;                       % weight force
@@ -130,11 +130,12 @@ for m = 1:NoAM
 end
 
 syms RxSym RySym RzSym
+
 switch muscleRecruitmentCriteria
     case 'None'
         msgbox('Please select a muscle recruitment criteria!','Muscle recruitment','error');
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
-        F = muscleRecruitment(z,side,a,w,NoAM,r,s,A,muscleRecruitmentCriteria,fasMass,NoAF,muscleList,musclePaths);
+        F = muscleRecruitment(HJC,side,a,w,NoAM,r,s,A,muscleRecruitmentCriteria,fasMass,NoAF,muscleList,musclePaths);
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + w(1);
         eq2 =  sum(F(2,:)) + RySym + w(2);
@@ -148,4 +149,5 @@ switch muscleRecruitmentCriteria
 
         data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 end
+
 end

@@ -1,7 +1,14 @@
 function LE = positionTLEM2(LE, jointAngles)
-% Rotation of the bones by jointAngles 
+% Rotation of the bones by jointAngles
 
 NoB = length(LE);
+
+if any(cellfun(@any, cellfun(@isnan, jointAngles, 'uni', 0)))
+    errMessage = ['At least one of the joint angles contains nan. '...
+        'Choose another cadaver to use this HJF model!'];
+    msgbox(errMessage,mfilename,'error')
+    error(errMessage)
+end
 
 % Convert from degree to radian
 jointAngles = cellfun(@deg2rad, jointAngles, 'uni', false);
