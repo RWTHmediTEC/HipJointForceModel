@@ -232,7 +232,7 @@ end
 MusclePaths = linesOfActionLEM(LE, MusclePaths);
 
 data.S.MusclePaths = MusclePaths;
-disp(['Muscle path modeling took ' num2str(toc(tStart),'%.1f') ' seconds.'])
+disp(['Muscle path modeling took ' num2str(toc(tStart),'%.0f') ' seconds.'])
 
 end
 
