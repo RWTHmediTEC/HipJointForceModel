@@ -1,11 +1,9 @@
 function force = muscleRecruitment(a, w, r, s, PCSA, data)
-% z = Location of hip joint center;
-% side = Which leg (right or left) was chosen;
-% a = lever arm of bodyweight force;
-% w = Bodyweight force;  
-% r = Origin of muscle at pelvis;
-% s = Orientation unit vectors of muscles;
-% A = Physiological cross sectional area of fascicles [mm²]
+% a = lever arm of the bodyweight force;
+% w = bodyweight force;  
+% r = origin of the muscle's line of action;
+% s = direction of the muscle's line of action;
+% PCSA = physiological cross sectional area of fascicles [mm²]
 
 tStart = tic;
 %% Inputs
@@ -46,12 +44,6 @@ opts = optimoptions(@fmincon,...
 [nbFas,fMaxM] = deal(zeros(NoAM,1));
 muscleNames = '';
 
-% Names of active fascicles
-activeFascicles = '';
-for i = 1:NoAM
-    activeFascicles{i} = musclePaths(i).Name;
-end
-
 %% Calculation of Resultant Muscle Force
 % Get Fmax of each muscle
 for m = 1:NoAM
@@ -71,7 +63,7 @@ switch side
     case 'R'
         momentW = cross([0 0 -a], w);               % Moment of bodyweight force around hip joint center [Nmm]
     case 'L'
-        momentW = cross([0 0 a], w);                % Moment of bodyweight force around hip joint center [Nmm]      
+        momentW = cross([0 0  a], w);               % Moment of bodyweight force around hip joint center [Nmm]      
 end
 aeq(1,:) = leverArm;                                % Lever arms of all active muscles around hip joint center
 beq = -momentW';                                    % Negative moment of external forces around hip joint center
@@ -117,6 +109,8 @@ uiwait(msgbox({'Unphysiolocial!';'Imbalance of moments!';...
     [num2str(round(sm,4)),' = ',num2str(round(-momentW(1),4))]},'Warning','warn','modal'));
 end
 
+disp(['Muscle recruitment took ' num2str(toc(tStart),'%.1f') ' seconds.'])
+
 %% Activation
 % Get force of active muscles
 muscleForce = zeros(length(fMaxM),1);
@@ -132,6 +126,6 @@ end
 
 fascicleActivation = fascicleForce./fMax;           % Activation of each fascicle
 muscleActivation = muscleForce./fMaxM;              % Activation of each muscle
-plotActivation(NoAM,MRC,fascicleActivation,activeFascicles,muscleActivation,muscleNames);
-disp(['Muscle recruitment took ' num2str(toc(tStart),'%.1f') ' seconds.'])
+plotActivation(NoAM,MRC,fascicleActivation,{musclePaths.Name},muscleActivation,muscleNames);
+
 end
