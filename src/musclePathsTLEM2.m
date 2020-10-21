@@ -19,8 +19,10 @@ MusclePathModels = cell(size(MusclePaths));
 for i = 1:length(MusclePaths)
     mlIdx = find(strcmp(MusclePaths(i).Name(1:end-1),MuscleList(:,1)));
     if isempty(mlIdx)
-        error([MusclePaths(i).Name(1:end-1) ' is not part of the ' ...
-            'muscle list of the cadaver! Choose another cadaver!'])
+        errMessage = [MusclePaths(i).Name(1:end-1) ' is not part of the ' ...
+            'muscle list of the cadaver! Choose another cadaver!'];
+        msgbox(errMessage,mfilename,'error')
+        error(errMessage)
     else
         MuscleListIdx(i,1) = mlIdx;
     end
@@ -227,11 +229,10 @@ for m = 1:length(MusclePaths)
 end
 
 %% % Create the lines of action for the muscle path models
-MusclePaths = linesOfActionLE(LE, MusclePaths);
+MusclePaths = linesOfActionLEM(LE, MusclePaths);
 
 data.S.MusclePaths = MusclePaths;
-mpTime = toc(tStart);
-disp(['Muscle path modeling took ' num2str(mpTime,1) ' seconds.'])
+disp(['Muscle path modeling took ' num2str(toc(tStart),'%.1f') ' seconds.'])
 
 end
 

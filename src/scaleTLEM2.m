@@ -35,7 +35,10 @@ switch data.ScalingLaw
 end
 
 if any(isnan([PD, PH, PW, FL, FW]))
-    error('At least one of the scaling parameters is nan! Choose another cadaver to use this scaling law!')
+    errMessage = ['At least one of the scaling parameters is nan! '...
+        'Choose another cadaver to use this scaling law!'];
+    msgbox(errMessage,mfilename,'error')
+    error(errMessage)
 end
 
 

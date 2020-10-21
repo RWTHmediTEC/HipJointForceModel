@@ -1,4 +1,4 @@
-function MusclePaths = linesOfActionLE(LE, MusclePaths)
+function MusclePaths = linesOfActionLEM(LE, MusclePaths)
 % Create the lines of action for the muscle path models
 
 % Contains origin and a normalized direction vector for each model

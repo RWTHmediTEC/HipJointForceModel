@@ -18,7 +18,10 @@ if data.SurfaceData
         calculateSkinningWeights(data, boneIdx)
     end
 else
-    error(['No surface data available for cadaver ' data.Cadaver '!. Skinning is not possible.'])
+    errMessage = ['No surface data available for cadaver ' data.Cadaver ...
+        '! Skinning is not possible.'];
+    msgbox(errMessage,mfilename,'error')
+    error(errMessage)
 end
 
 LE      = data.T.LE;

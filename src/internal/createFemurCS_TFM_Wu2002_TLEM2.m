@@ -3,7 +3,7 @@ function TFM = createFemurCS_TFM_Wu2002_TLEM2(LE, side)
 
 warningMessage = [...
     'Femoral bone landmarks are missing for the selected cadaver!' newline ... 
-    'Returning eye(4) for the transformation into the pelvic bone coordinate system!'];
+    'Returning eye(4) for the transformation into the femoral bone coordinate system!'];
 
 if isfield(LE, 'Landmarks')
     MEC = LE(2).Landmarks.MedialEpicondyle.Pos;

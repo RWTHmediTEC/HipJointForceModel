@@ -126,10 +126,6 @@ R = solve(eq1, eq2, eq3, eq4);
 rX = double(R.RxSym);
 rY = double(R.RySym);
 rZ = double(R.RzSym);
-f = double(R.f);
-if f < 0
-    warning(['Unphysiolocial / negative value of f (' num2str(f,1) ')!'])
-end
 
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 

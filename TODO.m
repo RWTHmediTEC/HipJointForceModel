@@ -13,11 +13,10 @@
 
 % Muscle path models
 % - Improve scaling of wrapping surfaces
-% - Improve inital wrapping paramters for better robustness of wrapping for
-%   scaling and different postures
+% - Improve inital wrapping parameters for better robustness of wrapping 
+%   for scaling and different postures
 
 % Muscle recruitment
-% - Implement common muscle recruitment criteria
 % - Use EMS studies (OrthoLoad) to select muscles of the models
 
 % HJF models
@@ -30,3 +29,4 @@
 % GUI
 % - Move postures selection to validation tab
 % - Enable pelvic tilt depending on the HJF model
+% - Add verbose option

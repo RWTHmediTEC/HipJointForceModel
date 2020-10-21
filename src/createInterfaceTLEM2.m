@@ -103,6 +103,18 @@ gui.Home.Settings.Popup_Scaling = uicontrol(...
     'Callback', @onScalingLaw);
 gui.Home.Settings.Popup_Scaling.Value=1;
 
+% Panel muscle recruitment
+gui.Home.Settings.Panel_MuscleRecruitmentCriteria = uix.Panel(...
+    'Parent', gui.Home.Settings.Layout_V,...
+    'Title', 'Muscle Recruitment Criteria');
+muscleRecruitmentCriteria = {'None','MinMax','Polynom2','Polynom3','Polynom5','Energy'};
+gui.Home.Settings.Popup_MuscleRecruitmentCriteria = uicontrol(...
+    'Parent', gui.Home.Settings.Panel_MuscleRecruitmentCriteria,...
+    'Style', 'popupmenu',...
+    'String', muscleRecruitmentCriteria,...
+    'Callback', @onMuscleRecruitment);
+gui.Home.Settings.Popup_MuscleRecruitmentCriteria.Value = 1;
+
 % Panel muscle path design
 gui.Home.Settings.Panel_MusclePath = uix.Panel(...
     'Parent', gui.Home.Settings.Layout_V,...
@@ -142,7 +154,7 @@ gui.Home.Settings.Checkbox_ShowWrappingSurfaces = uicontrol(...
 set(gui.Home.Settings.(['RadioButton_' data.MusclePathModel]), 'Value', 1)
 
 % Adjust layout
-set(gui.Home.Settings.Layout_V, 'Height', [40, 40, 40, 40*3])
+set(gui.Home.Settings.Layout_V, 'Height', [37, 37, 37, 37, 37*3])
 
 %% Box panel patient specific parameters
 gui.Home.Parameters.BoxPanel = uix.BoxPanel(...
@@ -644,7 +656,7 @@ set(gui.Home.Results.Layout_Grid_Bottom, 'Width',  [-1, -1, -1, -1],'Height', [-
 
 %% Adjust home layout
 set(gui.Home.Layout_H,       'Width',  [-1, -3, -3])
-set(gui.Home.Layout_V_Left,  'Height', [-8, -12])
+set(gui.Home.Layout_V_Left,  'Height', [-7, -13])
 set(gui.Home.Layout_H_Right, 'Width', [-1, -3])
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
@@ -819,6 +831,15 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
         % User has set the muscle path model to straight line
         data.ScalingLaw = ...
             gui.Home.Settings.Popup_Scaling.String{gui.Home.Settings.Popup_Scaling.Value};
+        gui.IsUpdated = false;
+        updateHomeTab();
+    end
+
+    function onMuscleRecruitment(~, ~)
+        % User has defined the muscle recruitment criteria
+        data.MuscleRecruitmentCriteria = ...
+            gui.Home.Settings.Popup_MuscleRecruitmentCriteria.String...
+            {gui.Home.Settings.Popup_MuscleRecruitmentCriteria.Value};
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -1132,6 +1153,22 @@ end
                     gui.Home.Parameters.EditText.CCD,...
                     gui.Home.Parameters.EditText.NeckLength],...
                     'Enable', 'off');
+        end
+    end
+
+    function updateMuscleRecruitmentCriteria()
+        switch data.MuscleRecruitmentCriteria
+            case 'None'
+                set([...
+                    gui.Home.Settings.RadioButton_ViaPoint,...
+                    gui.Home.Settings.RadioButton_Wrapping],...
+                    'Enable','on');
+            case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
+                set(gui.Home.Model.ListBox_MuscleList,'Enable','on');
+                set([...
+                    gui.Home.Settings.RadioButton_ViaPoint,...
+                    gui.Home.Settings.RadioButton_Wrapping],...
+                    'Enable','off');
         end
     end
 
