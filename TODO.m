@@ -29,3 +29,4 @@
 
 % GUI
 % - Move postures selection to validation tab
+% - Enable pelvic tilt depending on the HJF model
