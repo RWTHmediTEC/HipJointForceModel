@@ -27,7 +27,10 @@ gui.Validation.Layout_V     = uix.VBox('Parent', gui.Tabs,                'Spaci
 gui.Validation.Layout_H_Top = uix.HBox('Parent', gui.Validation.Layout_V, 'Spacing', 3);
 gui.Validation.Layout_Grid  = uix.Grid('Parent', gui.Validation.Layout_V, 'Spacing', 3);
 
-gui.Tabs.TabNames = {'Home', 'Validation'};
+% Create muscle activation tab
+gui.Activation.Layout_V     = uix.VBox('Parent', gui.Tabs,                'Spacing', 3);
+
+gui.Tabs.TabNames = {'Home', 'Validation', 'Muscle Recruitment'};
 gui.Tabs.SelectedChild = 1;
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
@@ -103,17 +106,17 @@ gui.Home.Settings.Popup_Scaling = uicontrol(...
     'Callback', @onScalingLaw);
 gui.Home.Settings.Popup_Scaling.Value=1;
 
-% Panel muscle recruitment
-gui.Home.Settings.Panel_MuscleRecruitmentCriteria = uix.Panel(...
+% Panel muscle recruitment criterion
+gui.Home.Settings.Panel_MuscleRecruitmentCriterion = uix.Panel(...
     'Parent', gui.Home.Settings.Layout_V,...
     'Title', 'Muscle Recruitment Criteria');
 muscleRecruitmentCriteria = {'None','MinMax','Polynom2','Polynom3','Polynom5','Energy'};
-gui.Home.Settings.Popup_MuscleRecruitmentCriteria = uicontrol(...
-    'Parent', gui.Home.Settings.Panel_MuscleRecruitmentCriteria,...
+gui.Home.Settings.Popup_MuscleRecruitmentCriterion = uicontrol(...
+    'Parent', gui.Home.Settings.Panel_MuscleRecruitmentCriterion,...
     'Style', 'popupmenu',...
     'String', muscleRecruitmentCriteria,...
     'Callback', @onMuscleRecruitment);
-gui.Home.Settings.Popup_MuscleRecruitmentCriteria.Value = 1;
+gui.Home.Settings.Popup_MuscleRecruitmentCriterion.Value = 1;
 
 % Panel muscle path design
 gui.Home.Settings.Panel_MusclePath = uix.Panel(...
@@ -789,11 +792,28 @@ set(gui.Validation.Layout_Grid, 'Widths', [-3, -3, -3], 'Heights', [-1, -1])
 set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
 
 %¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
+%                      MUSCLE ACTIVATION TAB PANELS                       %
+%_________________________________________________________________________%
+
+gui.Activation.Panel.Muscles = uix.BoxPanel(...
+    'Parent', gui.Activation.Layout_V,...
+    'Title', 'Muscle Recruitment',...
+    'FontWeight', 'bold');
+gui.Activation.Panel.Fascicles = uix.BoxPanel(...
+    'Parent', gui.Activation.Layout_V,...
+    'Title', 'Fascicle Recruitment',...
+    'FontWeight', 'bold');
+
+gui.Activation.Axes.Muscles = axes(...
+    'Parent', uicontainer(gui.Activation.Panel.Muscles),'Visible', 'Off');
+gui.Activation.Axes.Fascicles = axes(...
+    'Parent', uicontainer(gui.Activation.Panel.Fascicles),'Visible', 'Off');
+
+%¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯%
 %                           HOME TAB CALLBACKS                            %
 %_________________________________________________________________________%
 
 %% Box panel settings
-
     function onCadavers(~, ~)
         data.Cadaver = ...
             gui.Home.Settings.Popup_Cadaver.String{gui.Home.Settings.Popup_Cadaver.Value};
@@ -837,9 +857,9 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
 
     function onMuscleRecruitment(~, ~)
         % User has defined the muscle recruitment criteria
-        data.MuscleRecruitmentCriteria = ...
-            gui.Home.Settings.Popup_MuscleRecruitmentCriteria.String...
-            {gui.Home.Settings.Popup_MuscleRecruitmentCriteria.Value};
+        data.MuscleRecruitmentCriterion = ...
+            gui.Home.Settings.Popup_MuscleRecruitmentCriterion.String...
+            {gui.Home.Settings.Popup_MuscleRecruitmentCriterion.Value};
         gui.IsUpdated = false;
         updateHomeTab();
     end
@@ -872,7 +892,6 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
 
 
 %% Box panel patient specific parameters
-
     function onLeftSide(~, ~)
         % User has set side to left
         data.S.Side = 'L';
@@ -997,7 +1016,6 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
     end
 
 %% Box panel model
-
     function onListSelection_Model(src, ~)
         % User has selected a model from the list
         data.Model = models{get(src, 'Value')};
@@ -1030,22 +1048,18 @@ set(gui.Validation.Layout_V,  'Height', [-0.7, -10])
     end
 
 %% Box panel visualization
-function onAnatomicalView(~,~, axHandle, viewMatrix)
-
-axes(axHandle)
-mouseControl3d(axHandle, viewMatrix)
-
-end
-
+    function onAnatomicalView(~,~, axHandle, viewMatrix)
+        axes(axHandle)
+        mouseControl3d(axHandle, viewMatrix)
+    end
 
 %% Box panel results
-
     function onPushButton_RunCalculation(~, ~)
         % User has pressed the run calculation button
         set(gui.Home.Results.PushButton_RunCalculation, 'BackgroundColor', 'r', 'Enable', 'off');
         
         % Validtion with OrthoLoad data
-        if gui.Home.Results.Checkbox_Validation.Value == 1
+        if gui.Home.Results.Checkbox_Validation.Value
             data.View = 'Femur';
             updateHipJointForceView();
             data.Results = validateTLEM2(data, gui);
@@ -1056,6 +1070,7 @@ end
             data = gui.Home.Model.modelHandle.Calculation(data);
             gui.IsUpdated = true;
             gui = updateResults(data, gui);
+            updateActivationTab();
             drawnow
         end
     end
@@ -1085,7 +1100,6 @@ end
 %_________________________________________________________________________%
 
 %% Home tab
-
     function updateHomeTab()
         updateHipJointForceView();
         updateScalingLaw();
@@ -1099,7 +1113,6 @@ end
     end
 
 %% Box panel settings
-
     function updateHipJointForceView()
         set(gui.Home.Settings.RadioButton_Pelvis, 'Value', 0);
         set(gui.Home.Settings.RadioButton_Femur,  'Value', 0);
@@ -1156,8 +1169,8 @@ end
         end
     end
 
-    function updateMuscleRecruitmentCriteria()
-        switch data.MuscleRecruitmentCriteria
+    function updateMuscleRecruitmentCriterion()
+        switch data.MuscleRecruitmentCriterion
             case 'None'
                 set([...
                     gui.Home.Settings.RadioButton_ViaPoint,...
@@ -1192,13 +1205,11 @@ end
     end
 
 %% Box panel patient specific parameters
-
 % see:
 %   src/gui/updateSide.m
 %   src/gui/updateParameters.m
 
 %% Box panel model
-
     function updateModel()
         calculateTLEM2 = str2func(data.Model);
         gui.Home.Model.modelHandle = calculateTLEM2();
@@ -1226,7 +1237,6 @@ end
     end
 
 %% Box panel visualization
-
     function updateVisualization()
         data = scaleTLEM2(data);
         data = globalizeTLEM2(data);
@@ -1240,12 +1250,10 @@ end
     end
 
 %% Box panel results
-
 % see:
 %   src/gui/updateResults.m
 
 %% Update validation tab
-
     function updateFemoralCS()
         gui.Validation.Settings.RadioButton_Wu2002.Value = 0;
         gui.Validation.Settings.RadioButton_Bergmann2016.Value = 0;
@@ -1311,6 +1319,19 @@ end
             boxPlotHandle.YTick=singleHandle.YTick;
             boxPlotHandle.YTickLabel=singleHandle.YTickLabel;
             title(boxPlotHandle,['n = ' num2str(sum(~isnan(invivo) & ~isnan(simulated)))])
+        end
+    end
+
+%% Update activation tab
+    function updateActivationTab
+        structfun(@(x) delete(x.Children), gui.Activation.Axes)
+        if strcmp(data.MuscleRecruitmentCriterion, 'None') || isempty(data.Activation)
+            structfun(@(x) set(x, 'Visible','off'), gui.Activation.Axes)
+        else
+            structfun(@(x) set(x, 'Visible','on'), gui.Activation.Axes)
+            MSC = data.MuscleRecruitmentCriterion;
+            plotActivation(gui.Activation.Axes.Muscles, MSC, data.Activation.Muscles)
+            plotActivation(gui.Activation.Axes.Fascicles, MSC, data.Activation.Fascicles)
         end
     end
 

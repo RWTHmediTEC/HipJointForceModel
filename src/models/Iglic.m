@@ -85,7 +85,7 @@ MuscleList      = data.MuscleList;
 activeMuscles   = data.activeMuscles;
 MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
-MRC             = data.MuscleRecruitmentCriteria;
+MRC             = data.MuscleRecruitmentCriterion;
 
 %% Define Parameters
 G = -data.g;                       % weight force
@@ -158,13 +158,14 @@ switch MRC
         ft = double(R.ft);
         fp = double(R.fp);
         if fa < 0 || ft < 0 || fp < 0
-            warning(['Unphysiolocial / negative value of fa (' num2str(fa,1) '), ' ...
+            warning(['Unphysiological / negative value of fa (' num2str(fa,1) '), ' ...
                 'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
         end
         
+        data.Activation = [];
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
         
-        F = muscleRecruitment(a, W, r, s, A, data);
+        [F, data] = muscleRecruitment(a, W, r, s, A, data);
         
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + W(1);

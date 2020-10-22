@@ -18,8 +18,8 @@ if nargin == 0 || isempty(data)
     data.View = 'Femur';
     % Scaling law
     data.ScalingLaw = 'None';
-    % Muscle Recruitemnt Criteria: None, MinMax, Polynom2, Polynom3, Polynom5, Energy
-    data.MuscleRecruitmentCriteria = 'None';
+    % Muscle Recruitemnt Criterion: None, MinMax, Polynom2, Polynom3, Polynom5, Energy
+    data.MuscleRecruitmentCriterion = 'None';
     % Muscle Path Model: StraightLine, ViaPoint, Wrapping
     data.MusclePathModel = 'StraightLine';
     % Side of the hip joint: Right 'R'; Left 'L'

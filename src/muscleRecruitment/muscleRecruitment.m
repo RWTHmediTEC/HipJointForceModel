@@ -1,4 +1,4 @@
-function force = muscleRecruitment(a, w, r, s, PCSA, data)
+function [force, data] = muscleRecruitment(a, w, r, s, PCSA, data)
 % a = lever arm of the body weight force;
 % w = body weight force;
 % r = origin of the muscle's line of action;
@@ -10,7 +10,7 @@ tStart = tic;
 side          = data.S.Side;
 muscleList    = data.MuscleList;
 musclePaths   = data.S.MusclePaths;
-MRC           = data.MuscleRecruitmentCriteria;
+MRC           = data.MuscleRecruitmentCriterion;
 z             = data.S.LE(1).Joints.Hip.Pos;
 
 %% Parameters
@@ -102,7 +102,7 @@ momF = leverArm*fascicleForce;
 sm = sum(momF);
 % Check whether moments are equal
 if ~isequal(round(sm,4),round(-momentW(1),4))
-    uiwait(msgbox({'Unphysiolocial!';'Imbalance of moments!';...
+    uiwait(msgbox({'Unphysiological!';'Imbalance of moments!';...
         [num2str(round(sm,4)),' = ',num2str(round(-momentW(1),4))]},'Warning','warn','modal'));
 end
 
@@ -142,8 +142,11 @@ for i = 1:length(fMaxM)
     end
 end
 
-fascicleActivation = fascicleForce./fMax;           % Activation of each fascicle
-muscleActivation = muscleForce./fMaxM;              % Activation of each muscle
-plotActivation(NoAF,MRC,fascicleActivation,{musclePaths.Name},muscleActivation,activeMuscles);
+% Activation of each fascicle
+fascicleActivation = table(fascicleForce./fMax,'VariableNames',{'Activation'},'RowNames',{musclePaths.Name});
+data.Activation.Fascicles = fascicleActivation;
+% Activation of each muscle
+muscleActivation = table(muscleForce./fMaxM,'VariableNames',{'Activation'},'RowNames',activeMuscles);
+data.Activation.Muscles = muscleActivation;
 
 end

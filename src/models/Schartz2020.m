@@ -110,6 +110,8 @@ rY = double(R.RySym);
 rZ = double(R.RzSym);
 % f = double(R.f);
 
+data.Activation = [];
+
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
 end

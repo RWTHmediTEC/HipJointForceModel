@@ -63,7 +63,7 @@ Side            = data.S.Side;
 MuscleList      = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
-MRC             = data.MuscleRecruitmentCriteria;
+MRC             = data.MuscleRecruitmentCriterion;
 
 %% Define Parameters
 g = -data.g;                       % weight force
@@ -132,9 +132,11 @@ switch MRC
         
         % Clear assumptions
         assume(f, 'clear');
+        
+        data.Activation = [];
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
         
-        F = muscleRecruitment(a, W, r, s, A, data);
+        [F, data] = muscleRecruitment(a, W, r, s, A, data);
         
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + W(1);

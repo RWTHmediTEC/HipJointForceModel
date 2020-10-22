@@ -125,11 +125,13 @@ Results = solve(check, eq1, eq2, eq3);
 
 MuscleForce = double(Results.M_TLEM_magnitude);
 if MuscleForce < 0
-    warning(['Unphysiolocial / negative value of the muscle force M (' num2str(MuscleForce,1) ')!'])
+    warning(['Unphysiological / negative value of the muscle force M (' num2str(MuscleForce,1) ')!'])
 end
 rX = double(Results.RxSym);
 rY = double(Results.RySym);
 rZ = double(Results.RzSym);
+
+data.Activation = [];
 
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 

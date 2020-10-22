@@ -93,6 +93,8 @@ rX = double(Results.RxSym);
 rY = double(Results.RySym);
 rZ = double(Results.RzSym);
 
+data.Activation = [];
+
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
 end
