@@ -25,8 +25,9 @@ for b = 1:NoB
     % Lower Extremity (LE)
     LE(b).Name = Bones{b};
     % Load the bone surfaces described in the local (bone) coordinate system
-    [LE(b).Mesh.vertices, LE(b).Mesh.faces] = ...
-        stlRead([tempFileName Bones{b} BoneSuffix{b} '.stl']);
+    TR = stlread([tempFileName Bones{b} BoneSuffix{b} '.stl']);
+    LE(b).Mesh.vertices = TR.Points; 
+    LE(b).Mesh.faces = TR.ConnectivityList;
 end
 
 
