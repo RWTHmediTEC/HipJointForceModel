@@ -11,7 +11,7 @@ side          = data.S.Side;
 muscleList    = data.MuscleList;
 musclePaths   = data.S.MusclePaths;
 MRC           = data.MuscleRecruitmentCriterion;
-z             = data.S.LE(1).Joints.Hip.Pos;
+HJC           = data.S.LE(1).Joints.Hip.Pos;
 
 %% Parameters
 % Muscle Tension [N/mm²] 0.9 in Anybody, 0.5 in CusToM
@@ -27,12 +27,20 @@ switch n
         N = PCSA;
 end
 
+%% Optimization of muscle forces
 % Number of active fascicles
 NoAF = length(musclePaths);
 
-%% Calculation of Resultant Muscle Force
+% Initial value of optimization
+F_0 = zeros(NoAF,1);
+% Minimum fasicle strength [N]
+F_MIN = zeros(size(F_0));
 % Lever arms of muscles around hip joint center [mm]
-leverArm = leverOfMuscles(NoAF,r,s,z);
+leverArm = leverOfMuscles(r,s,HJC);
+% Lever arms of all active muscles around hip joint center
+aeq = zeros(3,NoAF);
+aeq(1,:) = leverArm;
+
 % Moment of bodyweight force around hip joint center [Nmm]
 switch side
     case 'R'
@@ -40,19 +48,9 @@ switch side
     case 'L'
         momentW = cross([0 0  a], w);
 end
-
-% Lever arms of all active muscles around hip joint center
-aeq = zeros(3,NoAF);
-aeq(1,:) = leverArm;
 % Negative moment of external forces around hip joint center
 beq = -momentW';
 
-
-%% Optimization of muscle forces
-% Initial value of optimization
-F_0 = zeros(NoAF,1);
-% Minimum fasicle strength [N]
-F_MIN = zeros(size(F_0));
 % Optimization options
 opts = optimoptions(@fmincon,...
     'Algorithm','sqp',...
