@@ -28,9 +28,9 @@ postures = {'OneLeggedStance' 'OLS';
 end
 
 %% Calculate the joint angles for positioning of the TLEM2
-function jointAngles = Position(~)
+function jointAngles = Position(data)
 
-jointAngles = {[0 0 0], [0 0 0], 0, 0, 0, 0};
+jointAngles = {[0 0 data.S.PelvicTilt], [0 0 0], 0, 0, 0, 0};
 
 end
 

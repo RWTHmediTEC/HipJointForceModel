@@ -30,7 +30,7 @@ phi = 0.5; % Pelvic bend [°]: rotation around the posterior-anterior axis
 % Calculate the joint angles
 b = 0.48 * l;
 ny = asind(b/x0); % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
-jointAngles = {[phi 0 0], [ny 0 0], 0, 0, -ny, 0};
+jointAngles = {[phi 0 data.S.PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
 
 end
 

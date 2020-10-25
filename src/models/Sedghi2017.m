@@ -27,7 +27,7 @@ postures = {'OneLeggedStance' 'OLS';
 end
 
 %% Calculate the joint angles for positioning of the TLEM2
-function jointAngles = Position(~)
+function jointAngles = Position(data)
 
 % Only used for visualization
 [~, Scale] = Dostal1981();
@@ -38,7 +38,7 @@ phi = 0.5;
 % Calculate the joint angles
 b = 0.48 * l_ref;
 ny = asind(b/x0);
-jointAngles = {[phi 0 0], [ny 0 0], 0, 0, -ny, 0};
+jointAngles = {[phi 0 data.S.PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
 
 end
 

@@ -4,7 +4,7 @@ addpath(genpath('..\src'))
 addpath(genpath('..\data'))
 addpath(genpath('src'))
 
-scalingLaws = {'None', 'NonuniformEggert2018', 'LandmarkSkinningFischer2018'};
+scalingLaws = {'None', 'NonuniformSedghi2017', 'NonuniformEggert2018', 'LandmarkSkinningFischer2018'};
 models = {'Pauwels','Debrunner1975','Iglic'};
 
 %% Create results
