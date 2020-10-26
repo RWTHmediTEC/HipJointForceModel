@@ -4,25 +4,27 @@ delete([...
     gui.Home.Results.Axis_SagittalView  .Children,...
     gui.Home.Results.Axis_TransverseView.Children])
 
+side = data.S.Side;
+switch side
+    case 'R'
+        sideSign = 1;
+    case 'L'
+        sideSign = -1;
+end
+
 visualizeTLEM2(gui.Home.Results.Axis_FrontalView, ...
-    data.S.LE, data.S.Side,...
+    data.S.LE, side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
 visualizeTLEM2(gui.Home.Results.Axis_SagittalView, ...
-    data.S.LE, data.S.Side,...
+    data.S.LE, side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
 visualizeTLEM2(gui.Home.Results.Axis_TransverseView, ...
-    data.S.LE, data.S.Side,...
+    data.S.LE, side,...
     'Bones', find(strcmp({data.S.LE.Name}, data.View)));
 
 gui.Home.Results.Axis_FrontalView.View = [90 ,0];
 gui.Home.Results.Axis_FrontalView.CameraUpVector = [0, 1, 0];
-
-switch data.S.Side
-    case 'R'
-        gui.Home.Results.Axis_SagittalView.View = [0, 90];
-    case 'L'
-        gui.Home.Results.Axis_SagittalView.View = [0, -90];
-end
+gui.Home.Results.Axis_SagittalView.View = [0, sideSign*90];
 gui.Home.Results.Axis_SagittalView.CameraUpVector = [0, 1, 0];
 
 switch data.View
@@ -36,8 +38,8 @@ end
 
 % Plot hip joint force vector
 if gui.IsUpdated
-    HJF = data.HJF.(data.View).Wu2002.R;
-    rDir = normalizeVector3d(data.HJF.(data.View).Wu2002.R);
+    HJF = data.HJF.(data.View).Wu2002.R .* [1 1 sideSign];
+    rDir = normalizeVector3d(HJF);
     switch data.View
         case 'Pelvis'
             Dist2HJC = 55;

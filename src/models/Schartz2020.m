@@ -28,14 +28,14 @@ function [activeMuscles, enable] = Muscles(~)
 enable = 'on';
 % Default fascicles of the model
 activeMuscles = {...
-%     'BicepsFemoris';
-%     'Gastrocnemius';
+    %     'BicepsFemoris';
+    %     'Gastrocnemius';
     'Gluteus';
     'Iliacus';
     'RectusFemoris';
-%     'Soleus';
-%     'TibialisAnterior';
-%     'Vastus'};
+    %     'Soleus';
+    %     'TibialisAnterior';
+    %     'Vastus'};
     };
 end
 
@@ -47,7 +47,6 @@ muscleList      = data.MuscleList;
 BW              = data.S.BodyWeight;
 HipJointWidth   = data.S.Scale(1).HipJointWidth;
 activeMuscles   = data.activeMuscles;
-Side            = data.S.Side;
 MusclePaths     = data.S.MusclePaths;
 MusclePathModel = data.MusclePathModel;
 
@@ -87,12 +86,8 @@ F = A .* cell2sym(repmat({'f'}, Noam,1)) .* s;
 % Moment of F around hip rotation center
 momentF = cross(r, F);
 
-switch Side
-    case 'R'
-        momentW = cross([0 0 -l], W); % Moment of bodyweight force around hip rotation center
-    case 'L'
-        momentW = cross([0 0  l], W); % Moment of bodyweight force around hip rotation center
-end
+% Moment of bodyweight force around hip rotation center
+momentW = cross([0 0 -l], W);
 
 % Calculate hip joint reaction force R
 syms RxSym RySym RzSym

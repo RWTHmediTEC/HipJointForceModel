@@ -1,3 +1,4 @@
+
 % Cadaver
 % - TLEM2: Move origin of the femur mesh (from the EC midpoint) to the HJC
 % - Include additonal cadaver from https://github.com/anmuller/CusToM
@@ -22,6 +23,8 @@
 % HJF models
 % - Implement other one-leg stance models
 % - Implement models for other ADLs
+% - Global2Local as to take the JointAnkles into account especially for
+%   models without surfaces
 
 % Validation
 % - Level Walking could be split in three peak force phases

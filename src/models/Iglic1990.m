@@ -72,7 +72,6 @@ function data = Calculation(data)
 
 % Inputs
 BW              = data.S.BodyWeight;
-Side            = data.S.Side;
 HipJointWidth   = data.S.Scale(1).HipJointWidth;
 MuscleList      = data.MuscleList;
 activeMuscles   = data.activeMuscles;
@@ -118,11 +117,8 @@ F = f.*A.*s;
 % Moment of F around hip rotation center
 momentF = cross(r, F);
 
-if Side == 'L'
-    momentW = cross([d 0  a], W); % Moment 'WB - WL' around hip rotation center
-else
-    momentW = cross([d 0 -a], W); % Moment 'WB - WL' around hip rotation center
-end
+% Moment 'WB - WL' around hip rotation center
+momentW = cross([d 0 -a], W);
 
 % Calculate hip joint reaction force R
 syms RxSym RySym RzSym

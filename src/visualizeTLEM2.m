@@ -31,15 +31,34 @@ patchProps.FaceLighting = 'gouraud';
 
 %% Visualize bones
 % NoB == 1 || NoB == 2 draws bone only pelvis (1) or femur (2). Transform 
-% bone back to its local bone CS (-> neutral postion). Used for Frontal, 
+% bone back into its local bone CS (-> neutral postion). Used for Frontal, 
 % Sagittal and Transversal View in the Results panel.
 if isfield(LE,'Mesh')
     if NoB == 1
-        patch(axH, transformPoint3d(LE(NoB).Mesh, ...
-            createPelvisCS_TFM_Wu2002_TLEM2(LE)), patchProps);
+        pelvis = transformPoint3d(LE(NoB).Mesh, createPelvisCS_TFM_Wu2002_TLEM2(LE));
     elseif  NoB == 2
-        patch(axH, transformPoint3d(LE(NoB).Mesh, ...
-            createFemurCS_TFM_Wu2002_TLEM2(LE, side)), patchProps);
+        % Before mirroring it is always the 'R'ight side
+        femur = transformPoint3d(LE(NoB).Mesh, createFemurCS_TFM_Wu2002_TLEM2(LE, 'R'));
+    end
+end
+
+%% TFM for right or left side
+TFM2GUI = eye(4);
+switch side
+    case 'R'
+    case 'L'
+        TFM2GUI(3,3) = -1;
+    otherwise
+        error('Invalid side variable!')
+end
+LE = transformTLEM2(LE, repmat(TFM2GUI, 1, 1, length(LE)));
+
+%% Visualize bones
+if isfield(LE,'Mesh')
+    if NoB == 1
+        patch(axH, transformPoint3d(pelvis, TFM2GUI), patchProps);
+    elseif  NoB == 2
+        patch(axH, transformPoint3d(femur, TFM2GUI), patchProps);
     else
         % Draws all the bones. Used for Visualization panel
         for n = 1:NoB
@@ -94,18 +113,20 @@ if ~isempty(Muscles)
         if isempty(Muscles(m).Surface)
             switch MusclePathModel
                 case 'StraightLine'
-                    drawPoint3d(axH, Muscles(m).Points([1,end],:), lineProps);
+                    drawPoint3d(axH, ...
+                        transformPoint3d(Muscles(m).Points([1,end],:), TFM2GUI), lineProps);
                 case {'ViaPoint', 'Wrapping'}
-                    drawPoint3d(axH, Muscles(m).Points, lineProps);
+                    drawPoint3d(axH, ...
+                        transformPoint3d(Muscles(m).Points, TFM2GUI), lineProps);
             end
         else
-            drawPoint3d(axH, Muscles(m).Points, lineProps);
+            drawPoint3d(axH, transformPoint3d(Muscles(m).Points, TFM2GUI), lineProps);
         end
         % Draw vectors for the lines of action
         if MusclePathModel
             drawArrow3d(axH, ...
-                Muscles(m).(MusclePathModel)(1:3),...
-                Muscles(m).(MusclePathModel)(4:6)*25);
+                transformPoint3d(Muscles(m).(MusclePathModel)(1:3), TFM2GUI),...
+                transformVector3d(Muscles(m).(MusclePathModel)(4:6)*25, TFM2GUI));
         end
     end
 end

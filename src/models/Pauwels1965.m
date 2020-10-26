@@ -60,10 +60,7 @@ end
 %% Calculation of the hip joint force
 function data = Calculation(data)
 
-% Inputs
-Side = data.S.Side;
-
-%% Define parameters
+% Define parameters
 G = -data.g; % Weight force
 
 [~, S5, abc] = derivationFromBrauneAndFischer189X; 
@@ -80,12 +77,7 @@ syms RxSym RySym RzSym
 % Calculation of the hip joint force
 eq2 = RxSym;                             % Force equilibrium in the direction of X
 eq3 = RySym + S5 * G - M * cosd(alphaM); % Force equilibrium in the direction of Y
-switch Side
-    case 'L'
-        eq4 = RzSym - M * sind(alphaM); % Force equilibrium in the direction of Z
-    case 'R'
-        eq4 = RzSym + M * sind(alphaM); % Force equilibrium in the direction of Z
-end
+eq4 = RzSym + M * sind(alphaM);          % Force equilibrium in the direction of Z
 
 Results = solve(eq1, eq2, eq3, eq4);
 

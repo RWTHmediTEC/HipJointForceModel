@@ -80,7 +80,6 @@ function data = Calculation(data)
 % Inputs
 BW              = data.S.BodyWeight;
 hipJointWidth   = data.S.Scale(1).HipJointWidth;
-side            = data.S.Side;
 MuscleList      = data.MuscleList;
 activeMuscles   = data.activeMuscles;
 MusclePathModel = data.MusclePathModel;
@@ -130,7 +129,7 @@ switch MRC
     case 'None'
         % [Iglic 1990, S.37, Equ.2]
         f = cell2sym(activeMuscles(:,2));
-        % The assumption 'f >= 0' should be included, but then the solver 
+        % The assumption 'f >= 0' should be included, but then the solver
         % will not find a solution
         assume(f >= 0); assume(f,'clear')
         F = f .* A .* s;
@@ -138,11 +137,8 @@ switch MRC
         % Moment of F around hip rotation center
         momentF = cross(r, F);
         
-        if side == 'L'
-            momentW = cross([d 0  a], W); % Moment of 'WB - WL' around hip rotation center
-        else
-            momentW = cross([d 0 -a], W); % Moment of 'WB - WL' around hip rotation center
-        end
+        % Moment of 'WB - WL' around hip rotation center
+        momentW = cross([d 0 -a], W);
         
         % Calculate hip joint reaction force R
         eq1 =  sum(F(:,1)) + RxSym + W(1); % [Iglic 1990, S.37, Equ.4]

@@ -59,7 +59,6 @@ MuscleList      = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
 MusclePaths     = data.S.MusclePaths;
 HJC             = data.S.LE(1).Joints.Hip.Pos;
-Side            = data.S.Side;
 HJW             = data.S.Scale(1).HipJointWidth;
 if isnan(HJW)
     error('Please specifiy the hip joint width (HJW)!')
@@ -87,12 +86,7 @@ syms RxSym RySym RzSym
 % Calculation of the hip joint force
 eq2 = RxSym;                             % Force equilibrium in the direction of X
 eq3 = RySym + S5 * G - M * cosd(alphaM); % Force equilibrium in the direction of Y
-switch Side
-    case 'L'
-        eq4 = RzSym - M * sind(alphaM); % Force equilibrium in the direction of Z
-    case 'R'
-        eq4 = RzSym + M * sind(alphaM); % Force equilibrium in the direction of Z
-end
+eq4 = RzSym + M * sind(alphaM);          % Force equilibrium in the direction of Z
 
 Results = solve(eq1, eq2, eq3, eq4);
 

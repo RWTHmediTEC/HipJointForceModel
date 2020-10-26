@@ -26,17 +26,11 @@ calculateTLEM2 = str2func(data.Model);
 modelHandles = calculateTLEM2();
 data.jointAngles = modelHandles.Position(data);
 
-LE = positionTLEM2(LE, data.jointAngles);
-
-%% Mirror TLEM2 for the left side
-switch data.S.Side
-    case 'L'
-        mirrorTFM      = eye(4);
-        mirrorTFM(3,3) = -1;
-        mirrorTFM      = repmat(mirrorTFM, 1, 1, length(LE));
-        LE = transformTLEM2(LE, mirrorTFM);
-end
+[LE, data.S.PositionTFM] = positionTLEM2(LE, data.jointAngles);
 
 data.S.LE = LE;
+
+%% Create muscle paths
 data = musclePathsTLEM2(data);
+
 end

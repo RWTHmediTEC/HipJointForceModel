@@ -7,10 +7,8 @@ LE = data.S.LE;
 MuscleList = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
 ActiveMuscles = parseActiveMuscles(data.activeMuscles, MuscleList);
-
+% Create the muscle paths variable
 MusclePaths = cell2struct(ActiveMuscles(:,1)',{'Name'});
-% Switch sign for right and left side
-switch data.S.Side; case 'R'; side = 1; case 'L'; side = -1; end
 % Find the Index of the active muscle in Muscle List
 MuscleListIdx = nan(size(MusclePaths));
 MuscleBones = cell(size(MusclePaths));
@@ -54,7 +52,7 @@ for i = 1:length(MusclePaths)
     MusclePaths(i).Surface = {};
 end
 
-% Update MusclePaths struct for Wrapping model
+% Update MusclePaths struct for Wrapping
 if strcmp(MusclePathModel,'Wrapping')
     for i = 1:length(ActiveMuscles)
         if isequal(MuscleList{MuscleListIdx(i,1),6},'WS')
@@ -100,11 +98,11 @@ if strcmp(MusclePathModel,'Wrapping')
                                 % inputs for initial conditions
                                 % angle according to cylinder coordinates, heigth according to cylinder coordinates, tangent
                                 % vector defining initial direction, length of arc over the surface
-                                qCyl = [theta height -side*abs(vector(1)) vector(2) arcLength];
+                                qCyl = [theta height -abs(vector(1)) vector(2) arcLength];
                                 switch data.Posture
                                     case 'SU'
                                         if contains(MusclePaths(i).Name,'Vastus')
-                                            qCyl(1) = qCyl(1)-side*0.3;
+                                            qCyl(1) = qCyl(1)-0.3;
                                             qCyl(5) = qCyl(5)*2/3;
                                         end
                                 end
@@ -118,7 +116,7 @@ if strcmp(MusclePathModel,'Wrapping')
                                 angleVect = rad2deg(vectorAngle3d(wrapVect,straightVect));
                                 if abs(angleVect - 90) <= 15 && abs(angleVect - 90) >= -15
                                     angleCorrection = 0.3;
-                                    qCyl(1) = qCyl(1)  -side*angleCorrection; % changing initial conditions for wrapping
+                                    qCyl(1) = qCyl(1)  -angleCorrection; % changing initial conditions for wrapping
                                     muscleWrappingSystem = MuscleWrappingSystem(lineOrigin', lineInsertion');
                                     muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCyl, qCyl);
                                 end
@@ -172,7 +170,7 @@ if strcmp(MusclePathModel,'Wrapping')
                                     % inputs for initial conditions
                                     % angle according to cylinder coordinates, heigth according to cylinder coordinates, tangent
                                     % vector defining initial direction, length of arc over the surface
-                                    qCyl = [theta height -side*abs(vector(1)) vector(2) arcLength];
+                                    qCyl = [theta height -abs(vector(1)) vector(2) arcLength];
                                     % adds the surface to the muscle wrapping system
                                     muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCyl, qCyl);
                                 end

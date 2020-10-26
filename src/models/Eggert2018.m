@@ -58,7 +58,6 @@ function data = Calculation(data)
 % Inputs
 BW              = data.S.BodyWeight;
 hipJointWidth   = data.S.Scale(1).HipJointWidth;
-Side            = data.S.Side;
 
 MuscleList      = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
@@ -113,13 +112,9 @@ switch MRC
         
         % Moment of F around hip rotation center
         momentF = cross(r, F);
-        
-        switch Side
-            case 'R'
-                momentW = cross([0 0 -a], W); % Moment of bodyweight force around hip rotation center
-            case 'L'
-                momentW = cross([0 0  a], W); % Moment of bodyweight force around hip rotation center
-        end
+
+        % Moment of bodyweight force around hip rotation center
+        momentW = cross([0 0 -a], W);
         
         % Calculate hip joint force R
         eq1 =  sum(F(:,1)) + RxSym + W(1); % [Iglic 1990, S.37, Equ.4]

@@ -1,7 +1,7 @@
 function funcHandles = Sedghi2017
-% Based on the model of [Iglic 1990] using the cadaver data of 
+% Based on the model of [Iglic 1990] using the cadaver data of
 % [Dostal 1981].  A patient-specific femoral and pelvic scaling was
-% included. PCSAs were changed without further explanation. 
+% included. PCSAs were changed without further explanation.
 
 % References:
 % [Iglic 1990] 1990 - Iglic - Mathematical analysis of Chiari Osteotomy
@@ -22,7 +22,7 @@ function [postures, default] = Posture()
 
 default = 1;
 postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+    'LevelWalking' 'LW'};
 
 end
 
@@ -47,7 +47,7 @@ function [activeMuscles, enable] = Muscles(~)
 % User is not allowed to edit the default values
 enable = 'off';
 
-% Without further explanation, [Sedghi 2017] changed the PCSAs compared to 
+% Without further explanation, [Sedghi 2017] changed the PCSAs compared to
 % [Iglic 1990, S.37, Tab.1] and excluded the Piriformis muscle.
 activeMuscles = {...
     'GluteusMediusAnterior1',   'fa', 3*0.2;...
@@ -55,7 +55,7 @@ activeMuscles = {...
     'TensorFasciaeLatae1',      'fa', 1;...
     'RectusFemoris1',           'fa', 1;...
     
-    'GluteusMediusMid1',        'ft', 3*0.6;... 
+    'GluteusMediusMid1',        'ft', 3*0.6;...
     'GluteusMinimusMid1',       'ft', 3*0.6;...
     
     'GluteusMediusPosterior1',  'fp', 3*0.2;...
@@ -70,7 +70,6 @@ function data = Calculation(data)
 % Inputs
 BW            = data.S.BodyWeight;
 hipJointWidth = data.S.Scale(1).HipJointWidth;
-Side          = data.S.Side;
 
 activeMuscles = data.activeMuscles;
 MuscleList      = data.MuscleList;
@@ -112,19 +111,16 @@ A=A.*cell2mat(activeMuscles(:,3));
 
 % [Iglic 1990, S.37, Equ.2]
 f = cell2sym(activeMuscles(:,2));
-% The assumption 'f >= 0' should be included, but then the solver 
+% The assumption 'f >= 0' should be included, but then the solver
 % sometimes will not find a solution.
-assume(f >= 0); assume(f, 'clear'); 
+assume(f >= 0); assume(f, 'clear');
 F = f.*A.*s;
 
 % Moment of F around hip rotation center
 momentF = cross(r, F);
 
-if Side == 'L'
-    momentW = cross([d 0  a], W); % Moment 'WB - WL' around hip rotation center
-else
-    momentW = cross([d 0 -a], W); % Moment 'WB - WL' around hip rotation center
-end
+% Moment 'WB - WL' around hip rotation center
+momentW = cross([d 0 -a], W);
 
 % Calculate hip joint reaction force R
 syms RxSym RySym RzSym

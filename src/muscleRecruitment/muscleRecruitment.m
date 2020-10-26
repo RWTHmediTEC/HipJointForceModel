@@ -7,7 +7,6 @@ function [force, data] = muscleRecruitment(a, w, r, s, PCSA, data)
 
 tStart = tic;
 %% Inputs
-side          = data.S.Side;
 muscleList    = data.MuscleList;
 musclePaths   = data.S.MusclePaths;
 MRC           = data.MuscleRecruitmentCriterion;
@@ -42,12 +41,8 @@ aeq = zeros(3,NoAF);
 aeq(1,:) = leverArm;
 
 % Moment of bodyweight force around hip joint center [Nmm]
-switch side
-    case 'R'
-        momentW = cross([0 0 -a], w);
-    case 'L'
-        momentW = cross([0 0  a], w);
-end
+momentW = cross([0 0 -a], w);
+
 % Negative moment of external forces around hip joint center
 beq = -momentW';
 

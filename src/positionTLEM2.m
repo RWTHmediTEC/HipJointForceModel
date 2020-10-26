@@ -1,4 +1,4 @@
-function LE = positionTLEM2(LE, jointAngles)
+function [LE, TFM] = positionTLEM2(LE, jointAngles)
 % Rotation of the bones by jointAngles
 
 NoB = length(LE);

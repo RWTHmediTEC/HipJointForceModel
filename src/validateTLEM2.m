@@ -20,24 +20,9 @@ for s = 1:length(OL)
         OL(s).HJF_Bergmann2016 = transformVector3d(meanPFP.HJF_pBW,...
             anatomicalOrientationTFM('RAS','ASR'));
         % Transform OrthoLoad HJF into the Wu2002 CS
-        switch OL(s).Subject(end)
-            case 'L'
-                % The OrthoLoad HJF is presented for the right side for all 
-                % subjects. Left sides were mirrored. Hence, for left sides
-                % the OrthoLoad HJF has to be mirrored back for the 
-                % transformation into the Wu2002 CS.
-                
-                % Right to left in 'RAS'
-                meanPFP.HJF_pBW(1)=-meanPFP.HJF_pBW(1);
-                % Transform to Wu2002 in 'ASR'
-                OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
-                % Left to right in 'ASR'
-                OL(s).HJF_Wu2002(3)=-OL(s).HJF_Wu2002(3); 
-            case 'R'
-                OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
-            otherwise
-                error('Invalid side identifier!')
-        end
+        % The OrthoLoad HJF is presented for the right side for all
+        % subjects. Left sides were mirrored.
+        OL(s).HJF_Wu2002 = transformVector3d(meanPFP.HJF_pBW, OL(s).Wu2002TFM);
         
         % Biometric
         data.S.Side       = OL(s).Subject(end); % 'R' or 'L'
@@ -135,15 +120,6 @@ for s = 1:length(OL)
         % comparison. Use the orientation 'ASR' instead of 'RAS'.
         HJF_Bergmann2016 = transformVector3d(data.HJF.Femur.Bergmann2016.R, ...
             anatomicalOrientationTFM('RAS','ASR'));
-        
-        % OrthoLoad HJF is presented for the right side for all subjects.
-        % Left sides were mirrored. Hence, for left sides the simulated HJF
-        % is also mirrored.
-        switch data.S.Side
-            case 'L'
-                HJF_Bergmann2016(3)=-HJF_Bergmann2016(3);
-                HJF_Wu2002(3)=-HJF_Wu2002(3);
-        end
         
         Results(s).HJF_Wu2002          = HJF_Wu2002;
         Results(s).OL_HJF_Wu2002       = OL(s).HJF_Wu2002;

@@ -47,7 +47,6 @@ LE                = data.S.LE;
 activeMuscles     = data.activeMuscles;
 BodyWeight        = data.S.BodyWeight;
 HipJointWidth     = data.S.Scale(1).HipJointWidth;
-Side              = data.S.Side;
 GreaterTrochanter = data.S.LE(2).Mesh.vertices(data.S.LE(2).Landmarks.GreaterTrochanter.Node,:);
 HipJointCenter    = data.S.LE(1).Joints.Hip.Pos;
 AcetabularRoof    = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.AcetabularRoof_R.Node,:);
@@ -107,13 +106,8 @@ syms M_TLEM_magnitude % Magnitude of the muscle force M
 M = M_TLEM_direction * M_TLEM_magnitude;
 G5_Force = [0, G5 * -g, 0];
 
-if Side == 'L'
-    momentG5 = cross([0 0 d5], G5_Force);  % Moment of bodyweight force around hip rotation center
-    eq1 = momentG5 + [-h_TLEM * M_TLEM_magnitude, 0, 0]; % Moment equilibrium around hip joint center
-else
-    momentG5 = cross([0 0 -d5], G5_Force); % Moment of bodyweight force around hip rotation center
-    eq1 = momentG5 + [ h_TLEM * M_TLEM_magnitude, 0, 0];  % Moment equilibrium around hip joint center
-end
+momentG5 = cross([0 0 -d5], G5_Force); % Moment of bodyweight force around hip rotation center
+eq1 = momentG5 + [ h_TLEM * M_TLEM_magnitude, 0, 0];  % Moment equilibrium around hip joint center
 
 syms RxSym RySym RzSym
 % Calculate the hip joint force
