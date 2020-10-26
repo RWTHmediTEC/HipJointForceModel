@@ -6,21 +6,19 @@ R = R / abs(data.S.BodyWeight * data.g) * 100;
 data.HJF.Global.R=R;
 
 % Pelvis bone CS
-data.HJF.Pelvis.Wu2002.R = transformVector3d(R, ...
-    createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE));
+data.HJF.Pelvis.Wu2002.R = transformVector3d(R, data.S.LE(1).positionTFM');
 % Sanity Check
 if data.SurfaceData
-    assert(all(ismembertol(data.S.PositionTFM(:,:,1)',...
+    assert(all(ismembertol(data.S.LE(1).positionTFM',...
         createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE),'ByRows',1)))
 end
 
 % Reverse (=negative) R for femur bone CS
 % [Wu 2002]
-data.HJF.Femur.Wu2002.R = transformVector3d(-R, ...
-    createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R'));
+data.HJF.Femur.Wu2002.R = transformVector3d(-R, data.S.LE(2).positionTFM');
 % Sanity Check
 if data.SurfaceData
-    assert(all(ismembertol(data.S.PositionTFM(:,:,2)',...
+    assert(all(ismembertol(data.S.LE(2).positionTFM',...
         createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R'),'ByRows',1)))
 end
 % [Bergmann 2016]

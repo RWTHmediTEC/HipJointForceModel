@@ -34,11 +34,8 @@ patchProps.FaceLighting = 'gouraud';
 % bone back into its local bone CS (-> neutral postion). Used for Frontal, 
 % Sagittal and Transversal View in the Results panel.
 if isfield(LE,'Mesh')
-    if NoB == 1
-        pelvis = transformPoint3d(LE(NoB).Mesh, createPelvisCS_TFM_Wu2002_TLEM2(LE));
-    elseif  NoB == 2
-        % Before mirroring it is always the 'R'ight side
-        femur = transformPoint3d(LE(NoB).Mesh, createFemurCS_TFM_Wu2002_TLEM2(LE, 'R'));
+    if NoB == 1 || NoB == 2
+        localBone = transformPoint3d(LE(NoB).Mesh, LE(NoB).positionTFM');
     end
 end
 
@@ -55,10 +52,8 @@ LE = transformTLEM2(LE, repmat(TFM2GUI, 1, 1, length(LE)));
 
 %% Visualize bones
 if isfield(LE,'Mesh')
-    if NoB == 1
-        patch(axH, transformPoint3d(pelvis, TFM2GUI), patchProps);
-    elseif  NoB == 2
-        patch(axH, transformPoint3d(femur, TFM2GUI), patchProps);
+    if NoB == 1 || NoB == 2
+        patch(axH, transformPoint3d(localBone, TFM2GUI), patchProps);
     else
         % Draws all the bones. Used for Visualization panel
         for n = 1:NoB

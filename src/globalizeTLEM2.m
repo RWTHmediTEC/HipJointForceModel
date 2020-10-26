@@ -26,7 +26,7 @@ calculateTLEM2 = str2func(data.Model);
 modelHandles = calculateTLEM2();
 data.jointAngles = modelHandles.Position(data);
 
-[LE, data.S.PositionTFM] = positionTLEM2(LE, data.jointAngles);
+LE = positionTLEM2(LE, data.jointAngles);
 
 data.S.LE = LE;
 

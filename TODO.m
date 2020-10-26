@@ -14,6 +14,8 @@
 
 % Muscle path models
 % - Improve scaling of wrapping surfaces
+% - Include sanity check for wrapping based on the length of the muscle
+%   path. If length is not physological, use StraightLine model.
 % - Improve inital wrapping parameters for better robustness of wrapping 
 %   for scaling and different postures
 
@@ -23,8 +25,7 @@
 % HJF models
 % - Implement other one-leg stance models
 % - Implement models for other ADLs
-% - Global2Local as to take the JointAnkles into account especially for
-%   models without surfaces
+% - Schartz2020 move upper body weight W anterior
 
 % Validation
 % - Level Walking could be split in three peak force phases
