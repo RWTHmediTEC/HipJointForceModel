@@ -1062,11 +1062,14 @@ gui.Activation.Axes.Fascicles = axes(...
         if gui.Home.Results.Checkbox_Validation.Value
             data.View = 'Femur';
             updateHipJointForceView();
+            data.Activation = [];
+            updateActivationTab();
             data.Results = validateTLEM2(data, gui);
             writetable(struct2table(data.Results), 'Results.xlsx')
             updateValidationTab();
         else
-            % Calculation with inserted data
+            data.Activation = [];
+            % Calculation with GUI inserted data
             data = gui.Home.Model.modelHandle.Calculation(data);
             gui.IsUpdated = true;
             gui = updateResults(data, gui);
