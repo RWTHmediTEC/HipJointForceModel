@@ -1,5 +1,11 @@
-function TFM = createFemurCS_TFM_Wu2002_TLEM2(LE, side)
+function TFM = createFemurCS_TFM_Wu2002_TLEM2(LE, side, varargin)
 % Wrapper function for createFemurCS_TFM_Wu2002 and the LE struct
+
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p,'verbose',1, logParValidFunc);
+parse(p,varargin{:});
+verbose = p.Results.verbose;
 
 warningMessage = [...
     'Femoral bone landmarks are missing for the selected cadaver!' newline ... 
@@ -13,11 +19,15 @@ if isfield(LE, 'Landmarks')
         TFM = createFemurCS_TFM_Wu2002(MEC, LEC, HJC, side);
     else
         TFM = eye(4);
-        warning(warningMessage)
+        if verbose
+            warning(warningMessage)
+        end
     end
 else
     TFM = eye(4);
-    warning(warningMessage)
+    if verbose
+        warning(warningMessage)
+    end
 end
 
 end

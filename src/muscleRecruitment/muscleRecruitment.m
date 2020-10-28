@@ -5,7 +5,9 @@ function [force, data] = muscleRecruitment(lBW, BW, LoA_PoA, LoA_Dir, PCSA, data
 % LoA_Dir = unit vector in the direction of the fascicle's line of action;
 % PCSA = physiological cross sectional area of fascicles [mm²]
 
-tStart = tic;
+if data.Verbose
+    tStart = tic;
+end
 %% Inputs
 muscleList    = data.MuscleList;
 musclePaths   = data.S.MusclePaths;

@@ -1,4 +1,10 @@
-function TFM = createFemurCS_TFM_Bergmann2016_TLEM2(LE, side)
+function TFM = createFemurCS_TFM_Bergmann2016_TLEM2(LE, side, varargin)
+
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p,'verbose',1, logParValidFunc);
+parse(p,varargin{:});
+verbose = p.Results.verbose;
 
 try
     % Wrapper function for createFemurCS_TFM_Bergmann2016 and the LE struct
@@ -9,7 +15,9 @@ try
     HJC = LE(2).Joints.Hip.Pos;
     TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, P1, P2, HJC, side);
 catch
-    warning('Missing data! Returning nan(4)!')
+    if verbose
+        warning('Missing data! Returning nan(4)!')
+    end
     TFM=nan(4);
 end
 

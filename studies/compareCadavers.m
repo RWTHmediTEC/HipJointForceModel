@@ -11,7 +11,9 @@ models = {'Pauwels','Debrunner1975','Iglic'};
 results = cell(length(cadavers), length(models));
 for c = 1:length(cadavers)
     for m=1:length(models)
+        display([cadavers{c} ' - ' models{m}])
         data = createDataTLEM2();
+        data.Verbose = 0;
         data = createDataTLEM2(data, cadavers{c});
         
         data.ScalingLaw = 'None';

@@ -72,9 +72,9 @@ end
 % Bone CSs may have changed due to scaling and have to be corrected
 boneCS_TFM = repmat(eye(4), 1, 1, 6);
 % Pelvis
-boneCS_TFM(:,:,1) = createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE);
+boneCS_TFM(:,:,1) = createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE, 'verbose',data.Verbose);
 % Femur. Should be always the right side 'R' before scaling.
-boneCS_TFM(:,:,2) = createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R');
+boneCS_TFM(:,:,2) = createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R', 'verbose',data.Verbose);
 
 data.S.LE = transformTLEM2(data.S.LE, boneCS_TFM);
 

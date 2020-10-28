@@ -1,8 +1,10 @@
 function data = musclePathsTLEM2(data)
 %MUSCLEPATHSTLEM2 constructs the paths of the active muscles
 
+if data.Verbose
+    tStart = tic;
+end
 %% create the muscle paths
-tStart = tic;
 LE = data.S.LE;
 MuscleList = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
@@ -19,7 +21,9 @@ for i = 1:length(MusclePaths)
     if isempty(mlIdx)
         errMessage = [MusclePaths(i).Name(1:end-1) ' is not part of the ' ...
             'muscle list of the cadaver! Choose another cadaver!'];
-        msgbox(errMessage,mfilename,'error')
+        if data.Verbose
+            msgbox(errMessage,mfilename,'error')
+        end
         error(errMessage)
     else
         MuscleListIdx(i,1) = mlIdx;
@@ -230,7 +234,9 @@ end
 MusclePaths = linesOfActionLEM(LE, MusclePaths);
 
 data.S.MusclePaths = MusclePaths;
-disp(['Muscle path modeling took ' num2str(toc(tStart),'%.0f') ' seconds.'])
+if data.Verbose
+    disp(['Muscle path modeling took ' num2str(toc(tStart),'%.0f') ' seconds.'])
+end
 
 end
 

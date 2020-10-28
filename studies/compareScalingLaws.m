@@ -11,7 +11,9 @@ models = {'Pauwels','Debrunner1975','Iglic'};
 results = cell(length(scalingLaws), length(models));
 for s = 1:length(scalingLaws)
     for m=1:length(models)
+        display([scalingLaws{s} ' - ' models{m}])
         data = createDataTLEM2();
+        data.Verbose = 0;
         data = createDataTLEM2(data, 'TLEM2_0');
         
         data.ScalingLaw = scalingLaws{s};

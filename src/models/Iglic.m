@@ -154,7 +154,7 @@ switch MRC
         fa = double(R.fa);
         ft = double(R.ft);
         fp = double(R.fp);
-        if fa < 0 || ft < 0 || fp < 0
+        if (fa < 0 || ft < 0 || fp < 0) && data.Verbose
             warning(['Unphysiological / negative value of fa (' num2str(fa,1) '), ' ...
                 'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
         end

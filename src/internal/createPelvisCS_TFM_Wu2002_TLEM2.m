@@ -1,5 +1,11 @@
-function TFM = createPelvisCS_TFM_Wu2002_TLEM2(LE)
+function TFM = createPelvisCS_TFM_Wu2002_TLEM2(LE, varargin)
 % Wrapper function for createPelvisCS_TFM_Wu2002 and the LE struct
+
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p,'verbose',1, logParValidFunc);
+parse(p,varargin{:});
+verbose = p.Results.verbose;
 
 warningMessage = [...
     'Pelvic bone landmarks are missing for the selected cadaver!' newline ... 
@@ -15,11 +21,15 @@ if isfield(LE, 'Landmarks')
         TFM = createPelvisCS_TFM_Wu2002(ASIS_R, ASIS_L, PSIS_R, PSIS_L, HJC);
     else
         TFM = eye(4);
-        warning(warningMessage)
+        if verbose
+            warning(warningMessage)
+        end
     end
 else
     TFM = eye(4);
-    warning(warningMessage)
+    if verbose
+        warning(warningMessage)
+    end
 end
 
 end

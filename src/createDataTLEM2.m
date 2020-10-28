@@ -10,6 +10,7 @@ function data = createDataTLEM2(data, Cadaver)
 
 % Build structure which contains default data
 if nargin == 0 || isempty(data)
+    data.Verbose = 1;
     % g-Force
     data.g = 9.81;
     % Cadaver

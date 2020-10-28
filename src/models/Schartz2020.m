@@ -123,6 +123,10 @@ rX = double(R.RxSym);
 rY = double(R.RySym);
 rZ = double(R.RzSym);
 
+if any(isempty([rX, rY, rZ]))
+    error(['No solution was found by the ' mfilename ' model!'])
+end
+
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
 end

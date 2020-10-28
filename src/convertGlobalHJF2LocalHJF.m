@@ -23,6 +23,6 @@ if data.SurfaceData
 end
 % [Bergmann 2016]
 data.HJF.Femur.Bergmann2016.R = transformVector3d(-R, ...
-    createFemurCS_TFM_Bergmann2016_TLEM2(data.S.LE, 'R'));
+    createFemurCS_TFM_Bergmann2016_TLEM2(data.S.LE, 'R', 'verbose',data.Verbose));
 
 end

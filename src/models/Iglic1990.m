@@ -141,7 +141,7 @@ ft = double(R.ft);
 fp = double(R.fp);
 if any(isempty([fa, ft, fp]))
     error(['No solution was found by the ' mfilename ' model!'])
-elseif fa < 0 || ft < 0 || fp < 0
+elseif (fa < 0 || ft < 0 || fp < 0) && data.Verbose
     warning(['Unphysiological / negative value of fa (' num2str(fa,1) '), ' ...
         'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
 end
