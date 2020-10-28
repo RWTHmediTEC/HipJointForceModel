@@ -93,8 +93,8 @@ force = (LoA_Dir.*fascicleForce)';
 momentF = (aeq*fascicleForce)';
 % Check whether moments are equal
 if any(~ismembertol(momentF,momentW,1e-8,'ByRows',1))
-    uiwait(msgbox({'Unphysiological!';'Imbalance of moments!';...
-        [num2str(sum(momentF)),' = ',num2str(sum(momentW))]},'Warning','warn','modal'));
+    msgbox({'Unphysiological!';'Imbalance of moments!';...
+        [num2str(sum(momentF)),' = ',num2str(sum(momentW))]},[mfilename '.m'],'warn');
 end
 
 disp(['Muscle recruitment took ' num2str(toc(tStart),'%.0f') ' seconds.'])
