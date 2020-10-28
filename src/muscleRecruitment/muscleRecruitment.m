@@ -1,8 +1,8 @@
-function [force, data] = muscleRecruitment(a, w, r, s, PCSA, data)
-% a = lever arm of the body weight force;
-% w = body weight force;
-% r = origin of the muscle's line of action;
-% s = direction of the muscle's line of action;
+function [force, data] = muscleRecruitment(lBW, BW, LoA_PoA, LoA_Dir, PCSA, data)
+% lBW = lever arm of the bodyweight force;
+% BW = bodyweight force;
+% LoA_PoA = point of application (origin) of the fascicle's line of action;
+% LoA_Dir = unit vector in the direction of the fascicle's line of action;
 % PCSA = physiological cross sectional area of fascicles [mm²]
 
 tStart = tic;
@@ -26,7 +26,7 @@ switch n
         N = PCSA;
 end
 
-%% Optimization of muscle forces
+%% Optimization of fascicle forces
 % Number of active fascicles
 NoAF = length(musclePaths);
 
@@ -34,15 +34,14 @@ NoAF = length(musclePaths);
 F_0 = zeros(NoAF,1);
 % Minimum fasicle strength [N]
 F_MIN = zeros(size(F_0));
-% Lever arms of muscles around hip joint center [mm]
-leverArm = leverOfMuscles(r,s,HJC);
-% Lever arms of all active muscles around hip joint center
-aeq = zeros(3,NoAF);
-aeq(1,:) = leverArm;
-
-% Moment of bodyweight force around hip joint center [Nmm]
-momentW = cross([0 0 -a], w);
-
+% Project the HJC onto the line of action
+HJConLineOfAction = projPointOnLine3d(HJC,[LoA_PoA LoA_Dir]);
+% Get lever arms of the fascicles around HJC
+leverArm = HJConLineOfAction-HJC;
+% Moment of the fascicle forces around HJC
+aeq = crossProduct3d(leverArm, LoA_Dir)';
+% Moment of the bodyweight force around hip joint center [Nmm]
+momentW = crossProduct3d(lBW, BW);
 % Negative moment of external forces around hip joint center
 beq = -momentW';
 
@@ -86,17 +85,16 @@ switch MRC
         fascicleForce = muscleRecruitmentEnergy(C1,F_0,F_MIN,fMax,aeq,beq,PCSA,opts,fascicleMass);
 end
 
-% Get force matrix by multiplying the force diagonal matrix with the matrix
-% of the unit force direction vector
-force = s'*diag(fascicleForce);
+% Get the fascicle forces by multiplying the unit force direction vector
+% with the magnitdue of the fascicle forces
+force = (LoA_Dir.*fascicleForce)';
 
 % Check if optimization was succesful
-momF = leverArm*fascicleForce;
-sm = sum(momF);
+momentF = (aeq*fascicleForce)';
 % Check whether moments are equal
-if ~isequal(round(sm,4),round(-momentW(1),4))
+if any(~ismembertol(momentF,momentW,1e-8,'ByRows',1))
     uiwait(msgbox({'Unphysiological!';'Imbalance of moments!';...
-        [num2str(round(sm,4)),' = ',num2str(round(-momentW(1),4))]},'Warning','warn','modal'));
+        [num2str(sum(momentF)),' = ',num2str(sum(momentW))]},'Warning','warn','modal'));
 end
 
 disp(['Muscle recruitment took ' num2str(toc(tStart),'%.0f') ' seconds.'])

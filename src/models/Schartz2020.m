@@ -28,14 +28,14 @@ function [activeMuscles, enable] = Muscles(~)
 enable = 'on';
 % Default fascicles of the model
 activeMuscles = {...
-    %     'BicepsFemoris';
-    %     'Gastrocnemius';
+    'BicepsFemorisCaputLongum';
+    % 'Gastrocnemius';
     'Gluteus';
     'Iliacus';
     'RectusFemoris';
-    %     'Soleus';
-    %     'TibialisAnterior';
-    %     'Vastus'};
+    % 'Soleus';
+    % 'TibialisAnterior';
+    % 'Vastus';
     };
 end
 
@@ -46,28 +46,33 @@ function data = Calculation(data)
 muscleList      = data.MuscleList;
 BW              = data.S.BodyWeight;
 HipJointWidth   = data.S.Scale(1).HipJointWidth;
+STjointPos      = data.S.LE(6).Joints.Subtalar.Pos;
+
 activeMuscles   = data.activeMuscles;
 MusclePaths     = data.S.MusclePaths;
 MusclePathModel = data.MusclePathModel;
+MRC             = data.MuscleRecruitmentCriterion;
 
 %% Define Parameters
-g = -data.g;                       % Weight force
-Wb = BW * g;                       % Resultant force of total bodyweight
-Wl = 0.161 * Wb;                   % Resultant force of the supporting limb
-W = [0, (Wb - 2*Wl)/2, 0];         % Resultant bodyweight force
-l = HipJointWidth/2;               % Half the distance between the two hip rotation centers
+g = -data.g;                  % Weight force
+Wb = BW * g;                  % Resultant force of total body weight
+Wl = 0.161 * Wb;              % Resultant force of the supporting limb
+W = [0, (Wb - 2*Wl)/2, 0];    % Resultant body weight force
+zW = HipJointWidth/2;         % Half the distance between the two hip rotation centers
+xW = STjointPos(1);           % Position of the foot in posteroanterior direction
+lW = [xW 0 -zW];              % Lever arm of the body weight force
 
 % Implement matrices for muscle origin points r, muscle insertion points r'
 % and relative physiological cross-sectional areas A
 
 % Number of active muscles
 Noam = size(activeMuscles,1);
-A = zeros(Noam,1);
+PCSA = zeros(Noam,1);
 % Get physiological cross-sectional areas
 for m = 1:Noam
     % Physiological cross-sectional areas of each fascicle
-    A_Idx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
-    A(m) = muscleList{A_Idx,5} / muscleList{A_Idx,4};
+    PCSA_Idx = strcmp(activeMuscles{m}(1:end-1), muscleList(:,1));
+    PCSA(m) = muscleList{PCSA_Idx,5} / muscleList{PCSA_Idx,4};
 end
 
 % r is origin of line of action
@@ -79,33 +84,44 @@ for i = 1:length(MusclePaths)
     s(i,:) = MusclePaths(i).(MusclePathModel)(4:6);
 end
 
-% Iglic 1990 equation 2
-syms f % Symbolic average muscle tension f
-F = A .* cell2sym(repmat({'f'}, Noam,1)) .* s;
-
-% Moment of F around hip rotation center
-momentF = cross(r, F);
-
-% Moment of bodyweight force around hip rotation center
-momentW = cross([0 0 -l], W);
-
-% Calculate hip joint reaction force R
 syms RxSym RySym RzSym
 
-eq1 =  sum(F(:,1)) + RxSym + W(1); % Iglic 1990 equation 4 for X-component
-eq2 =  sum(F(:,2)) + RySym + W(2); % Iglic 1990 equation 4 for Y-component
-eq3 =  sum(F(:,3)) + RzSym + W(3); % Iglic 1990 equation 4 for Z-component
-
-eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
-
-R = solve(eq1, eq2, eq3, eq4);
+switch MRC
+    case 'None'
+        % Iglic 1990 equation 2
+        syms f % Symbolic average muscle tension f
+        F = PCSA .* cell2sym(repmat({'f'}, Noam,1)) .* s;
+        
+        % Moment of F around hip rotation center
+        momentF = cross(r, F);
+        
+        % Moment of bodyweight force around hip rotation center
+        momentW = cross(lW, W);
+        
+        % Calculate hip joint reaction force R
+        eq1 =  sum(F(:,1)) + RxSym + W(1); % Iglic 1990 equation 4 for X-component
+        eq2 =  sum(F(:,2)) + RySym + W(2); % Iglic 1990 equation 4 for Y-component
+        eq3 =  sum(F(:,3)) + RzSym + W(3); % Iglic 1990 equation 4 for Z-component
+        
+        eq4 = sum(momentF(:,1)) + momentW(1); % Iglic 1990 equation 5 for X-component
+        eq5 = sum(momentF(:,2)) + momentW(2); % Iglic 1990 equation 5 for Y-component
+        eq6 = sum(momentF(:,3)) + momentW(3); % Iglic 1990 equation 5 for Y-component
+        
+        R = solve(eq1, eq2, eq3, eq4, eq5, eq6);
+        
+    case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
+        [F, data] = muscleRecruitment(lW, W, r, s, PCSA, data);
+        % Calculate hip joint reaction force R
+        eq1 =  sum(F(1,:)) + RxSym + W(1);
+        eq2 =  sum(F(2,:)) + RySym + W(2);
+        eq3 =  sum(F(3,:)) + RzSym + W(3);
+        
+        R = solve(eq1, eq2, eq3);
+end
 
 rX = double(R.RxSym);
 rY = double(R.RySym);
 rZ = double(R.RzSym);
-% f = double(R.f);
-
-data.Activation = [];
 
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 

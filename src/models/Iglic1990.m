@@ -146,8 +146,6 @@ elseif fa < 0 || ft < 0 || fp < 0
         'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
 end
 
-data.Activation = [];
-
 data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 
 % Clear assumptions

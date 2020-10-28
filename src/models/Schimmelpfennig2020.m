@@ -13,8 +13,9 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+postures = {...
+    'OneLeggedStance' 'OLS';
+    'LevelWalking' 'LW'};
 
 end
 
@@ -25,11 +26,11 @@ function jointAngles = Position(data)
 l = data.S.Scale(1).HipJointWidth/2;
 x0 = data.S.Scale(2).FemoralLength; % Femoral length
 
-phi = 0.5; % Pelvic bend [°]: rotation around the posterior-anterior axis
+phi = 0.5; % Pelvic bend [°]: rotation around the posteroanterior axis
 
 % Calculate the joint angles
 b = 0.48 * l;
-ny = asind(b/x0); % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
+ny = asind(b/x0); % Femoral adduction: rotation around the posteroanterior axis [Iglic 1990, S.37, Equ.8]
 jointAngles = {[phi 0 data.S.PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
 
 end
@@ -80,7 +81,7 @@ end
 function data = Calculation(data)
 
 % Inputs
-BW              = data.S.BodyWeight;
+BW_kg           = data.S.BodyWeight;
 hipJointWidth   = data.S.Scale(1).HipJointWidth;
 muscleList      = data.MuscleList;
 musclePathModel = data.MusclePathModel;
@@ -92,14 +93,15 @@ g = -data.g;                       % weight force
 
 % Subject-specific values
 l = hipJointWidth/2;               % Half the distance between the two hip rotation centers
-wb = BW * g;                       % total body weight [N]
+Wb = BW_kg * g;                    % total body weight [N]
 % Generic values
-wl = 0.161 * wb;                   % weight of the supporting limb
-w = [0, wb - wl, 0];               % 'WB - WL'
+Wl = 0.161 * Wb;                   % weight of the supporting limb
+W = [0, Wb - Wl, 0];               % 'WB - WL'
 
-b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
-c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
-a = (wb * c - wl * b) / (wb - wl); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]           
+b = 0.48 * l;                      % mediolateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
+c = 1.01 * l;                      % mediolateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
+a = (Wb * c - Wl * b) / (Wb - Wl); % mediolateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
+lW = [0 0 -a];                     % lever arm of the body weight W
 
 % Number of active muscles
 NoAM = length(musclePaths);
@@ -130,18 +132,18 @@ switch MRC
         msgbox(errMessage,mfilename,'error')
         error(errMessage)
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
-        [F, data] = muscleRecruitment(a, w, r, s, PCSA, data);
+        [F, data] = muscleRecruitment(lW, W, r, s, PCSA, data);
         % Calculate hip joint reaction force R
-        eq1 =  sum(F(1,:)) + RxSym + w(1);
-        eq2 =  sum(F(2,:)) + RySym + w(2);
-        eq3 =  sum(F(3,:)) + RzSym + w(3);
+        eq1 =  sum(F(1,:)) + RxSym + W(1);
+        eq2 =  sum(F(2,:)) + RySym + W(2);
+        eq3 =  sum(F(3,:)) + RzSym + W(3);
         
         R = solve(eq1, eq2, eq3);
         
         rX = double(R.RxSym);
         rY = double(R.RySym);
         rZ = double(R.RzSym);
-
+        
         data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
 end
 

@@ -25,11 +25,11 @@ function jointAngles = Position(data)
 % Inputs
 l = data.S.Scale(1).HipJointWidth/2;
 x0 = data.S.Scale(2).FemoralLength; % Femoral length
-phi = 0.5; % Pelvic bend [°]: rotation around the posterior-anterior axis
+phi = 0.5; % Pelvic bend [°]: rotation around the posteroanterior axis
 
 % Calculate the joint angles
 b = 0.48 * l;
-ny = asind(b/x0); % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
+ny = asind(b/x0); % Femoral adduction: rotation around the posteroanterior axis [Iglic 1990, S.37, Equ.8]
 jointAngles = {[phi 0 data.S.PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
 
 end
@@ -95,10 +95,11 @@ WB = BW * G;                       % total body weight
 % Generic values
 WL = 0.161 * WB;                   % weight of the supporting limb
 W = [0, WB - WL, 0];               % 'WB - WL'
-b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
-c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
-a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
-d = 0;                             % antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
+b = 0.48 * l;                      % mediolateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
+c = 1.01 * l;                      % mediolateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
+a = (WB * c - WL * b) / (WB - WL); % mediolateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
+d = 0;                             % posteroanterior moment arm of 'WB - WL' [Iglic 1990, S.37]
+lW = [d 0 -a];                     % lever arm of the body weight W
 
 % Create matrices for muscle origin points r, muscle insertion points r'
 % and relative physiological cross-sectional areas A
@@ -138,7 +139,7 @@ switch MRC
         momentF = cross(r, F);
         
         % Moment of 'WB - WL' around hip rotation center
-        momentW = cross([d 0 -a], W);
+        momentW = cross(lW, W);
         
         % Calculate hip joint reaction force R
         eq1 =  sum(F(:,1)) + RxSym + W(1); % [Iglic 1990, S.37, Equ.4]
@@ -157,11 +158,9 @@ switch MRC
             warning(['Unphysiological / negative value of fa (' num2str(fa,1) '), ' ...
                 'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
         end
-        
-        data.Activation = [];
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
         
-        [F, data] = muscleRecruitment(a, W, r, s, A, data);
+        [F, data] = muscleRecruitment(lW, W, r, s, A, data);
         
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + W(1);

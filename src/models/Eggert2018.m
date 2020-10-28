@@ -27,11 +27,11 @@ function jointAngles = Position(data)
 l = data.S.Scale(1).HipJointWidth/2;
 x0 = data.S.Scale(2).FemoralLength; % Femoral length
 
-phi = 0.5; % Pelvic bend [°]: rotation around the posterior-anterior axis
+phi = 0.5; % Pelvic bend [°]: rotation around the posteroanterior axis
 
 % Calculate the joint angles
 b = 0.48 * l;
-ny = asind(b/x0); % Femoral adduction: rotation around the posterior-anterior axis [Iglic 1990, S.37, Equ.8]
+ny = asind(b/x0); % Femoral adduction: rotation around the posteroanterior axis [Iglic 1990, S.37, Equ.8]
 jointAngles = {[phi 0 data.S.PelvicTilt], [ny 0 0], 0, 0, -ny, 0};
 
 end
@@ -74,9 +74,10 @@ WB = BW * g;                       % total body weight [N]
 WL = 0.161 * WB;                   % weight of the supporting limb
 W = [0, WB - WL, 0];               % 'WB - WL'
 
-b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
-c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
-a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
+b = 0.48 * l;                      % mediolateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
+c = 1.01 * l;                      % mediolateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
+a = (WB * c - WL * b) / (WB - WL); % mediolateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
+lBW = [0 0 -a];                    % lever arm of the body weight BW
 
 % Number of active muscles
 NoAM = length(MusclePaths);
@@ -93,12 +94,12 @@ for i = 1:NoAM
     NoAF{i} = MusclePaths(i).Name;
 end
 
-A = zeros(NoAM,1);
+PCSA = zeros(NoAM,1);
 % Get physiological cross-sectional areas
 for m = 1:NoAM
     % Physiological cross-sectional areas of each fascicle
-    A_Idx = strcmp(MusclePaths(m).Name(1:end-1), MuscleList(:,1));
-    A(m) = MuscleList{A_Idx,5} / MuscleList{A_Idx,4};
+    PCSA_Idx = strcmp(MusclePaths(m).Name(1:end-1), MuscleList(:,1));
+    PCSA(m) = MuscleList{PCSA_Idx,5} / MuscleList{PCSA_Idx,4};
 end
 
 syms RxSym RySym RzSym
@@ -108,13 +109,13 @@ switch MRC
         % [Iglic 1990, S.37, Equ.2]
         f = cell2sym(repmat({'f'}, NoAM,1));
         assume(f >= 0);
-        F = f .* A .* s;
+        F = f .* PCSA .* s;
         
         % Moment of F around hip rotation center
         momentF = cross(r, F);
 
         % Moment of bodyweight force around hip rotation center
-        momentW = cross([0 0 -a], W);
+        momentW = cross(lBW, W);
         
         % Calculate hip joint force R
         eq1 =  sum(F(:,1)) + RxSym + W(1); % [Iglic 1990, S.37, Equ.4]
@@ -127,11 +128,9 @@ switch MRC
         
         % Clear assumptions
         assume(f, 'clear');
-        
-        data.Activation = [];
     case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
         
-        [F, data] = muscleRecruitment(a, W, r, s, A, data);
+        [F, data] = muscleRecruitment(lBW, W, r, s, PCSA, data);
         
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + W(1);
