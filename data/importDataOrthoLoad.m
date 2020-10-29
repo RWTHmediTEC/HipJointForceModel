@@ -100,13 +100,13 @@ SIC_IL = OL(s).Landmarks.Pelvis.(['SIC_' Side_IL]);
 IIT_IL = OL(s).Landmarks.Pelvis.(['IIT_' Side_IL]);
 
 % See createDataTLEM2.m for the exact definitions
-OL(s).HipJointWidth = abs(HJC_IL(3)  - HJC_CL(3));
-OL(s).ASISDistance  = distancePoints3d(ASIS_IL, ASIS_CL);
+OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
+OL(s).PelvicHeight  = abs(SIC_IL(2) - IIT_IL(2));
 OL(s).HJCASISHeight = abs(ASIS_IL(2) - HJC_IL(2));
 % !!! Assuming symmetry of the pelvis. No consideration of the width of the pubic symphysis !!!
 OL(s).PelvicWidth   = 2 * abs(IT_IL(3) - MP_IL(3));
-OL(s).PelvicHeight  = abs(SIC_IL(2) - IIT_IL(2));
-OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
+OL(s).HipJointWidth = abs(HJC_IL(3)  - HJC_CL(3));
+OL(s).ASISDistance  = abs(ASIS_IL(3) - ASIS_CL(3));
 
 % Femoral parameters
 % Transform the landmarks into the femur CS [Wu 2002] with the MEC-LEC midpoint as origin.

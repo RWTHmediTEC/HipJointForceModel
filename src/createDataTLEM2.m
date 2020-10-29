@@ -135,70 +135,72 @@ if ~isfield(data.T, 'Scale') && ~exist('Scale', 'var')
 end
 
 % Pelvic parameters:
-% !!! The landmarks should be transformed into the pelvic bone coordinate 
-% systems [Wu 2002] to use consistent parameter definitions. However, this 
-% is not possible for some of the cadavers due to missing landmark 
-% information !!!
+% Transform the landmarks into the pelvic coordinate system [Wu 2002]
+pTFM = createPelvisCS_TFM_Wu2002_TLEM2(data.T.LE, 'verbose',data.Verbose);
 
-% HipJointWidth = Distance between the hip joint centers
+% PelvicDepth = posteroanterior distance between ASIS and PSIS
+switch Cadaver
+    case{'TLEM2_0','TLEM2_1'}
+        PSIS2ASIS = ...
+            transformPoint3d(data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos, pTFM) - ...
+            transformPoint3d(data.T.LE(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos, pTFM);
+        data.T.Scale(1).PelvicDepth = abs(PSIS2ASIS(1));
+    case 'Dostal1981'
+        data.T.Scale(1).PelvicDepth = Scale(1).PelvicDepth;
+end
+
+% PelvicHeight = Inferosuperior distance between most inferior and superior
+% pelvic landmarks 
+switch Cadaver
+    case{'TLEM2_0','TLEM2_1'}
+        IIT2SIP = ...
+            transformPoint3d(data.T.LE(1).Landmarks.SuperiorIliacCrest_R.Pos, pTFM) - ...
+            transformPoint3d(data.T.LE(1).Landmarks.InferiorIschialTuberosity_R.Pos, pTFM);
+        data.T.Scale(1).PelvicHeight = abs(IIT2SIP(2));
+    case 'Dostal1981'
+        data.T.Scale(1).PelvicHeight = Scale(1).PelvicHeight;
+end
+% HJCASISHeight = inferosuperior distance between the HJC and ASIS
+HJC2ASISDist = ...
+    transformPoint3d(data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos, pTFM) - ...
+    transformPoint3d(data.T.LE(1).Joints.Hip.Pos, pTFM);
+data.T.Scale(1).HJCASISHeight = abs(HJC2ASISDist(2));
+
+% HipJointWidth = mediolateral distance between the hip joint centers
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         % !!! Assuming symmetry of the pelvis !!!
         % !!! No consideration of the width of the pubic symphysis !!!
-        data.T.Scale(1).HipJointWidth = 2 * (...
-            data.T.LE(1).Joints.Hip.Pos(3) -...
-            min(data.T.LE(1).Mesh.vertices(:,3)));  
+        hipBoneVertices = transformPoint3d(data.T.LE(1).Mesh.vertices, pTFM);
+        HJC = transformPoint3d(data.T.LE(1).Joints.Hip.Pos, pTFM);
+        data.T.Scale(1).HipJointWidth = ...
+            2 * abs(HJC(3) - min(hipBoneVertices(:,3)));
     case 'Dostal1981'
         data.T.Scale(1).HipJointWidth = abs(...
             LE(1).Landmarks.RightHipJointCenter.Pos(3)-...
             LE(1).Landmarks.LeftHipJointCenter.Pos(3));
 end
-% ASISDistance: distance between the two ASIS
-data.T.Scale(1).ASISDistance = distancePoints3d(...
-    data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos, ...
-    data.T.LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos);
-% HJCASISHeight = Distance between HRC and ASIS along Y-Axis
-data.T.Scale(1).HJCASISHeight = abs(...
-    data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(2));
-% Pelvic width: distance between the most lateral pelvic landmarks (iliac 
-% tubercles) along the Z-axis.
+% ASISDistance: mediolateral distance between the two ASIS
+ASISDistance = ...
+    transformPoint3d(data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos, pTFM) - ...
+    transformPoint3d(data.T.LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos, pTFM);
+data.T.Scale(1).ASISDistance = abs(ASISDistance(3));
+% Pelvic width: mediolateral distance between the most lateral pelvic 
+% landmarks located at the iliac tubercles.
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         % !!! Assuming symmetry of the pelvis !!!
         % !!! No consideration of the width of the pubic symphysis !!!
-        data.T.Scale(1).PelvicWidth = 2 * (...
-            data.T.LE(1).Landmarks.IliacTubercle_R.Pos(3) -...
-            min(data.T.LE(1).Mesh.vertices(:,3)));
+        IT = transformPoint3d(data.T.LE(1).Landmarks.IliacTubercle_R.Pos, pTFM);
+        data.T.Scale(1).PelvicWidth = 2 * abs(IT(3) - min(hipBoneVertices(:,3)));
     case 'Dostal1981'
         data.T.Scale(1).PelvicWidth = Scale(1).PelvicWidth;
-end
-% PelvicHeight = Distance between most inferior and superior landmarks along
-% the Y-Axis
-switch Cadaver
-    case{'TLEM2_0','TLEM2_1'}
-        data.T.Scale(1).PelvicHeight = abs(...
-            data.T.LE(1).Landmarks.SuperiorIliacCrest_R.Pos(2) - ...
-            data.T.LE(1).Landmarks.InferiorIschialTuberosity_R.Pos(2));
-    case 'Dostal1981'
-        data.T.Scale(1).PelvicHeight = Scale(1).PelvicHeight;
-end
-% PelvicDepth = Distance between ASIS and PSIS along X-Axis
-switch Cadaver
-    case{'TLEM2_0','TLEM2_1'}
-        data.T.Scale(1).PelvicDepth = abs(...
-            data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(1) - ...
-            data.T.LE(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos(1));
-    case 'Dostal1981'
-        data.T.Scale(1).PelvicDepth = Scale(1).PelvicDepth;
 end
 
 %% Femoral parameters
 % Transform the landmarks into the femoral coordinate system [Wu 2002]
 % Cadaver should always be a right side: 'R'
-fTFM = createFemurCS_TFM_Wu2002(...
-    data.T.LE(2).Landmarks.MedialEpicondyle.Pos, ...
-    data.T.LE(2).Landmarks.LateralEpicondyle.Pos, ...
-    data.T.LE(2).Joints.Hip.Pos, 'R');
+fTFM = createFemurCS_TFM_Wu2002_TLEM2(data.T.LE, 'R', 'verbose',data.Verbose);
 % FemoralLength: Distance between the midpoint between medial and lateral 
 % epicondyle and the HJC.
 data.T.Scale(2).FemoralLength = distancePoints3d(transformPoint3d(midPoint3d(...
