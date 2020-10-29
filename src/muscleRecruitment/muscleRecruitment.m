@@ -39,9 +39,9 @@ F_MIN = zeros(size(F_0));
 % Project the HJC onto the line of action
 HJConLineOfAction = projPointOnLine3d(HJC,[LoA_PoA LoA_Dir]);
 % Get lever arms of the fascicles around HJC
-leverArm = HJConLineOfAction-HJC;
+% leverArm = HJConLineOfAction-HJC;
 % Moment of the fascicle forces around HJC
-aeq = crossProduct3d(leverArm, LoA_Dir)';
+aeq = crossProduct3d(LoA_PoA, LoA_Dir)';
 % Moment of the bodyweight force around hip joint center [Nmm]
 momentW = crossProduct3d(lBW, BW);
 % Negative moment of external forces around hip joint center
