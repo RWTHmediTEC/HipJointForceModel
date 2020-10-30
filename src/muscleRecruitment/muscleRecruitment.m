@@ -39,12 +39,13 @@ F_MIN = zeros(size(F_0));
 % Project the HJC onto the line of action
 HJConLineOfAction = projPointOnLine3d(HJC,[LoA_PoA LoA_Dir]);
 % Get lever arms of the fascicles around HJC
-% leverArm = HJConLineOfAction-HJC;
-% Moment of the fascicle forces around HJC
-aeq = crossProduct3d(LoA_PoA, LoA_Dir)';
-% Moment of the bodyweight force around hip joint center [Nmm]
+leverArm = HJConLineOfAction-HJC;
+% Moment of the unit fascicle forces around HJC [Nmm]
+unitMomentF = crossProduct3d(LoA_PoA, LoA_Dir);
+aeq = unitMomentF';
+% Moment of the bodyweight force around HJC [Nmm]
 momentW = crossProduct3d(lBW, BW);
-% Negative moment of external forces around hip joint center
+% Negative moment of external forces around HJC [Nmm]
 beq = -momentW';
 
 % Optimization options
@@ -91,16 +92,16 @@ end
 % with the magnitdue of the fascicle forces
 force = (LoA_Dir.*fascicleForce)';
 
-% Check if optimization was succesful
-momentF = (aeq*fascicleForce)';
-% Check whether moments are equal
-if any(~ismembertol(momentF,beq',1e-8,'ByRows',1,'DataScale',[1 1 1]))
-    msgbox({'Unphysiological!';'Imbalance of moments!';...
-        [num2str(sum(momentF)),' = ',num2str(sum(beq))]},[mfilename '.m'],'warn');
+if data.Verbose
+    % Check if optimization was succesful
+    momentF = (aeq*fascicleForce)';
+    % Check whether moments are equal
+    if any(~ismembertol(momentF,beq',1e-8,'ByRows',1,'DataScale',[1 1 1]))
+        msgbox({'Unphysiological!';'Imbalance of moments!';...
+            [num2str(sum(momentF)),' = ',num2str(sum(beq))]},[mfilename '.m'],'warn');
+    end
+    disp(['Muscle recruitment took ' num2str(toc(tStart),'%.0f') ' seconds.'])
 end
-
-disp(['Muscle recruitment took ' num2str(toc(tStart),'%.0f') ' seconds.'])
-
 
 %% Activation
 % Get Fmax of each muscle

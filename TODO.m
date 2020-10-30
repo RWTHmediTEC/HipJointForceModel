@@ -33,4 +33,5 @@
 % GUI
 % - Move postures selection to validation tab
 % - Enable pelvic tilt depending on the HJF model
-% - Add verbose option
+% - Left radio button not working for the LandmarkSkinningFischer2018. See
+%   skinPelvisLEM.m lines 89 to 93.

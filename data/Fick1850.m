@@ -40,7 +40,7 @@ Moments.AdductorBrevis           = [  26.479 -42.213   2.185];
 Moments.AdductorLongus           = [  33.697 -40.557  -1.880];
 Moments.Gracilis                 = [   3.946 -17.631   0.032];
 Moments.Sartorius                = [  11.210   4.003   0.676];
-Moments.TensorFasciae            = [  12.495   7.605   0.001];
+Moments.TensorFasciaeLatae       = [  12.495   7.605   0.001];
 Moments.RectusFemoris            = [  46.182  14.813   2.958];
 Moments.GluteusMedius            = [  -9.928 114.177 -17.612];
 Moments.GluteusMinimus           = [   7.855  53.864 -15.817];
@@ -48,10 +48,10 @@ Moments.ObturatorExternus        = [  16.758 -25.138   0.126];
 
 % [Fick 1850, S.105-106]
 % Tensor Fasciae
-HM(1).Muscle.TensorFasciae1.Pos = [24 -18 80]; % Origin
-HM(1).Muscle.TensorFasciae2.Pos = [28  10 96]; % Origin
-HM(2).Muscle.TensorFasciae1.Pos = [64 449 103]; % Insertion
-HM(2).Muscle.TensorFasciae2.Pos = [55 447 110]; % Insertion
+HM(1).Muscle.TensorFasciaeLatae1.Pos = [24 -18 80]; % Origin
+HM(1).Muscle.TensorFasciaeLatae2.Pos = [28  10 96]; % Origin
+HM(2).Muscle.TensorFasciaeLatae1.Pos = [64 449 103]; % Insertion
+HM(2).Muscle.TensorFasciaeLatae2.Pos = [55 447 110]; % Insertion
 
 % Biceps Femoris Caput Longum (Langer Kopf)
 HM(1).Muscle.BicepsFemorisCaputLongum1.Pos = [119 65 130]; % Origin

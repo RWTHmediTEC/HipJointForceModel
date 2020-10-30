@@ -70,6 +70,17 @@ switch Cadaver
 end
 
 data.T.LE = LE;
+
+%% Check if muscle list contains PCSA normalized by the Gluteus Maximus
+GluteusMaximusIdx = find(contains(muscleList(:,1),'GluteusMaximus'), 1);
+if ~isempty(GluteusMaximusIdx)
+    if muscleList{GluteusMaximusIdx,5} <= 1
+        % Taken from Table 3: 2009 - Ward - Are current measurements of 
+        % lower extremity muscle architecture accurate?
+        GTM_MEAN_PCSA = 33.4*100; % [mm²]
+        muscleList(:,5) = cellfun(@(x) x*GTM_MEAN_PCSA, muscleList(:,5), 'uni',0);
+    end
+end
 data.MuscleList = muscleList;
 
 %% Save initally as (T)emplate (Cadaver) and (S)ubject (Patient)

@@ -172,6 +172,7 @@ end
 xlabel(axH, 'X'); ylabel(axH, 'Y'); zlabel(axH, 'Z');
 if NoB>2
     axis(axH, 'equal')
+    grid(axH, 'on')
 else
     axis(axH, 'equal','tight');
 end
