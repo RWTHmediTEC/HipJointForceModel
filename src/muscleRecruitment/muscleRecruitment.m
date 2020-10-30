@@ -94,9 +94,9 @@ force = (LoA_Dir.*fascicleForce)';
 % Check if optimization was succesful
 momentF = (aeq*fascicleForce)';
 % Check whether moments are equal
-if any(~ismembertol(momentF,momentW,1e-8,'ByRows',1))
+if any(~ismembertol(momentF,beq',1e-8,'ByRows',1,'DataScale',[1 1 1]))
     msgbox({'Unphysiological!';'Imbalance of moments!';...
-        [num2str(sum(momentF)),' = ',num2str(sum(momentW))]},[mfilename '.m'],'warn');
+        [num2str(sum(momentF)),' = ',num2str(sum(beq))]},[mfilename '.m'],'warn');
 end
 
 disp(['Muscle recruitment took ' num2str(toc(tStart),'%.0f') ' seconds.'])
@@ -114,7 +114,7 @@ for m = 1:NoAF
     fMaxM(m) = muscleList{tempIdx,5}*SIGMA;
 end
 % Delete values of all fascicles except one per muscle
-[~,idx] = unique(fMaxM,'first');
+[~,idx] = unique(cellstr(string(activeMuscles)),'first');
 % Number of fascicles of each muscle
 nbFas = nbFas(sort(idx),:);
 % Names of active muscles
@@ -127,14 +127,13 @@ muscleForce = zeros(length(fMaxM),1);
 % Calculation of the sum of all fascicle forces of each muscle
 for i = 1:length(fMaxM)
     if i == 1
-        muscleForce(i) = sum(fascicleForce(1:nbFas(i)));
+        muscleForce(i) = norm(sum(force(:,1:nbFas(i)),2));
     else
         j = 1+sum(nbFas(1:(i-1)));
         k = sum(nbFas(1:i));
-        muscleForce(i) = sum(fascicleForce(j:k));
+        muscleForce(i) = norm(sum(force(:,j:k),2));
     end
 end
-
 % Activation of each fascicle
 fascicleActivation = table(fascicleForce./fMax,'VariableNames',{'Activation'},'RowNames',{musclePaths.Name});
 data.Activation.Fascicles = fascicleActivation;
