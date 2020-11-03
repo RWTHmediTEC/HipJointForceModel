@@ -19,7 +19,7 @@ if nargin == 0 || isempty(data)
     data.View = 'Femur';
     % Scaling law
     data.ScalingLaw = 'None';
-    % Muscle Recruitemnt Criterion: None, MinMax, Polynom2, Polynom3, Polynom5, Energy
+    % Muscle Recruitemnt Criterion: None, Polynom1, Polynom2, Polynom3, Polynom5, MinMax, Energy
     data.MuscleRecruitmentCriterion = 'None';
     % Muscle Path Model: StraightLine, ViaPoint, Wrapping
     data.MusclePathModel = 'StraightLine';

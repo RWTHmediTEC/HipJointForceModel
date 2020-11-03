@@ -158,7 +158,7 @@ switch MRC
             warning(['Unphysiological / negative value of fa (' num2str(fa,1) '), ' ...
                 'ft (' num2str(ft,1) ') or fp (' num2str(fp,1) ')!'])
         end
-    case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
+    case {'Polynom1','Polynom2','Polynom3','Polynom5','MinMax','Energy'}
         
         [F, data] = muscleRecruitment(lW, W, r, s, A, data);
         

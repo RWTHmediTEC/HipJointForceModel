@@ -120,7 +120,7 @@ switch MRC
         errMessage = 'Please select a muscle recruitment criterion!';
         msgbox(errMessage,mfilename,'error')
         error(errMessage)
-    case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
+    case {'Polynom1','Polynom2','Polynom3','Polynom5','MinMax','Energy'}
         [F, data] = muscleRecruitment(lW, W, r, s, PCSA, data);
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + W(1);

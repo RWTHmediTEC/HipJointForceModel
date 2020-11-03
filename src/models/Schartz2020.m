@@ -109,7 +109,7 @@ switch MRC
         
         R = solve(eq1, eq2, eq3, eq4, eq5, eq6);
         
-    case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
+    case {'Polynom1','Polynom2','Polynom3','Polynom5','MinMax','Energy'}
         [F, data] = muscleRecruitment(lW, W, r, s, PCSA, data);
         % Calculate hip joint reaction force R
         eq1 =  sum(F(1,:)) + RxSym + W(1);

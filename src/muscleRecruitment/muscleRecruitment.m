@@ -61,13 +61,13 @@ opts = optimoptions(@fmincon,...
     'FunctionTolerance',1e-10,...
     'MaxIterations',5000);
 switch MRC
-    case 'MinMax'
-        % MinMax muscle recruitment criteria
-        fascicleForce = muscleRecruitmentMinMax(F_0,F_MIN,fMax,aeq,beq,N,opts);
-    case {'Polynom2', 'Polynom3', 'Polynom5'}
+    case {'Polynom1', 'Polynom2', 'Polynom3', 'Polynom5'}
         % Polynomial muscle recruitment criteria with power = 2, 3 or 5
         DP = str2double(MRC(end));
         fascicleForce = muscleRecruitmentPoly(DP,F_0,F_MIN,fMax,aeq,beq,N,opts);
+    case 'MinMax'
+        % MinMax muscle recruitment criteria
+        fascicleForce = muscleRecruitmentMinMax(F_0,F_MIN,fMax,aeq,beq,N,opts);
     case 'Energy'
         % Energy muscle recruitment criteria
         if size(muscleList,2) >= 7

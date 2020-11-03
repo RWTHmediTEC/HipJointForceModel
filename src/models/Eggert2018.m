@@ -128,7 +128,7 @@ switch MRC
         
         % Clear assumptions
         assume(f, 'clear');
-    case {'MinMax','Polynom2','Polynom3','Polynom5','Energy'}
+    case {'Polynom1','Polynom2','Polynom3','Polynom5','MinMax','Energy'}
         
         [F, data] = muscleRecruitment(lBW, W, r, s, PCSA, data);
         
