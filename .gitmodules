@@ -3,7 +3,7 @@
 	url = https://github.com/mattools/matGeom/
 [submodule "src/internal/ManualLandmarkSelection"]
 	path = src/internal/ManualLandmarkSelection
-	url = https://git.rwth-aachen.de/Maximilian.Fischer/ManualLandmarkSelection
+	url = https://github.com/MCM-Fischer/ManualLandmarkSelection
 [submodule "src/external/AnatomicalViewTools"]
 	path = src/external/AnatomicalViewTools
 	url = https://github.com/MCM-Fischer/AnatomicalViewTools
