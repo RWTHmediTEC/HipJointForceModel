@@ -62,14 +62,22 @@ for p = 1:length(postures)
                 AE_Mag{c,m,p} = abs(vectorNorm3d(sHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction
                 AE_Dir{c,m,p} = rad2deg(vectorAngle3d(sHJF, iHJF));
-                % Percentage error magnitude
-                APE_Mag{c,m,p} = abs((vectorNorm3d(sHJF)-vectorNorm3d(iHJF))./vectorNorm3d(iHJF));
                 
-                % Final small table
+                % Table
                 compTab(2+c,2+(m-1)*NoE,p) = medianStats(AE_Mag{c,m,p},'format','short','test','none','alpha',alpha);
                 compTab(2+c,1+m*NoE,p)     = medianStats(AE_Dir{c,m,p},'format','short','test','none','alpha',alpha);
             end
         end
     end
     writecell(compTab(:,:,p),'compareCadavers.xlsx','Sheet',postures{p,2},'Range','B2')
+end
+
+% Check for significant differences between the cadavers for each model
+for p = 1:length(postures)
+    for m=1:length(models)
+        % Remove failed simulations
+        cadaverIdx = ~cellfun(@(x) any(isnan(x)), AE_Mag(:,m,p));
+        [pValue,tbl,stats] = friedman(reshape(cell2mat(AE_Mag(cadaverIdx,m,p)),10,[]),1,'off');
+        disp([postures{p} ' - ' models{m} ': ' num2str(pValue)])
+    end
 end

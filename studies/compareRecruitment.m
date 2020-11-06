@@ -64,10 +64,8 @@ for p = 1:length(postures)
                 AE_Mag{c,m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction
                 AE_Dir{c,m,p} = rad2deg(vectorAngle3d(pHJF, iHJF));
-                % Percentage error magnitude
-                APE_Mag{c,m,p} = abs((vectorNorm3d(pHJF)-vectorNorm3d(iHJF))./vectorNorm3d(iHJF));
                 
-                % Final small table
+                % Table
                 compTab(2+c,2+(m-1)*NoE,p) = medianStats(AE_Mag{c,m,p},'format','short','test','none','alpha',alpha);
                 compTab(2+c,1+m*NoE,p)     = medianStats(AE_Dir{c,m,p},'format','short','test','none','alpha',alpha);
             end

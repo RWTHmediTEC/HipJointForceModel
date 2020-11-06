@@ -4,7 +4,7 @@ clearvars; close all;
 % 2016 - Bergmann - Standardized Loads Acting in Hip Implants
 % https://orthoload.com/test-loads/standardized-loads-acting-at-hip-implants/
 % https://orthoload.com/wp-content/uploads/StandardLoads-Hip_CompleteData.zip
-dbPath = 'D:\Biomechanics\Hip\Database\StandardLoads-Hip_CompleteData\Data\';
+dbPath = 'D:\Biomechanics\Hip\Databases\StandardLoads-Hip_CompleteData\Data\';
 
 activities = {...
     'Walking', 'Level Walking', 'LW';...
@@ -25,6 +25,7 @@ pointProps.Color='none';
 for a=1:length(activities)
     for s=1:10
         sFile = dir([dbPath activities{a,1} '\' activities{a,1} '_H' num2str(s) '\' activities{a,1} '_H' num2str(s) '.xlsx']);
+        peakIdx = [];
         if length(sFile) == 1
             OL_Data = xlsread(fullfile(sFile.folder, sFile.name),'BW'); % Read the BW sheet
             % Import body weight [N]
@@ -39,20 +40,17 @@ for a=1:length(activities)
             % Find peak force phase
             switch activities{a,1}
                 case 'Walking'
-                    % [~, pfpIdx] = findpeaks(avHJF(:,5),'MinPeakProminence',10);
-                    [~, pfpIdx] = findpeaks(avHJF(:,5),...
+                    [~, peakIdx] = findpeaks(avHJF(:,5),...
                         'MinPeakHeight', 0.75*max(avHJF(:,5)),...
                         'MinPeakProminence',10,...
-                        'NPeaks',1);
-                    assert(numel(pfpIdx) == 1)
-                    % [~, pfpIdx2] = findpeaks(-avHJF(:,5),...
-                    %     'MinPeakProminence',10,...
-                    %     'NPeaks',1);
-                    % assert(numel(pfpIdx) == 1)
+                        'NPeaks',2);
+                    assert(numel(peakIdx) == 2)
                     % Add -+ 2.5% values
-                    pfpIdx = ...
-                        pfpIdx-round(0.025*size(avHJF,1))+1: ...
-                        pfpIdx+round(0.025*size(avHJF,1));
+                    pfpIdx = [...
+                        peakIdx(1)-round(0.025*size(avHJF,1))+1: ...
+                        peakIdx(1)+round(0.025*size(avHJF,1)), ...
+                        peakIdx(2)-round(0.025*size(avHJF,1))+1: ...
+                        peakIdx(2)+round(0.025*size(avHJF,1))];
                 case 'Stance'
                     % Identify a rough estimation of force plateau during
                     % stance phase. Keep all values above 75% of Fmax
@@ -65,12 +63,12 @@ for a=1:length(activities)
                         round(median(pfpIdx))+round(0.25*size(avHJF,1));
                 case 'StandUp'
                     % Find Fmax
-                    [~, pfpIdx] = max(avHJF(:,5));
-                    assert(numel(pfpIdx) == 1)
+                    [~, peakIdx] = max(avHJF(:,5));
+                    assert(numel(peakIdx) == 1)
                     % Add -+ 2.5% values
                     pfpIdx = ...
-                        pfpIdx-round(0.025*size(avHJF,1))+1: ...
-                        pfpIdx+round(0.025*size(avHJF,1));
+                        peakIdx-round(0.025*size(avHJF,1))+1: ...
+                        peakIdx+round(0.025*size(avHJF,1));
                 otherwise
                     error([activities{a,1} ' not implemented yet!'])
             end
@@ -96,6 +94,9 @@ for a=1:length(activities)
                 for h=1:4
                     hold(saxH(h),'on')
                     plot(saxH(h), avHJF(pfpIdx,1),avHJF(pfpIdx,1+h),pointProps)
+                end
+                if ~isempty(peakIdx)
+                    plot(saxH(4), avHJF(peakIdx,1),avHJF(peakIdx,1+4),pointProps,'MarkerFaceColor','m')
                 end
             end
         elseif isempty(sFile) || length(sFile) > 1

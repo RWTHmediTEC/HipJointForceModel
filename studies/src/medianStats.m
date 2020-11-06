@@ -2,7 +2,7 @@ function statsCell = medianStats(data, varargin)
 p = inputParser;
 addRequired(p,'data',@(x) validateattributes(x,{'numeric'},{'ncols', 1}))
 addOptional(p,'fSpec', '% 1.1f');
-addParameter(p,'format', 'long',@(x) any(validatestring(x,{'long','short'})));
+addParameter(p,'format', 'long',@(x) any(validatestring(x,{'long','short','Q234'})));
 addParameter(p,'test', 'none',@(x) any(validatestring(x,{'none','signrank'})));
 addParameter(p,'alpha', 0.05,@(x) validateattributes(x,{'numeric'},{'scalar', '>=', 0.0001, '<=' 0.1}));
 parse(p,data,varargin{:});
@@ -13,7 +13,6 @@ alpha = p.Results.alpha;
 
 PRCT=prctile(data,[0,25,50,75,100]);
 IQR=iqr(data);
-RNG=range(data);
 
 switch test
     case 'none'
@@ -28,11 +27,13 @@ end
 
 switch format
     case 'long'
-        statsCell = {...
+        statsCell = {[...
             num2str(PRCT(3),fSpec),... % median
-            [num2str(IQR,fSpec), ' (' num2str(PRCT(2),fSpec) ' to ' num2str(PRCT(4),fSpec) ')'], ... % IQR
-            [num2str(RNG,fSpec), ' (' num2str(PRCT(1),fSpec) ' to ' num2str(PRCT(5),fSpec) ')'], ... % Range
+            ' (' num2str(PRCT(2),fSpec) ' to ' num2str(PRCT(4),fSpec) '', ... % IQR
+            ', ' num2str(PRCT(1),fSpec) ' to ' num2str(PRCT(5),fSpec) ')'] ... % Range
             };
+    case 'Q234'
+        statsCell = {[num2str(PRCT(3),fSpec), ', ' num2str(PRCT(4),fSpec) ', ' num2str(PRCT(5),fSpec)]};
     case 'short'
         statsCell = {[num2str(PRCT(3),fSpec) ' (' num2str(IQR,fSpec) ')']};
 end

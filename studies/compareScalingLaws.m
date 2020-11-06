@@ -66,17 +66,15 @@ for p = 1:length(postures)
                 AE_Mag{s,m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction
                 AE_Dir{s,m,p} = rad2deg(vectorAngle3d(pHJF, iHJF));
-                % Absolute percentage error in magnitude
-                APE_Mag{s,m,p} = abs((vectorNorm3d(pHJF)-vectorNorm3d(iHJF))./vectorNorm3d(iHJF));
                 
-                % Final small table
+                % Table
                 compTab(2+s,2+(m-1)*NoE,p) = medianStats(AE_Mag{s,m,p},'format','short','test','none','alpha',alpha);
                 compTab(2+s,1+m*NoE,p)     = medianStats(AE_Dir{s,m,p},'format','short','test','none','alpha',alpha);
             end
         end
     end
     
-    % Compare to unscaled cadaver
+    % Significant differences to the unscaled cadaver
     for s = 2:length(scalingLaws)
         for m=1:length(models)
             if ~isempty(results{s,m})
