@@ -20,15 +20,12 @@
 %   for scaling and different postures
 
 % Muscle recruitment
-% - Use EMS studies (OrthoLoad) to select muscles of the models
+% - Create a simple test case for verification
 
 % HJF models
 % - Implement other one-leg stance models
 % - Implement models for other ADLs
 % - Schartz2020 move upper body weight W anterior
-
-% Validation
-% - Level Walking could be split in three peak force phases
 
 % GUI
 % - Move postures selection to validation tab
