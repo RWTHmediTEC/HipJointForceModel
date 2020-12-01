@@ -10,7 +10,8 @@ data.HJF.Pelvis.Wu2002.R = transformVector3d(R, data.S.LE(1).positionTFM');
 % Sanity Check
 if data.SurfaceData
     assert(all(ismembertol(data.S.LE(1).positionTFM',...
-        createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE),1e-6,'ByRows',1)))
+        createPelvisCS_TFM_Wu2002_TLEM2(data.S.LE, 'definition',data.PelvicCS),...
+        1e-6,'ByRows',1)))
 end
 
 % Reverse (=negative) R for femur bone CS

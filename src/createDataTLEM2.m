@@ -27,6 +27,8 @@ if nargin == 0 || isempty(data)
     data.T.Side = 'R';
     % Pelvic Tilt [°]
     data.T.PelvicTilt = 0;
+    % Pelvic bone coordinate system
+    data.PelvicCS = 'Wu2002';
 end
 
 data.Cadaver = Cadaver;
