@@ -133,19 +133,23 @@ HM(2).Muscle=structfun(@(x) setfield(x,'Type',{'Insertion'}), HM(2).Muscle, 'uni
 
 %% Landmarks
 % Pelvis
-HM(1).Landmarks.RightHipJointCenter.Pos=[0.0 0.0 0.0];
-HM(1).Landmarks.LeftHipJointCenter.Pos=[0.3 -0.4 -16.9];
-HM(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos=[5.9 8.3 5.1];
-HM(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos=[5.9 8.3 -20.9];
-HM(1).Landmarks.RightPubicTubercle.Pos=[5.9 -1.8 -4.9];
-HM(1).Landmarks.LeftPubicTubercle.Pos=[5.7 -1.9 -10.6];
-HM(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos=nan(1,3);
-HM(1).Landmarks.LeftPosteriorSuperiorIliacSpine.Pos=nan(1,3);
+HM(1).Landmarks.RightHipJointCenter.Pos = [0.0 0.0 0.0];
+HM(1).Landmarks.LeftHipJointCenter.Pos = [0.3 -0.4 -16.9];
+HM(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos = [5.9 8.3 5.1];
+HM(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos = [5.9 8.3 -20.9];
+HM(1).Landmarks.RightPubicTubercle.Pos = [5.9 -1.8 -4.9];
+HM(1).Landmarks.LeftPubicTubercle.Pos = [5.7 -1.9 -10.6];
+HM(1).Landmarks.RightPosteriorSuperiorIliacSpine.Pos = nan(1,3);
+HM(1).Landmarks.LeftPosteriorSuperiorIliacSpine.Pos = nan(1,3);
+% Construction of Pubic Symphysis
+HM(1).Landmarks.PubicSymphysis.Pos = midPoint3d(...
+    HM(1).Landmarks.RightPubicTubercle.Pos,...
+    HM(1).Landmarks.LeftPubicTubercle.Pos);
 % Femur
-HM(2).Landmarks.MedialEpicondyle.Pos=[0.1 -42.3 -4.4];
-HM(2).Landmarks.LateralEpicondyle.Pos=[-0.2 -42.3 4.4];
-HM(2).Landmarks.PosteriorMedialCondyle.Pos=[-2.8 -43.4 -2.8];
-HM(2).Landmarks.PosteriorLateralCondyle.Pos=[-2.8 -43.4 2.9];
+HM(2).Landmarks.MedialEpicondyle.Pos = [0.1 -42.3 -4.4];
+HM(2).Landmarks.LateralEpicondyle.Pos = [-0.2 -42.3 4.4];
+HM(2).Landmarks.PosteriorMedialCondyle.Pos = [-2.8 -43.4 -2.8];
+HM(2).Landmarks.PosteriorLateralCondyle.Pos = [-2.8 -43.4 2.9];
 
 %% Transform from [cm] to [mm]
 scaleTFM = repmat(10*eye(4), 1, 1, 2);
