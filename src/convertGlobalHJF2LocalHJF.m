@@ -20,10 +20,12 @@ data.HJF.Femur.Wu2002.R = transformVector3d(-R, data.S.LE(2).positionTFM');
 % Sanity Check
 if data.SurfaceData
     assert(all(ismembertol(data.S.LE(2).positionTFM',...
-        createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R'),1e-6,'ByRows',1)))
+        createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R', 'definition','Wu2002'),...
+        1e-6,'ByRows',1)))
 end
 % [Bergmann 2016]
 data.HJF.Femur.Bergmann2016.R = transformVector3d(-R, ...
-    createFemurCS_TFM_Bergmann2016_TLEM2(data.S.LE, 'R', 'verbose',data.Verbose));
+    createFemurCS_TFM_Wu2002_TLEM2(data.S.LE, 'R',...
+    'definition','Bergmann2016', 'verbose',data.Verbose));
 
 end

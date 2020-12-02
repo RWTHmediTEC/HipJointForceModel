@@ -2,11 +2,11 @@ function data = skinFemurLEM(data, method)
 % Linear blend skinning (LBS) of the femur
 
 boneIdx = 2; % femur
-mesh = data.T.LE(boneIdx).Mesh;
-templateControls = data.T.Scale(boneIdx).Landmarks;
 
-% Create controls - !!! Caching should be included here !!!
+% Create weights
 if data.SurfaceData
+    mesh = data.T.LE(boneIdx).Mesh;
+    templateControls = data.T.Scale(boneIdx).Landmarks;
     weights = calculateSkinningWeights(mesh, templateControls, data.SkinningCache);
 else
     errMessage = ['No surface data available for cadaver ' data.Cadaver ...

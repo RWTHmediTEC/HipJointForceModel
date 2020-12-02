@@ -10,11 +10,11 @@ visu = p.Results.visualization;
 
 sides={'R','L'};
 boneIdx = 1; % Pelvis
-mesh = data.T.LE(boneIdx).Mesh;
-templateControls = data.T.Scale(boneIdx).Landmarks;
 
-% Create controls - !!! Caching should be included here !!!
+% Create weights
 if data.SurfaceData
+    mesh = data.T.LE(boneIdx).Mesh;
+    templateControls = data.T.Scale(boneIdx).Landmarks;
     weights = calculateSkinningWeights(mesh, templateControls, data.SkinningCache);
 else
     errMessage = ['No surface data available for cadaver ' data.Cadaver ...
