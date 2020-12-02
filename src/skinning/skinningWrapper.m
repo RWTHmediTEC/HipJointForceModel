@@ -1,21 +1,19 @@
-function skinnedMesh = skinningWrapper(weightsFile, newControls)
+function skinnedMesh = skinningWrapper(mesh, tControls, weights, sControls)
 % Wrapper for linear blend skinning (LBS)
 
-% Load mesh, controls and weights
-load(weightsFile, 'mesh', 'controls', 'weights')
 % Number of controls
-NoC = length(fieldnames(controls));
+NoC = length(fieldnames(tControls));
 % Convert to point matrix
-C = cell2mat(struct2cell(controls));
-new_C = cell2mat(struct2cell(newControls));
+tC = cell2mat(struct2cell(tControls));
+sC = cell2mat(struct2cell(sControls));
 
 %% Calculate skinning transformations
-[T, AX, AN, Sm, O] = skinning_transformations(C, 1:NoC, [], new_C);
+[T, AX, AN, Sm, O] = skinning_transformations(tC, 1:NoC, [], sC);
 
 % Number of handles
 m = numel(1:NoC); % + size(BE,1);
 % Dimension (2 or 3)
-dim = size(C,2);
+dim = size(tC,2);
 % Extract scale
 TR = zeros(dim,dim+1,m);
 TR(1:dim,1:dim,:) = Sm;

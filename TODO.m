@@ -4,7 +4,6 @@
 % - Include additonal cadaver from https://github.com/anmuller/CusToM
 
 % Scaling laws
-% - Add caching for skinning weights
 % - Revision of PCSAs
 % 	- AnyBody adapts the PCSAs by: PCSA = MuscleVolume/OptimalFiberLength
 % 	- MuscleVolume and OptimalFiberLength can be patient-specific adapted 
@@ -29,6 +28,5 @@
 
 % GUI
 % - Move postures selection to validation tab
-% - Enable pelvic tilt depending on the HJF model
 % - Left radio button not working for the LandmarkSkinningFischer2018. See
 %   skinPelvisLEM.m lines 89 to 93.

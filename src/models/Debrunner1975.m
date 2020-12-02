@@ -48,7 +48,12 @@ activeMuscles     = data.activeMuscles;
 BodyWeight        = data.S.BodyWeight;
 HipJointWidth     = data.S.Scale(1).HipJointWidth;
 HipJointCenter    = data.S.LE(1).Joints.Hip.Pos;
-if data.Verbose
+Verbose           = data.Verbose;
+
+if ~isfield(data.S.LE(2), 'Mesh')
+    Verbose = 0;
+end
+if Verbose
     GreaterTrochanter = data.S.LE(2).Mesh.vertices(data.S.LE(2).Landmarks.GreaterTrochanter.Node,:);
     AcetabularRoof    = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.AcetabularRoof_R.Node,:);
     MostCranial       = data.S.LE(1).Mesh.vertices(data.S.LE(1).Landmarks.SuperiorIliacCrest_R.Node,:);
@@ -62,7 +67,7 @@ d6 = HipJointWidth/2; % Half the distance between the two hip joint centers
 d5 = 1.28 * d6; % Lever arm of G5 around the hip joint center
 G5 = 5/6 * BodyWeight; % Partial body weight weighing on the hip joint
 Z = [0, HipJointCenter(2:3)]; % Coordinates of the hip joint center in frontal plane
-if data.Verbose
+if Verbose
     T = [0, GreaterTrochanter(2:3)]; % Coordinates of the greater trochanter in frontal plane
     bD = MostLateral(3) - MostMedial(3); % Width of the iliac bone along the Z-axis
     hD = MostCranial(2) - AcetabularRoof(2); % Height of the iliac bone along the Y-axis
@@ -102,7 +107,7 @@ T_cadaver = [0,...
           sum(insertion(:,3)) / length(activeMuscles)];
 h_cadaver = norm(cross(A_cadaver-T_cadaver, Z-T_cadaver)) / norm(A_cadaver-T_cadaver);
 
-if data.Verbose
+if Verbose
     disp(['Difference between the origin of the pelvic muscle attachment point A [Debrunner1975] ' ...
         'and A calculated using the selected cadaver: ' num2str(A-A_cadaver)])
     disp(['Difference between the origin of the femoral muscle attachment point T [Debrunner1975] ' ...
