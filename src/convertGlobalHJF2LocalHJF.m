@@ -1,11 +1,14 @@
 function data = convertGlobalHJF2LocalHJF(R, data)
+%CONVERTGLOBALHJF2LOCALHJF converts the HJF calculated in the global
+% (world) coordinate system to the local bone coordinate systems.
 
 % Convert R from [N] to [%BW]
 R = R / abs(data.S.BodyWeight * data.g) * 100;
 
-data.HJF.Global.R=R;
+% Store global HJF
+data.HJF.Global.R = R;
 
-% Pelvis bone CS
+% Pelvic bone CS
 data.HJF.Pelvis.Wu2002.R = transformVector3d(R, data.S.LE(1).positionTFM');
 % Sanity Check
 if data.SurfaceData
@@ -14,7 +17,7 @@ if data.SurfaceData
         1e-6,'ByRows',1)))
 end
 
-% Reverse (=negative) R for femur bone CS
+% Reverse (=negative) R for femoral bone CS
 % [Wu 2002]
 data.HJF.Femur.Wu2002.R = transformVector3d(-R, data.S.LE(2).positionTFM');
 % Sanity Check

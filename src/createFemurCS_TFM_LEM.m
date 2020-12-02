@@ -11,25 +11,20 @@ verbose = p.Results.verbose;
 
 switch definition
     case 'Wu2002'
-        warningMessage = [...
-            'Femoral bone landmarks are missing for the selected cadaver!' newline ...
-            'Returning eye(4) for the transformation into the femoral bone coordinate system!'];
+        TFM = nan;
         if isfield(LE, 'Landmarks')
             MEC = LE(2).Landmarks.MedialEpicondyle.Pos;
             LEC = LE(2).Landmarks.LateralEpicondyle.Pos;
             HJC = LE(2).Joints.Hip.Pos;
             if all(~isnan([MEC, LEC, HJC]))
                 TFM = createFemurCS_TFM_Wu2002(MEC, LEC, HJC, side);
-            else
-                TFM = eye(4);
-                if verbose
-                    warning(warningMessage)
-                end
             end
-        else
+        end
+        if isnan(TFM)
             TFM = eye(4);
             if verbose
-                warning(warningMessage)
+                warning(['Femoral bone landmarks are missing for the selected cadaver!' newline ...
+                    'Returning eye(4) for the transformation into the femoral bone coordinate system!'])
             end
         end
     case 'Bergmann2016'
@@ -42,9 +37,8 @@ switch definition
             TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, P1, P2, HJC, side);
         catch
             if verbose
-                warning([...
-            'Landmarks of the Bergmann2016 femoral bone coordinate system ' ...
-            'are missing for the selected cadaver! Returning nan(4)!'])
+                warning(['Landmarks of the Bergmann2016 femoral bone coordinate system ' ...
+                    'are missing for the selected cadaver! Returning nan(4)!'])
             end
             TFM=nan(4);
         end
