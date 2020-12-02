@@ -1,4 +1,4 @@
-function TFM = createPelvisCS_TFM_Wu2002_TLEM2(LE, varargin)
+function TFM = createPelvisCS_TFM_LEM(LE, varargin)
 % Wrapper function for createPelvisCS_TFM_Wu2002 and the LE struct
 
 p = inputParser;

@@ -152,7 +152,7 @@ end
 
 % Pelvic parameters:
 % Transform the landmarks into the pelvic coordinate system [Wu 2002]
-pTFM = createPelvisCS_TFM_Wu2002_TLEM2(data.T.LE, 'verbose',data.Verbose);
+pTFM = createPelvisCS_TFM_LEM(data.T.LE, 'verbose',data.Verbose, 'definition','Wu2002');
 
 % PelvicDepth = posteroanterior distance between ASIS and PSIS
 switch Cadaver
