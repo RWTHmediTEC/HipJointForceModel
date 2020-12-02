@@ -1,6 +1,6 @@
 function TFM = createPelvisCS_TFM_APP(ASIS_R, ASIS_L, PS, varargin)
 % Construct the anterior pelvic plane (APP) bone coordinate system 
-% recommended by orthopedic surgeons around the world.
+% recommended by orthopedic surgeons around the world. ASR orientation.
 
 p = inputParser;
 isPoint3d = @(x) validateattributes(x,{'numeric'},...

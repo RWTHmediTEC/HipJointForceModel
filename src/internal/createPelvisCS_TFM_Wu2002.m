@@ -1,6 +1,6 @@
 function TFM = createPelvisCS_TFM_Wu2002(ASIS_R, ASIS_L, PSIS_R, PSIS_L,varargin)
 % Construct the pelvic superior iliac spine plane (SISP) coordinate system 
-% recommended by the ISB [Wu 2002]
+% recommended by the ISB [Wu 2002]. ASR orientation.
 
 p = inputParser;
 isPoint3d = @(x) validateattributes(x,{'numeric'},...
