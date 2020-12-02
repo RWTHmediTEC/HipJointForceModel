@@ -216,7 +216,7 @@ end
 %% Femoral parameters
 % Transform the landmarks into the femoral coordinate system [Wu 2002]
 % Cadaver should always be a right side: 'R'
-fTFM = createFemurCS_TFM_Wu2002_TLEM2(data.T.LE, 'R', ...
+fTFM = createFemurCS_TFM_LEM(data.T.LE, 'R', ...
     'definition','Wu2002', 'verbose',data.Verbose);
 % FemoralLength: Distance between the midpoint between medial and lateral 
 % epicondyle and the HJC.

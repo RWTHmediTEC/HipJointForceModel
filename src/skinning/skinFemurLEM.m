@@ -23,7 +23,7 @@ switch method
     case 'ParameterBased'
         % Change of the control points based on the femoral length, femoral
         % version, CCD angle and neck length
-        subjectControls = parameterBased(controls,T,S);
+        subjectControls = parameterBased(templateControls,T,S);
     case 'LandmarkBased'
         subjectControls = S.Scale(boneIdx).Landmarks;
 end

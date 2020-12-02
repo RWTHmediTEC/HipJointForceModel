@@ -1,4 +1,4 @@
-function TFM = createFemurCS_TFM_Wu2002_TLEM2(LE, side, varargin)
+function TFM = createFemurCS_TFM_LEM(LE, side, varargin)
 % Wrapper function for createFemurCS_TFM_*.m and the LE struct
 
 p = inputParser;
