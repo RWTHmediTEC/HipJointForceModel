@@ -11,7 +11,6 @@ for s = 1:length(OL)
     Results(s).Sex     = OL(s).Sex;
     try
         % Load body weight and HJF of OrthoLoad subjects
-        % !!! Add the source of the mat files !!!
         load([OL(s).Subject '_' data.Posture '.mat'],'meanPFP')
         OL(s).BodyWeight = meanPFP.Weight_N / data.g; % [N] to [kg]
         

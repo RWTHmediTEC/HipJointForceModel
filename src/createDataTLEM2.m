@@ -165,8 +165,7 @@ switch Cadaver
         data.T.Scale(1).PelvicDepth = Scale(1).PelvicDepth;
 end
 
-% PelvicHeight = Inferosuperior distance between most inferior and superior
-% pelvic landmarks 
+% PelvicHeight = Inferosuperior distance between most inferior and superior pelvic landmarks 
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         IIT2SIP = ...

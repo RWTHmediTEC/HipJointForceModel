@@ -110,16 +110,16 @@ OL(s).ASISDistance  = abs(ASIS_IL(3) - ASIS_CL(3));
 
 % Femoral parameters
 % Transform the landmarks into the femur CS [Wu 2002] with the MEC-LEC midpoint as origin.
-midPointEC = midPoint3d(OL(s).Landmarks.Femur.(['LEC_' Side_IL]), OL(s).Landmarks.Femur.(['MEC_' Side_IL]));
 femurTFM = createFemurCS_TFM_Wu2002(...
     OL(s).Landmarks.Femur.(['MEC_' Side_IL]), OL(s).Landmarks.Femur.(['LEC_' Side_IL]), ...
-    OL(s).Landmarks.Femur.(['HJC_' Side_IL]), Side_IL, 'origin', midPointEC);
+    OL(s).Landmarks.Femur.(['HJC_' Side_IL]), Side_IL);
 OL(s).Landmarks.Femur = structfun(@(x) transformPoint3d(x, femurTFM),  OL(s).Landmarks.Femur, 'uni', 0);
-midPointEC = transformPoint3d(midPointEC, femurTFM);
-assert(all(ismembertol(midPointEC,[0 0 0], 'ByRows',1,'DataScale',10)))
+assert(all(ismembertol(OL(s).Landmarks.Femur.(['HJC_' Side_IL]),[0 0 0], 'ByRows',1,'DataScale',10)))
 
 % FemoralLength
-OL(s).FemoralLength = distancePoints3d(midPointEC, OL(s).Landmarks.Femur.(['HJC_' Side_IL]));
+OL(s).FemoralLength = distancePoints3d(...
+    midPoint3d(OL(s).Landmarks.Femur.(['LEC_' Side_IL]), OL(s).Landmarks.Femur.(['MEC_' Side_IL])), ...
+    OL(s).Landmarks.Femur.(['HJC_' Side_IL]));
 % FemoralWidth: Distance between the HJC and the greater trochanter along the Z-Axis.
 HJC2GreaterTrochanter = OL(s).Landmarks.Femur.(['GT_' Side_IL]) - OL(s).Landmarks.Femur.(['HJC_' Side_IL]);
 OL(s).FemoralWidth = abs(HJC2GreaterTrochanter(3));
