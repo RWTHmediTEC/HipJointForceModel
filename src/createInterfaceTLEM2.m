@@ -1213,7 +1213,7 @@ gui.Activation.Axes.Fascicles = axes(...
         if ~gui.ManualSelectedMuscles
             [data.activeMuscles, gui.Home.Model.MuscleListEnable] = gui.Home.Model.modelHandle.Muscles(gui);
         end
-        data.activeMuscles = parseActiveMuscles(data.activeMuscles, data.MuscleList);
+        data.activeMuscles = parseActiveMusclesLEM(data.activeMuscles, data.MuscleList);
         if ~gui.ManualSelectedPosture
             [postures, defaultPosture] = gui.Home.Model.modelHandle.Posture();
             data.Posture = postures{defaultPosture, 2};

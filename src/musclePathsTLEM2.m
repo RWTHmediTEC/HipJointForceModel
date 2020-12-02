@@ -8,7 +8,7 @@ end
 LE = data.S.LE;
 MuscleList = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
-ActiveMuscles = parseActiveMuscles(data.activeMuscles, MuscleList);
+ActiveMuscles = parseActiveMusclesLEM(data.activeMuscles, MuscleList);
 % Create the muscle paths variable
 MusclePaths = cell2struct(ActiveMuscles(:,1)',{'Name'});
 % Find the Index of the active muscle in Muscle List

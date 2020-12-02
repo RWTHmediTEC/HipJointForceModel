@@ -34,7 +34,7 @@ for m=1:NoM
         data.Posture = postures{p,2};
         
         data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
-        data.activeMuscles = parseActiveMuscles(data.activeMuscles, data.MuscleList);
+        data.activeMuscles = parseActiveMusclesLEM(data.activeMuscles, data.MuscleList);
         
         results{m,p} = validateTLEM2(data, gui);
     end

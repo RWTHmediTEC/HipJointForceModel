@@ -40,7 +40,7 @@ for s = 1:length(scalingLaws)
             data.Posture = postures{p,2};
             
             data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
-            data.activeMuscles = parseActiveMuscles(data.activeMuscles, data.MuscleList);
+            data.activeMuscles = parseActiveMusclesLEM(data.activeMuscles, data.MuscleList);
             
             results{s,m,p} = validateTLEM2(data, gui);
         end

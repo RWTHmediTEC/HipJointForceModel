@@ -1,4 +1,4 @@
-function activeFascicles = parseActiveMuscles(activeMuscles, muscleList)
+function activeFascicles = parseActiveMusclesLEM(activeMuscles, muscleList)
 
 % Workaround for some older models with additonal info (columns) in the active muscle variable
 if size(activeMuscles,2) > 1
