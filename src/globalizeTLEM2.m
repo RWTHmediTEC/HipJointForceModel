@@ -31,6 +31,6 @@ LE = positionTLEM2(LE, data.jointAngles);
 data.S.LE = LE;
 
 %% Create muscle paths
-data = musclePathsTLEM2(data);
+data = musclePathsLEM(data);
 
 end

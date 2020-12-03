@@ -1,5 +1,5 @@
-function data = musclePathsTLEM2(data)
-%MUSCLEPATHSTLEM2 constructs the paths of the active muscles
+function data = musclePathsLEM(data)
+%MUSCLEPATHSLEM constructs the paths of the active muscles
 
 if data.Verbose
     tStart = tic;
