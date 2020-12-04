@@ -126,6 +126,9 @@ for s = 1:length(OL)
         Results(s).HJF_Bergmann2016    = HJF_Bergmann2016;
         Results(s).OL_HJF_Bergmann2016 = OL(s).HJF_Bergmann2016;
         Results(s).BodyWeight          = OL(s).BodyWeight;
+        if data.Verbose
+            disp(['Validation with subject ' Results(s).Subject ' was successfull.'])
+        end
     catch err
         fprintf(1,'The identifier was: %s\n',err.identifier);
         fprintf(1,'There was an error! The message was: %s\n',err.message);

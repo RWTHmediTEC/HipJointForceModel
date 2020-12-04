@@ -13,8 +13,6 @@
 
 % Muscle path models
 % - Improve scaling of wrapping surfaces
-% - Include sanity check for wrapping based on the length of the muscle
-%   path. If length is not physological, use StraightLine model.
 % - Improve inital wrapping parameters for better robustness of wrapping 
 %   for scaling and different postures
 

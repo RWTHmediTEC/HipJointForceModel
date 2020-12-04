@@ -60,7 +60,8 @@ end
 if strcmp(MusclePathModel,'Wrapping')
     for i = 1:length(ActiveMuscles)
         if isequal(MuscleList{MuscleListIdx(i,1),6},'WS')
-            muscleWrappingSystem = {};
+            % Initialize the muscle wrapping system (MWS)
+            MWS = {};
             if size(MusclePaths(i).Points,1) <= 2 % Checks if there are no Via Points
                 for b = 1:2 % loop through bones with Surfaces
                     Surface = fieldnames(LE(b).Surface);
@@ -84,19 +85,19 @@ if strcmp(MusclePathModel,'Wrapping')
                                 % Cylinder inputs: center, rotation matrix, linear velocity, angular velocity, radius, heigth
                                 cyl = Cylinder(cCenter', cRot(1:3,1:3), [0 0 0]', [0 0 0]', cRadius, 20*cRadius); % Cylinder initialization
                                 wrappingCyl = WrappingObstacle(cyl); % Initialization for wrapping Cylinder
-                                if ~isempty(muscleWrappingSystem)
+                                if ~isempty(MWS)
                                     % If there is more than one wrapping surface, the start point on the cylinder has to be adjusted
-                                    geoLen = length(muscleWrappingSystem.wrappingObstacles); % Numbers of geodesic elements
-                                    lineOrigin = muscleWrappingSystem.straightLineSegments{1, geoLen+1}.startPoint'; % creating new start Point
+                                    geoLen = length(MWS.wrappingObstacles); % Numbers of geodesic elements
+                                    lineOrigin = MWS.straightLineSegments{1, geoLen+1}.startPoint'; % creating new start Point
                                     % initialize starting conditions for wrapping
                                     [~, theta, height, arcLength, vector] = startingPoint3d(testCylinder, lineOrigin, lineInsertion, cCenter, cAxis);
-                                elseif isempty(muscleWrappingSystem)
+                                elseif isempty(MWS)
                                     lineOrigin = MusclePaths(i).Points(1,:); % creating new start Point
                                     lineInsertion = MusclePaths(i).Points(end,:);
                                     % initialize starting conditions for wrapping
                                     [~, theta, height, arcLength, vector] = startingPoint3d(testCylinder, lineOrigin, lineInsertion, cCenter, cAxis);
                                     % initialize wrapping system with Origin and Insertion
-                                    muscleWrappingSystem = MuscleWrappingSystem(lineOrigin', lineInsertion');
+                                    MWS = MuscleWrappingSystem(lineOrigin', lineInsertion');
                                 end
                                 % define initial conditions for wrapping, depending on muscles
                                 % inputs for initial conditions
@@ -111,23 +112,23 @@ if strcmp(MusclePathModel,'Wrapping')
                                         end
                                 end
                                 % adds the surface to the muscle wrapping system
-                                muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCyl, qCyl);
+                                MWS = MWS.addWrappingObstacle(wrappingCyl, qCyl);
                                 % check if straight line is
                                 % vertical to tangent vector of
                                 % cylinder
                                 straightVect = lineInsertion - lineOrigin;
-                                wrapVect = transformVector3d(muscleWrappingSystem.geodesics{1}.KP.t', cRot); % tangent vector
+                                wrapVect = transformVector3d(MWS.geodesics{1}.KP.t', cRot); % tangent vector
                                 angleVect = rad2deg(vectorAngle3d(wrapVect,straightVect));
                                 if abs(angleVect - 90) <= 15 && abs(angleVect - 90) >= -15
                                     angleCorrection = 0.3;
                                     qCyl(1) = qCyl(1)  -angleCorrection; % changing initial conditions for wrapping
-                                    muscleWrappingSystem = MuscleWrappingSystem(lineOrigin', lineInsertion');
-                                    muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCyl, qCyl);
+                                    MWS = MuscleWrappingSystem(lineOrigin', lineInsertion');
+                                    MWS = MWS.addWrappingObstacle(wrappingCyl, qCyl);
                                 end
                             end
                         end
-                    end % s changes
-                end % b changes
+                    end
+                end
             elseif size(MusclePaths(i).Points,1) > 2 % check if there are Via Points
                 for b = 1:2 % loop through bones with Surfaces
                     Surface = fieldnames(LE(b).Surface);
@@ -169,33 +170,41 @@ if strcmp(MusclePathModel,'Wrapping')
                                     % initialize starting conditions for wrapping
                                     [~, theta, height, arcLength, vector] = startingPoint3d(testCylinder, MusclePaths(i).Points(p,:), MusclePaths(i).Points(p+1,:), cCenter, cAxis);
                                     % initialize wrapping system with the successive points
-                                    muscleWrappingSystem = MuscleWrappingSystem(MusclePaths(i).Points(p,:)', MusclePaths(i).Points(p+1,:)');
+                                    MWS = MuscleWrappingSystem(MusclePaths(i).Points(p,:)', MusclePaths(i).Points(p+1,:)');
                                     % define initial conditions for wrapping, depending on muscles
                                     % inputs for initial conditions
                                     % angle according to cylinder coordinates, heigth according to cylinder coordinates, tangent
                                     % vector defining initial direction, length of arc over the surface
                                     qCyl = [theta height -abs(vector(1)) vector(2) arcLength];
-                                    % adds the surface to the muscle wrapping system
-                                    muscleWrappingSystem = muscleWrappingSystem.addWrappingObstacle(wrappingCyl, qCyl);
+                                    % Add the surface to the muscle wrapping system
+                                    MWS = MWS.addWrappingObstacle(wrappingCyl, qCyl);
                                 end
-                                
-                            end % p changes
+                            end
                         end
-                    end % s changes
-                end % b changes
+                    end
+                end
             end
             
-            if ~isempty(muscleWrappingSystem)
+            if ~isempty(MWS)
                 for z = 1:4
                     % solves a root finding problem to find the shortest path over the cylinder
-                    muscleWrappingSystem = muscleWrappingSystem.doNewtonStep();
+                    MWS = MWS.doNewtonStep();
                 end
-                % adds wrapping system to MusclePaths struct
-                MusclePaths(i).Surface = muscleWrappingSystem;
+                % !!! WORKAROUND !!! - Sanity check in case Newton steps did not work
+                if sum(abs(MWS.Dxi)) > 1
+                    if data.Verbose
+                        warning(['Wrapping did not work for ' MusclePaths(i).Name ...
+                            '. Resetting to a simpler muscle path model for this fascile.'])
+                    end
+                else
+                    % Add wrapping system to MusclePaths struct
+                    MusclePaths(i).Surface = MWS;
+                end
+                
             end
-            clearvars muscleWrappingSystem
+            clearvars MWS
         end
-    end % i changes
+    end
 end
 
 %% Create the points representing the muscles in case of wrapping

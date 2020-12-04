@@ -97,7 +97,7 @@ if ~isempty(Muscles)
     lineProps.Linestyle = '-';
     lineProps.MarkerSize = 1;
     for m = 1:length(Muscles)
-        lineProps.DisplayName = Muscles(m).Name(1:end-1);
+        lineProps.DisplayName = Muscles(m).Name;
         for c = 1:size(MuscleList,1)
             if isequal(Muscles(m).Name(1:end-1),MuscleList{c,1})
                 lineProps.Color = MuscleList{c,2};
