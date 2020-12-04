@@ -4,7 +4,7 @@ warning off backtrace; warning off verbose
 addpath(genpath('src'))
 addpath(genpath('data'))
 
-data = createDataLEM();
+data = createLEM();
 gui = createInterfaceLEM(data);
 
 % [List.f, List.p] = matlab.codetools.requiredFilesAndProducts([mfilename '.m']);

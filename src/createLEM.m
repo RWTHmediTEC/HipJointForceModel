@@ -1,5 +1,5 @@
-function data = createDataLEM(data, Cadaver)
-%CREATEDATALEM initializes the lower extremity template
+function data = createLEM(data, Cadaver)
+%CREATELEM initializes the lower extremity template
 %
 % References:
 % [Carbone 2015] 2015 - Carbone - TLEM 2.0 - A comprehensive  

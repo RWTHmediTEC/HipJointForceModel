@@ -824,7 +824,7 @@ gui.Activation.Axes.Fascicles = axes(...
     function onCadavers(~, ~)
         data.Cadaver = ...
             gui.Home.Settings.Popup_Cadaver.String{gui.Home.Settings.Popup_Cadaver.Value};
-        data = createDataLEM(data, data.Cadaver);
+        data = createLEM(data, data.Cadaver);
         switch data.Cadaver
             case {'TLEM2_0','TLEM2_1'}
                 gui.Home.Settings.RadioButton_ViaPoint.Enable='on';
