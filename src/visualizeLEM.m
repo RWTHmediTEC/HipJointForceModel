@@ -1,4 +1,4 @@
-function visualizeTLEM2(axH, LE, side, varargin)
+function visualizeLEM(axH, LE, side, varargin)
 
 %% Input parsing
 p = inputParser;
