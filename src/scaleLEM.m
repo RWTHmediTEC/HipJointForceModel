@@ -1,4 +1,5 @@
-function data = scaleTLEM2(data)
+function data = scaleLEM(data)
+%SCALELEM scales the lower extremity template
 
 % Create scaling matrices
 scaleTFM = repmat(eye(4), 1, 1, length(data.T.LE));

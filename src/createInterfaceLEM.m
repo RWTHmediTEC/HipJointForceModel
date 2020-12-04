@@ -458,7 +458,7 @@ gui.Home.Visualization.Axis_Visualization = axes(...
     'Parent', uicontainer('Parent',gui.Home.Visualization.Panel_Visualization));
 
 
-data = scaleTLEM2(data);
+data = scaleLEM(data);
 data = globalizeLEM(data);
 visualizeLEM(gui.Home.Visualization.Axis_Visualization, ...
     data.S.LE, data.S.Side,...
@@ -824,7 +824,7 @@ gui.Activation.Axes.Fascicles = axes(...
     function onCadavers(~, ~)
         data.Cadaver = ...
             gui.Home.Settings.Popup_Cadaver.String{gui.Home.Settings.Popup_Cadaver.Value};
-        data = createDataTLEM2(data, data.Cadaver);
+        data = createDataLEM(data, data.Cadaver);
         switch data.Cadaver
             case {'TLEM2_0','TLEM2_1'}
                 gui.Home.Settings.RadioButton_ViaPoint.Enable='on';
@@ -1235,7 +1235,7 @@ gui.Activation.Axes.Fascicles = axes(...
 
 %% Box panel visualization
     function updateVisualization()
-        data = scaleTLEM2(data);
+        data = scaleLEM(data);
         data = globalizeLEM(data);
         delete(gui.Home.Visualization.Axis_Visualization.Children);
         visualizeLEM(gui.Home.Visualization.Axis_Visualization, ...

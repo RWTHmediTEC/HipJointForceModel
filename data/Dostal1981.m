@@ -156,7 +156,7 @@ scaleTFM = repmat(10*eye(4), 1, 1, 2);
 HM = transformLEM(HM, scaleTFM);
 
 %% Scaling parameters
-% See createDataTLEM2.m for the exact definitions
+% See createDataLEM.m for the exact definitions
 Scale(1).HipJointWidth = abs(...
     HM(1).Landmarks.RightHipJointCenter.Pos(3)-...
     HM(1).Landmarks.LeftHipJointCenter.Pos(3));

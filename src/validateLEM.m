@@ -81,7 +81,7 @@ for s = 1:length(OL)
         data.S.Scale(2).CCD            = OL(s).CCD;
         
         %% Calculate HJF
-        data = scaleTLEM2(data);
+        data = scaleLEM(data);
         data = globalizeLEM(data);
         data = gui.Home.Model.modelHandle.Calculation(data);
         if isfield(gui.Home, 'Visualization')

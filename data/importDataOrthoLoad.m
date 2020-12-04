@@ -77,7 +77,7 @@ if writeExcel
 end
 
 %% Calculate scaling parameters
-% See createDataTLEM2.m for the exact definitions
+% See createDataLEM.m for the exact definitions
 % !!! Create functions for the parameter definitions !!!
 
 % Pelvic parameters
@@ -99,7 +99,7 @@ MP_IL = OL(s).Landmarks.Pelvis.(['MP_' Side_IL]);
 SIC_IL = OL(s).Landmarks.Pelvis.(['SIC_' Side_IL]);
 IIT_IL = OL(s).Landmarks.Pelvis.(['IIT_' Side_IL]);
 
-% See createDataTLEM2.m for the exact definitions
+% See createDataLEM.m for the exact definitions
 OL(s).PelvicDepth   = abs(ASIS_IL(1) - PSIS_IL(1));
 OL(s).PelvicHeight  = abs(SIC_IL(2) - IIT_IL(2));
 OL(s).HJCASISHeight = abs(ASIS_IL(2) - HJC_IL(2));
