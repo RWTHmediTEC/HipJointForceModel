@@ -57,7 +57,7 @@ if size(scaleTFM,3) > 2 && ~isnan(data.T.Scale(2).FemoralLength)
 end
 
 %% Scale
-data.S.LE = transformTLEM2(data.T.LE, scaleTFM);
+data.S.LE = transformLEM(data.T.LE, scaleTFM);
 
 %% Skinning
 switch data.ScalingLaw
@@ -78,6 +78,6 @@ boneCS_TFM(:,:,1) = createPelvisCS_TFM_LEM(data.S.LE, ...
 boneCS_TFM(:,:,2) = createFemurCS_TFM_LEM(data.S.LE, 'R',...
     'definition','Wu2002', 'verbose',data.Verbose);
 
-data.S.LE = transformTLEM2(data.S.LE, boneCS_TFM);
+data.S.LE = transformLEM(data.S.LE, boneCS_TFM);
 
 end

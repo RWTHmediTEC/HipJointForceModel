@@ -19,7 +19,7 @@ for b = 2:NoB
     transTFM(:,:,b) = transTFM(:,:,pBoneIdx) * pTRANS * TRANS;
 end
 
-LE = transformTLEM2(LE, transTFM);
+LE = transformLEM(LE, transTFM);
 
 %% Position TLEM2 according to the model
 calculateTLEM2 = str2func(data.Model);

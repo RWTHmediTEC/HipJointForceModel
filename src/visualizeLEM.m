@@ -48,7 +48,7 @@ switch side
     otherwise
         error('Invalid side variable!')
 end
-LE = transformTLEM2(LE, repmat(TFM2GUI, 1, 1, length(LE)));
+LE = transformLEM(LE, repmat(TFM2GUI, 1, 1, length(LE)));
 
 %% Visualize bones
 if isfield(LE,'Mesh')

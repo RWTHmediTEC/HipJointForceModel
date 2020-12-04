@@ -153,7 +153,7 @@ HM(2).Landmarks.PosteriorLateralCondyle.Pos = [-2.8 -43.4 2.9];
 
 %% Transform from [cm] to [mm]
 scaleTFM = repmat(10*eye(4), 1, 1, 2);
-HM = transformTLEM2(HM, scaleTFM);
+HM = transformLEM(HM, scaleTFM);
 
 %% Scaling parameters
 % See createDataTLEM2.m for the exact definitions

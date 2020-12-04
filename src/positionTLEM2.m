@@ -48,7 +48,7 @@ end
     end
 %-------------------------------------------------------------------------%
 % Transform bones
-LE = transformTLEM2(LE, TFM);
+LE = transformLEM(LE, TFM);
 
 for b = 1:NoB
     LE(b).positionTFM = TFM(:,:,b);

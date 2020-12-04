@@ -1,5 +1,5 @@
-function LE = transformTLEM2(LE, TFM)
-%TRANSFORMTLEM2 Transformation of the model by matrix TFM
+function LE = transformLEM(LE, TFM)
+%TRANSFORMLEM Transformation of the model by matrix TFM
 
 for b = 1:length(LE)
     if ~isequal(TFM(:,:,b), eye(4))
