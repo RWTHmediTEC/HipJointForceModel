@@ -459,7 +459,7 @@ gui.Home.Visualization.Axis_Visualization = axes(...
 
 
 data = scaleTLEM2(data);
-data = globalizeTLEM2(data);
+data = globalizeLEM(data);
 visualizeLEM(gui.Home.Visualization.Axis_Visualization, ...
     data.S.LE, data.S.Side,...
     'Muscles', data.S.MusclePaths,...
@@ -1074,7 +1074,7 @@ gui.Activation.Axes.Fascicles = axes(...
             updateHipJointForceView();
             data.Activation = [];
             updateActivationTab();
-            data.Results = validateTLEM2(data, gui);
+            data.Results = validateLEM(data, gui);
             writetable(struct2table(data.Results), 'Results.xlsx')
             updateValidationTab();
         else
@@ -1236,7 +1236,7 @@ gui.Activation.Axes.Fascicles = axes(...
 %% Box panel visualization
     function updateVisualization()
         data = scaleTLEM2(data);
-        data = globalizeTLEM2(data);
+        data = globalizeLEM(data);
         delete(gui.Home.Visualization.Axis_Visualization.Children);
         visualizeLEM(gui.Home.Visualization.Axis_Visualization, ...
             data.S.LE, data.S.Side,...

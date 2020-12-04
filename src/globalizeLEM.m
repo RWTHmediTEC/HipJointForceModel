@@ -1,5 +1,5 @@
-function data = globalizeTLEM2(data)
-% Transformation of TLEM2 data into a global coordinate system
+function data = globalizeLEM(data)
+%GLOBALIZELEM tranforms the bones from the local to the global coordinate system
 LE = data.S.LE;
 
 %% Transformations from local to global coordinate system

@@ -1,5 +1,5 @@
-function Results = validateTLEM2(data, gui)
-% Calculate validation parameters for the OrthoLoad subjects
+function Results = validateLEM(data, gui)
+%VALIDATELEM validates the simulated HJF with the OrthoLoad subjects
 
 OL = importDataOrthoLoad;
 
@@ -82,7 +82,7 @@ for s = 1:length(OL)
         
         %% Calculate HJF
         data = scaleTLEM2(data);
-        data = globalizeTLEM2(data);
+        data = globalizeLEM(data);
         data = gui.Home.Model.modelHandle.Calculation(data);
         if isfield(gui.Home, 'Visualization')
             delete(gui.Home.Visualization.Axis_Visualization.Children);
