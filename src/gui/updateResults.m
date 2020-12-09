@@ -38,14 +38,15 @@ end
 
 % Plot hip joint force vector
 if gui.IsUpdated
-    HJF = data.HJF.(data.View).Wu2002.R .* [1 1 sideSign];
-    rDir = normalizeVector3d(HJF);
     switch data.View
         case 'Pelvis'
+            HJF = data.HJF.(data.View).(data.PelvicCS).R .* [1 1 sideSign];
             Dist2HJC = 55;
         case 'Femur'
+            HJF = data.HJF.(data.View).Wu2002.R .* [1 1 sideSign];
             Dist2HJC = 75;
     end
+    rDir = normalizeVector3d(HJF);
     drawArrow3d(gui.Home.Results.Axis_FrontalView,    -rDir*Dist2HJC, rDir*55, 'r')
     drawArrow3d(gui.Home.Results.Axis_SagittalView,   -rDir*Dist2HJC, rDir*55, 'r')
     drawArrow3d(gui.Home.Results.Axis_TransverseView, -rDir*Dist2HJC, rDir*55, 'r')

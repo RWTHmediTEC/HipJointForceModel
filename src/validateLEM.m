@@ -120,12 +120,12 @@ for s = 1:length(OL)
         HJF_Bergmann2016 = transformVector3d(data.HJF.Femur.Bergmann2016.R, ...
             anatomicalOrientationTFM('RAS','ASR'));
         
+        Results(s).BodyWeight          = OL(s).BodyWeight;
         Results(s).HJF_Wu2002          = HJF_Wu2002;
-        Results(s).HJF_Pelvis_Wu2002   = data.HJF.Pelvis.Wu2002.R;
         Results(s).OL_HJF_Wu2002       = OL(s).HJF_Wu2002;
         Results(s).HJF_Bergmann2016    = HJF_Bergmann2016;
         Results(s).OL_HJF_Bergmann2016 = OL(s).HJF_Bergmann2016;
-        Results(s).BodyWeight          = OL(s).BodyWeight;
+        Results(s).(['HJF_Pelvis_' data.PelvicCS]) = data.HJF.Pelvis.(data.PelvicCS).R;
         if data.Verbose
             disp(['Validation with subject ' Results(s).Subject ' was successfull.'])
         end

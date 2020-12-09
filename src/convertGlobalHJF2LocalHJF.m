@@ -9,7 +9,7 @@ R = R / abs(data.S.BodyWeight * data.g) * 100;
 data.HJF.Global.R = R;
 
 % Pelvic bone CS
-data.HJF.Pelvis.Wu2002.R = transformVector3d(R, data.S.LE(1).positionTFM');
+data.HJF.Pelvis.(data.PelvicCS).R = transformVector3d(R, data.S.LE(1).positionTFM');
 % Sanity Check
 if data.SurfaceData
     assert(all(ismembertol(data.S.LE(1).positionTFM',...
