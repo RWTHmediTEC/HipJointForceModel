@@ -381,7 +381,7 @@ gui.Home.Model.Panel_Model = uix.Panel(...
     'Title', 'HJF Model');
 
 % Get models
-models = dir('src\models\*.m');
+models = dir(strrep(mfilename('fullpath'), mfilename, 'models\*.m'));
 defaultModel=1;
 [~, models] = arrayfun(@(x) fileparts(x.name), models, 'uni', 0);
 data.Model = models{defaultModel};
