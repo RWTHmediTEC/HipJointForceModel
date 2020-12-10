@@ -201,7 +201,7 @@ gui.Home.Parameters.RadioButton_R = uicontrol(...
     'String', 'Right',...
     'Callback', @onRightSide);
 
-set(gui.Home.Parameters.(['RadioButton_' data.T.Side]), 'Value', 1)
+set(gui.Home.Parameters.(['RadioButton_' data.S.Side]), 'Value', 1)
 
 % Panel body weight
 gui.Home.Parameters.Panel_BodyWeight = uix.Panel(...
@@ -653,7 +653,7 @@ gui.Home.Results.Label_TransverseAngle = uicontrol(...
     'FontWeight', 'bold');
 
 % Push button for calculation
-gui.IsUpdated = false;
+gui.IsUpdated = 0;
 
 gui.Home.Results.PushButton_RunCalculation = uicontrol(...
     'Parent', gui.Home.Results.Layout_Grid_Bottom,...
@@ -671,6 +671,13 @@ gui.Home.Results.Checkbox_Validation = uicontrol(...
 set(gui.Home.Results.Layout_V,           'Height', [-11, -1])
 set(gui.Home.Results.Layout_V_Top,       'Height', [-3, -1])
 set(gui.Home.Results.Layout_Grid_Bottom, 'Width',  [-1, -1, -1, -1],'Height', [-1, -1])
+
+% Show HJF if data already contains precalculated results
+if isfield(data, 'HJF')
+    gui.IsUpdated = 1;
+    gui = updateResults(data, gui);
+    gui.IsUpdated = 0;
+end
 
 %% Adjust home layout
 set(gui.Home.Layout_H,       'Width',  [-1, -3, -3])
