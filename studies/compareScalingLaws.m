@@ -17,9 +17,9 @@ results = cell(length(scalingLaws), length(models));
 for s = 1:length(scalingLaws)
     for m=1:length(models)
         display([scalingLaws{s} ' - ' models{m}])
-        data = createDataTLEM2();
+        data = createLEM();
         data.Verbose = 0;
-        data = createDataTLEM2(data, cadaver);
+        data = createLEM(data, cadaver);
         
         data.ScalingLaw = scalingLaws{s};
         data.MusclePathModel = musclePathModel;
@@ -42,7 +42,7 @@ for s = 1:length(scalingLaws)
             data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
             data.activeMuscles = parseActiveMusclesLEM(data.activeMuscles, data.MuscleList);
             
-            results{s,m,p} = validateTLEM2(data, gui);
+            results{s,m,p} = validateLEM(data, gui);
         end
     end
 end
@@ -60,8 +60,13 @@ for p = 1:length(postures)
             compTab(2,2+(m-1)*NoE:1+m*NoE,p) = errorNames;
             if ~isempty(results{s,m})
                 % Predicted and in vivo HJF
-                pHJF = reshape([results{s,m,p}.HJF_Wu2002],[3,10])';
-                iHJF = reshape([results{s,m,p}.OL_HJF_Wu2002],[3,10])';
+                if all(all(isnan(reshape([results{s,m,p}.HJF_Bergmann2016],[3,10])')))
+                    pHJF = reshape([results{s,m,p}.HJF_Wu2002],[3,10])';
+                    iHJF = reshape([results{s,m,p}.OL_HJF_Wu2002],[3,10])';
+                else
+                    pHJF = reshape([results{s,m,p}.HJF_Bergmann2016],[3,10])';
+                    iHJF = reshape([results{s,m,p}.OL_HJF_Bergmann2016],[3,10])';
+                end
                 % Absolute Error in magnitude
                 AE_Mag{s,m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction

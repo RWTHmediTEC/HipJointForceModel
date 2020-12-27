@@ -12,9 +12,9 @@ results = cell(length(cadavers), length(models));
 for c = 1:length(cadavers)
     for m=1:length(models)
         display([cadavers{c} ' - ' models{m}])
-        data = createDataTLEM2();
+        data = createLEM();
         data.Verbose = 0;
-        data = createDataTLEM2(data, cadavers{c});
+        data = createLEM(data, cadavers{c});
         
         data.ScalingLaw = 'None';
         data.MusclePathModel = 'StraightLine';
@@ -37,7 +37,7 @@ for c = 1:length(cadavers)
             data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
             data.activeMuscles = parseActiveMusclesLEM(data.activeMuscles, data.MuscleList);
             
-            results{c,m,p} = validateTLEM2(data, gui);
+            results{c,m,p} = validateLEM(data, gui);
         end
     end
 end
@@ -56,12 +56,17 @@ for p = 1:length(postures)
             compTab{1,2+(m-1)*NoE,p} = models{m};
             compTab(2,2+(m-1)*NoE:1+m*NoE,p) = errorNames;
             if ~isempty(results{c,m})
-                sHJF = reshape([results{c,m,p}.HJF_Wu2002],[3,10])';
-                iHJF = reshape([results{c,m,p}.OL_HJF_Wu2002],[3,10])';
+                if all(all(isnan(reshape([results{c,m,p}.HJF_Bergmann2016],[3,10])')))
+                    pHJF = reshape([results{c,m,p}.HJF_Wu2002],[3,10])';
+                    iHJF = reshape([results{c,m,p}.OL_HJF_Wu2002],[3,10])';
+                else
+                    pHJF = reshape([results{c,m,p}.HJF_Bergmann2016],[3,10])';
+                    iHJF = reshape([results{c,m,p}.OL_HJF_Bergmann2016],[3,10])';
+                end
                 % Absolute Error in magnitude
-                AE_Mag{c,m,p} = abs(vectorNorm3d(sHJF)-vectorNorm3d(iHJF));
+                AE_Mag{c,m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction
-                AE_Dir{c,m,p} = rad2deg(vectorAngle3d(sHJF, iHJF));
+                AE_Dir{c,m,p} = rad2deg(vectorAngle3d(pHJF, iHJF));
                 
                 % Table
                 compTab(2+c,2+(m-1)*NoE,p) = medianStats(AE_Mag{c,m,p},'format','short','test','none','alpha',alpha);

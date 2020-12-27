@@ -1,10 +1,10 @@
-clearvars
+clearvars; warning off backtrace; warning off verbose
 
 addpath(genpath('..\src'))
 addpath(genpath('..\data'))
 addpath(genpath('src'))
 
-cadavers = {'Dostal1981','TLEM2_0'};
+cadavers = {'TLEM2_0'};
 model = 'Schimmelpfennig2020';
 MRC = {'Polynom1','Polynom2','Polynom3','Polynom5','MinMax'};
 
@@ -13,9 +13,9 @@ results = cell(length(cadavers), length(MRC));
 for c = 1:length(cadavers)
     for m=1:length(MRC)
         disp([cadavers{c} ' - ' MRC{m}])
-        data = createDataTLEM2();
+        data = createLEM();
         data.Verbose = 0;
-        data = createDataTLEM2(data, cadavers{c});
+        data = createLEM(data, cadavers{c});
         
         switch cadavers{c}
             case 'Dostal1981'
@@ -38,7 +38,7 @@ for c = 1:length(cadavers)
             data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
             data.activeMuscles = parseActiveMusclesLEM(data.activeMuscles, data.MuscleList);
             
-            results{c,m,p} = validateTLEM2(data, gui);
+            results{c,m,p} = validateLEM(data, gui);
         end
     end
 end
@@ -58,8 +58,8 @@ for p = 1:length(postures)
             compTab(2,2+(m-1)*NoE:1+m*NoE,p) = errorNames;
             if ~isempty(results{c,m})
                 % Predicted and in vivo HJF
-                pHJF = reshape([results{c,m,p}.HJF_Wu2002],[3,10])';
-                iHJF = reshape([results{c,m,p}.OL_HJF_Wu2002],[3,10])';
+                pHJF = reshape([results{c,m,p}.HJF_Bergmann2016],[3,10])';
+                iHJF = reshape([results{c,m,p}.OL_HJF_Bergmann2016],[3,10])';
                 % Absolute Error in magnitude
                 AE_Mag{c,m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction
@@ -73,3 +73,6 @@ for p = 1:length(postures)
     end
     writecell(compTab(:,:,p),'compareRecruitment.xlsx','Sheet',postures{p,2},'Range','B2')
 end
+
+% [p,tbl,stats] = friedman(cell2mat(AE_Mag(1,:,1)));
+% multcompare(stats,'alpha',0.01)

@@ -5,9 +5,8 @@ addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 models = {...
-    'Debrunner1975', 'Dostal1981', 'NonuniformSedghi2017', 'None', 'StraightLine'; ...
-    'Iglic', 'Dostal1981', 'NonuniformSedghi2017', 'None', 'StraightLine'; ...
-    'Schimmelpfennig2020', 'Dostal1981', 'NonuniformEggert2018', 'Polynom2', 'StraightLine';...
+    'Debrunner1975', 'TLEM2_0', 'NonuniformSedghi2018', 'None', 'Wrapping'; ...
+    'Schimmelpfennig2020', 'TLEM2_0', 'LandmarkSkinningFischer2018', 'Polynom1', 'Wrapping';...
     };
 
 alpha = 0.01;
@@ -18,9 +17,9 @@ results = cell(NoM,1);
 for m=1:NoM
     disp(['Model: ' models{m,1} ', Cadaver: ' models{m,2} ', Scaling Law: ' models{m,3} ...
         ', Recruitm. Criterion: ' models{m,4} ', Muscle Paths: ' models{m,5}])
-    data = createDataTLEM2();
+    data = createLEM();
     data.Verbose = 0;
-    data = createDataTLEM2(data, models{m,2});
+    data = createLEM(data, models{m,2});
     
     data.Model = models{m,1};
     data.ScalingLaw = models{m,3};
@@ -36,7 +35,7 @@ for m=1:NoM
         data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
         data.activeMuscles = parseActiveMusclesLEM(data.activeMuscles, data.MuscleList);
         
-        results{m,p} = validateTLEM2(data, gui);
+        results{m,p} = validateLEM(data, gui);
     end
 end
 
@@ -48,8 +47,8 @@ for m=1:NoM
     compTab(m*4-3,1:5) = models(m,1:5);
     for p = 1:length(postures)
         % Predicted and in vivo HJF
-        pHJF = reshape([results{m,p}.HJF_Wu2002],[3,10])';
-        iHJF = reshape([results{m,p}.OL_HJF_Wu2002],[3,10])';
+        pHJF = reshape([results{m,p}.HJF_Bergmann2016],[3,10])';
+        iHJF = reshape([results{m,p}.OL_HJF_Bergmann2016],[3,10])';
         % Absolute Error in magnitude
         AE_Mag{m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
         % Angular Error in direction
