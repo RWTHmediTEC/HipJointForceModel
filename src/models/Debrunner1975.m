@@ -43,6 +43,7 @@ end
 function data = Calculation(data)
 
 % Inputs
+g                 = data.g;
 LE                = data.S.LE;
 activeMuscles     = data.activeMuscles;
 BodyWeight        = data.S.BodyWeight;
@@ -62,7 +63,7 @@ if Verbose
 end
 
 %% Define Parameters
-g = 9.18;
+
 d6 = HipJointWidth/2; % Half the distance between the two hip joint centers
 d5 = 1.28 * d6; % Lever arm of G5 around the hip joint center
 G5 = 5/6 * BodyWeight; % Partial body weight weighing on the hip joint
