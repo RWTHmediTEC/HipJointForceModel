@@ -1239,9 +1239,13 @@ gui.Activation.Axes.Fascicles = axes(...
     function updateMuscleList()
         gui.Home.Model.ListBox_MuscleList.String = data.MuscleList(:,1);
         gui.Home.Model.ListBox_MuscleList.Max = size(data.MuscleList,1);
-        % Get the indices of the muscles used in the current model
-        mListValues = find(ismember(data.MuscleList(:,1), ...
-            unique(cellfun(@(x)regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
+        if ~isempty(data.activeMuscles)
+            % Get the indices of the muscles used in the current model
+            mListValues = find(ismember(data.MuscleList(:,1), ...
+                unique(cellfun(@(x) regexp(x,'\D+','match'), data.activeMuscles(:,1)))));
+        else
+            mListValues=[];
+        end
         gui.Home.Model.ListBox_MuscleList.Value = mListValues;
         gui.Home.Model.ListBox_MuscleList.Enable = gui.Home.Model.MuscleListEnable;
     end
