@@ -65,7 +65,7 @@ G = -data.g; % Weight force
 
 [~, S5, abc] = derivationFromBrauneAndFischer189X; 
 
-[BO, alphaM] = derivationFromFick1850;
+[BO, alphaM] = derivationFromFick1850();
 % BO = 40; % Moment arm of the muscle force M [Pauwels 1965, S.111]
 % alphaM = 21; % Angle between the muscle force M and the vertical [Pauwels 1965, S.111] 
 
@@ -154,8 +154,8 @@ PT_group_FP = [PT_group_Its GMe_FP(3:4)*GMe_rF + GMi_FP(3:4)*GMi_rF];
 %% S.C. Group [Pauwels 1965, S.110]
 RF1 = createLine3d(HM(1).Muscle.RectusFemoris1.Pos, HM(2).Muscle.RectusFemoris1.Pos);
 RF2 = createLine3d(HM(1).Muscle.RectusFemoris2.Pos, HM(2).Muscle.RectusFemoris2.Pos);
-TF1 = createLine3d(HM(1).Muscle.TensorFasciae1.Pos, HM(2).Muscle.TensorFasciae1.Pos);
-TF2 = createLine3d(HM(1).Muscle.TensorFasciae2.Pos, HM(2).Muscle.TensorFasciae2.Pos);
+TF1 = createLine3d(HM(1).Muscle.TensorFasciaeLatae1.Pos, HM(2).Muscle.TensorFasciaeLatae1.Pos);
+TF2 = createLine3d(HM(1).Muscle.TensorFasciaeLatae2.Pos, HM(2).Muscle.TensorFasciaeLatae2.Pos);
  S1 = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
  S2 = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
 
@@ -174,7 +174,7 @@ TF_FP_MA = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3), TF_FP));
 
 % Relative force of the muscle based on its volume
 RF_rF = Moments.RectusFemoris(2)/RF_FP_MA;
-TF_rF = Moments.TensorFasciae(2)/TF_FP_MA;
+TF_rF = Moments.TensorFasciaeLatae(2)/TF_FP_MA;
  S_rF = Moments.Sartorius(2)/S_FP_MA;
 
 % Calculate the S.C. group's resulting force
@@ -220,7 +220,7 @@ if visu
         pointProps.MarkerEdgeColor = muscleList{colorIdx,2};
         pointProps.MarkerFaceColor = muscleList{colorIdx,2};
         drawEdge3d(axH, Origin, Insertion, pointProps);
-        drawLabels3d(axH, [Origin; Insertion], [Fascicles{m}([1,end]);Fascicles{m}([1,end])], pointProps);
+        drawLabels3d(axH, [Origin; Insertion], [Fascicles{m}([1,end]);Fascicles{m}([1,end])]);
     end
     
     ylim([-500 150]);zlim([-50 350])
