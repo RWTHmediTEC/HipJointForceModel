@@ -1,11 +1,14 @@
 function funcHandles = Pauwels
-% The model by Pauwels with patient-specific adaption using the TLEM2 
-% cadaver data instead of Fick's cadaver data and the data of Braune and 
-% Fischer
+% A Pauwels based model with subject-specific adaption using the the data 
+% of Braune and Fischer
 % 
 % References:
 %   [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur 
 %   funktionellen Anatomie des Bewegungsapparates - Der Schenkelhalsbruch
+% or 
+%   [Pauwels 1980] 1980 - Pauwels - Biomechanics of the Locomotor Apparatus
+%   - The Fracture of the Femoral Neck. A Mechanical Problem
+%
 %   [Braune 1895] 1985 - Braune - Der Gang des Menschen - I. Theil
 %   [Fischer 1898] 1898 - Fischer - Der Gang des Menschen - II. Theil
 % or
@@ -48,12 +51,14 @@ activeMuscles = {...
     'GluteusMinimus';
     'Piriformis'
     'Sartorius'};
+
 end
 
 %% Calculation of the hip joint force
 function data = Calculation(data)
 
 % Inputs
+g               = data.g;
 S               = data.S.BodyWeight;
 MuscleList      = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
@@ -64,59 +69,65 @@ if isnan(HJW)
     error('Please specifiy the hip joint width (HJW)!')
 end
 
-
 %% Define parameters
-G = -data.g; % Weight force
 
-% Partial body weight and its lever arm in percent of the full body weight
-% and the hip joint width
-[relPartialBW, ratioLeverArm2HJW] = derivationFromBrauneAndFischer189X();
-S5 = S*relPartialBW;
-a = HJW*ratioLeverArm2HJW;
+% Partial body weight and its moment arm in relation to the body weight and
+% the hip joint width
+[ratio_S52S, ratio_a2HJW] = derivationFromBrauneAndFischer189X();
+S5 = ratio_S52S * S;
+% Force of the partial body weight
+K = -g * S5;
+% Moment arm of the partial body weight about the hip joint center
+a = ratio_a2HJW*HJW;
 
-% Moment arm of the muscle force M
-% Angle between the muscle force M and the vertical in the frontal plane
-[BO, alphaM] = combineMuscleForces(MusclePaths, MusclePathModel, MuscleList, HJC);
+% Line of action of the muscle force of the abductors in the frontal plane
+M_LoA = combineMuscleForces(MusclePaths, MusclePathModel, MuscleList);
 
-syms M % Magnitude of the muscle force
-% Calculation of the muscle force
-eq1 = S5 * G * a + M * BO; % Moment equilibrium around hip joint center
+% Unit vector of the muscle force of the abductors
+M_Dir = normalizeVector3d(M_LoA(4:6));
+% Moment arm of the muscle force of the abductors
+BO = distancePoints3d(HJC, projPointOnLine3d(HJC, M_LoA));
 
-syms RxSym RySym RzSym
-% Calculation of the hip joint force
-eq2 = RxSym;                             % Force equilibrium in the direction of X
-eq3 = RySym + S5 * G - M * cosd(alphaM); % Force equilibrium in the direction of Y
-eq4 = RzSym + M * sind(alphaM);          % Force equilibrium in the direction of Z
+% Symbolic magnitude of the muscle force of the abductors
+syms M_Mag
+% Moment equilibrium about the hip joint center
+eqMoment = K * a + M_Mag * BO;
 
-Results = solve(eq1, eq2, eq3, eq4);
+% Symbolic resulting hip joint force
+syms Rx Ry Rz
+% Force equilibrium
+eqForce = M_Dir*M_Mag + [Rx Ry Rz] + [0 K 0];
 
-rX = double(Results.RxSym);
-rY = double(Results.RySym);
-rZ = double(Results.RzSym);
+% Solve the system of equations
+Results = solve([eqMoment(:); eqForce(:)]);
 
-data = convertGlobalHJF2LocalHJF([rX rY rZ], data);
+% Resulting hip joint force pointing to the pelvis
+R = [double(Results.Rx) double(Results.Ry) double(Results.Rz)];
+
+data = convertGlobalHJF2LocalHJF(R, data);
 
 end
 
-function [relPartialBW, leverArm2HJW, a] = derivationFromBrauneAndFischer189X()
+function [ratio_S52S, ratio_a2HJW, a] = derivationFromBrauneAndFischer189X()
 % Derivation of the lever arm of the body weight during stance phase.
 % Step 16, Experiment 1, Braune and Fischer
 [S, HJW, G1, G2, g1_16, g2_L_16, hjc_R_16] = BrauneAndFischer189X();
 
-% Derivation 
+% Partial body weight
 S5 = S*(G1+G2);
-relPartialBW=S5/S;
-s5 = (g1_16*G1+g2_L_16*G2)/(G1+G2); % [Pauwels 1965, S.101]
+% Ratio between the partial body weight and the body weight
+ratio_S52S = S5/S;
+s5 = (g1_16*G1+g2_L_16*G2)/(G1+G2); % [Pauwels 1965, p.101; Pauwels 1980, p.80]
 
-% Lever arms of S5 projected into the anatomical planes
-a = hjc_R_16(2)-s5(2); % Frontal plane [Pauwels 1965, S.103]
-% Ratio between the lever arm in the frontal plane and the hip joint width
-leverArm2HJW=a/HJW;
+% Moment arm of S5 projected to the anatomical planes
+a = hjc_R_16(2) - s5(2); % Frontal plane [Pauwels 1965, p.103; Pauwels 1980, p.82]
+% Ratio between the moment arm in the frontal plane and the hip joint width
+ratio_a2HJW = a/HJW;
 end
 
-function [R_FP_MA, R_FP_Angle] = combineMuscleForces(MusclePaths, MusclePathModel, MuscleList, HJC)
-% Combination of muscle forces in the frontal plane into one resulting
-% muscle force as desribed by Pauwels [Pauwels 1965, S.111] 
+function M_FP = combineMuscleForces(MusclePaths, MusclePathModel, MuscleList)
+% Combination of muscle forces in the frontal plane (FP) into one resulting
+% muscle force as desribed by Pauwels [Pauwels 1965, p.111; Pauwels 1980, p.85] 
 
 % Number of active muscles
 NoAM = length(MusclePaths);
@@ -139,19 +150,15 @@ end
 
 % Multiplicate the muscle unit vectors with the PCSAs and project them on
 % the frontal plane
-muscleForces = [LoA_Origins(:,2:3) LoA_Vectors(:,2:3).*PCSAs];
+M_FP = [LoA_Origins(:,2:3) LoA_Vectors(:,2:3).*PCSAs];
 % Calculate the resulting muscle force in the frontal plane
-while size(muscleForces,1)>1
-    muscleForces(end-1,:) = resultingOf2Forces2d(muscleForces(end-1,:), muscleForces(end,:));
-    muscleForces(end,:)=[];
+while size(M_FP,1)>1
+    M_FP(end-1,:) = resultingOf2Forces2d(M_FP(end-1,:), M_FP(end,:));
+    M_FP(end,:)=[];
 end
 
-% R (resulting line of action)
-% Moment arm of R
-R_FP_MA  = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3),muscleForces));
-% Angle to vertical
-R_FP_Angle = rad2deg(lineAngle(muscleForces,[0 0 -1 0]));
-if R_FP_Angle>90; R_FP_Angle=360-R_FP_Angle; end
+% Back to 3D
+M_FP = [0 M_FP(1:2) 0 M_FP(3:4)];
 
 end
 
