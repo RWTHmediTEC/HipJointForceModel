@@ -5,7 +5,7 @@ addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 cadavers = {'Fick1850','Dostal1981','TLEM2_0'};
-models = {'Pauwels','Debrunner1975','Iglic','Schimmelpfennig2020'};
+models = {'Pauwels','Debrunner','Iglic','Schimmelpfennig2020'};
 
 %% Create results
 results = cell(length(cadavers), length(models));

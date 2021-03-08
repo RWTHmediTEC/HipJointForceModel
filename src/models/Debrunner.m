@@ -37,7 +37,6 @@ enable = 'on';
 % Default fascicles of the model
 activeMuscles = {...
     'GluteusMedius';
-    'GluteusMinimus';
     };
 
 end

@@ -5,7 +5,7 @@ addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 scalingLaws = {'None', 'NonuniformSedghi2017', 'NonuniformEggert2018', 'LandmarkSkinningFischer2018'};
-models = {'Pauwels','Debrunner1975','Iglic','Schimmelpfennig2020'};
+models = {'Pauwels','Debrunner','Iglic','Schimmelpfennig2020'};
 
 cadaver = 'TLEM2_0'; % Dostal1981
 musclePathModel = 'Wrapping'; % StraightLine
