@@ -50,18 +50,6 @@ for s = 1:length(OL)
                 data.S.Scale(2).Landmarks.(femurLM{lm}) = ...
                     OL(s).Landmarks.Femur.([femurLM{lm} '_' OL(s).Subject(end)]);
             end
-            % For scaling landmarks have to be mirrored to the right side as
-            % the cadavers are right sided.
-            switch OL(s).Subject(end)
-                case 'L'
-                    mirrorZTFM = eye(4); mirrorZTFM(3,3) = -1;
-                    data.S.Scale(1).Landmarks = structfun(@(x) ...
-                        transformPoint3d(x, mirrorZTFM), data.S.Scale(1).Landmarks,'uni',0);
-                    data.S.Scale(1).boneCSLandmarks = structfun(@(x) ...
-                        transformPoint3d(x, mirrorZTFM), data.S.Scale(1).boneCSLandmarks,'uni',0);
-                    data.S.Scale(2).Landmarks = structfun(@(x) ...
-                        transformPoint3d(x, mirrorZTFM), data.S.Scale(2).Landmarks,'uni',0);
-            end
         end
         
         %% Scaling parameters
