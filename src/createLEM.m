@@ -73,7 +73,7 @@ switch Cadaver
         data.T.BodyHeight = 172; % Generic body height [cm] [Destatis 2018]
         data.SurfaceData = false;
     otherwise
-        error('No valid TLEM version')
+        error('Unknown cadaver template!')
 end
 
 data.T.LE = LE;

@@ -5,7 +5,8 @@ addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 models = {...
-    'Debrunner', 'TLEM2_0', 'LandmarkSkinningFischer2018', 'None', 'Wrapping'; ...
+    'Pauwels', 'Dostal1981', 'None', 'None', 'StraightLine'; ...
+    'Debrunner', 'Dostal1981', 'NonuniformSedghi2017', 'None', 'StraightLine'; ...
     'Schimmelpfennig2020', 'TLEM2_0', 'LandmarkSkinningFischer2018', 'Polynom1', 'Wrapping';...
     };
 
@@ -47,8 +48,8 @@ for m=1:NoM
     compTab(m*4-3,1:5) = models(m,1:5);
     for p = 1:length(postures)
         % Predicted and in vivo HJF
-        pHJF = reshape([results{m,p}.HJF_Bergmann2016],[3,10])';
-        iHJF = reshape([results{m,p}.OL_HJF_Bergmann2016],[3,10])';
+        pHJF = reshape([results{m,p}.HJF_Wu2002],[3,10])';
+        iHJF = reshape([results{m,p}.OL_HJF_Wu2002],[3,10])';
         % Absolute Error in magnitude
         AE_Mag{m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
         % Angular Error in direction

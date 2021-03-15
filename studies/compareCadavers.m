@@ -56,13 +56,8 @@ for p = 1:length(postures)
             compTab{1,2+(m-1)*NoE,p} = models{m};
             compTab(2,2+(m-1)*NoE:1+m*NoE,p) = errorNames;
             if ~isempty(results{c,m})
-                if all(all(isnan(reshape([results{c,m,p}.HJF_Bergmann2016],[3,10])')))
-                    pHJF = reshape([results{c,m,p}.HJF_Wu2002],[3,10])';
-                    iHJF = reshape([results{c,m,p}.OL_HJF_Wu2002],[3,10])';
-                else
-                    pHJF = reshape([results{c,m,p}.HJF_Bergmann2016],[3,10])';
-                    iHJF = reshape([results{c,m,p}.OL_HJF_Bergmann2016],[3,10])';
-                end
+                pHJF = reshape([results{c,m,p}.HJF_Wu2002],[3,10])';
+                iHJF = reshape([results{c,m,p}.OL_HJF_Wu2002],[3,10])';
                 % Absolute Error in magnitude
                 AE_Mag{c,m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction
