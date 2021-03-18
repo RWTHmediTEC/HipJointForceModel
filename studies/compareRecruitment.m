@@ -19,10 +19,10 @@ for c = 1:length(cadavers)
         
         switch cadavers{c}
             case 'Dostal1981'
-                data.ScalingLaw = 'NonuniformEggert2018';
+                data.ScalingLaw = 'NonUniformLinearB';
                 data.MusclePathModel = 'StraightLine';
             case 'TLEM2_0'
-                data.ScalingLaw = 'LandmarkSkinningFischer2018';
+                data.ScalingLaw = 'LandmarkDeformableBones';
                 data.MusclePathModel = 'Wrapping';
         end
         

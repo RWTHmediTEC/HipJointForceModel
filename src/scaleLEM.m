@@ -6,30 +6,27 @@ scaleTFM = repmat(eye(4), 1, 1, length(data.T.LE));
 
 %% Scale factors
 switch data.ScalingLaw
-    case 'NonuniformSedghi2017'
+    case 'NonUniformLinearA'
         PD = 1;
         PH =  data.S.Scale(1).PelvicHeight / data.T.Scale(1).PelvicHeight;
         PW = (data.S.Scale(1).PelvicWidth - data.S.Scale(1).HipJointWidth) / ...
              (data.T.Scale(1).PelvicWidth - data.T.Scale(1).HipJointWidth);
         FemoralLength = (0.53-0.285)*data.S.BodyHeight*10; % [cm] to [mm] [Winter 2009, S.83, Fig.4.1]
         FL = FemoralLength / data.T.Scale(2).FemoralLength;
-        % !!! Sedghi2017 used a slightly different definition than the one implemented here !!!
         FW = data.S.Scale(2).FemoralWidth / data.T.Scale(2).FemoralWidth;
-    case 'NonuniformEggert2018'
-        % Patient specific scaling of TLEM2 by ASISDistance, HJCASISHeight,
-        % pelvic depth and femoral length
+    case 'NonUniformLinearB'
         PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
         PH = data.S.Scale(1).HJCASISHeight / data.T.Scale(1).HJCASISHeight;
         PW = data.S.Scale(1).ASISDistance  / data.T.Scale(1).ASISDistance;
         FL = data.S.Scale(2).FemoralLength / data.T.Scale(2).FemoralLength;
         FW = 1;
-    case 'ParameterSkinningFischer2018'
+    case 'ParameterDeformableFemur'
         PD = data.S.Scale(1).PelvicDepth   / data.T.Scale(1).PelvicDepth;
         PH = data.S.Scale(1).HJCASISHeight / data.T.Scale(1).HJCASISHeight;
         PW = data.S.Scale(1).ASISDistance  / data.T.Scale(1).ASISDistance;
         FL = 1;
         FW = 1;
-    case {'None','LandmarkSkinningFischer2018'}
+    case {'None','LandmarkDeformableBones'}
         [PD, PH, PW, FL, FW] = deal(1);
     otherwise
         error('Invalid scaling law!')
@@ -62,9 +59,9 @@ data.S.LE = transformLEM(data.T.LE, scaleTFM);
 
 %% Skinning
 switch data.ScalingLaw
-    case 'ParameterSkinningFischer2018'
+    case 'ParameterDeformableFemur'
         data = skinFemurLEM(data,'ParameterBased');
-    case 'LandmarkSkinningFischer2018'
+    case 'LandmarkDeformableBones'
         data = skinPelvisLEM(data,'LandmarkBased');
         data = skinFemurLEM(data,'LandmarkBased');
 end

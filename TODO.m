@@ -26,5 +26,5 @@
 
 % GUI
 % - Move postures selection to validation tab
-% - Left radio button not working for the LandmarkSkinningFischer2018. See
+% - Left radio button not working for the LandmarkDeformableBones. See
 %   skinPelvisLEM.m lines 89 to 93.

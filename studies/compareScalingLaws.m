@@ -4,7 +4,7 @@ addpath(genpath('..\src'))
 addpath(genpath('..\data'))
 addpath(genpath('src'))
 
-scalingLaws = {'None', 'NonuniformSedghi2017', 'NonuniformEggert2018', 'LandmarkSkinningFischer2018'};
+scalingLaws = {'None', 'NonUniformLinearA', 'NonUniformLinearB', 'LandmarkDeformableBones'};
 models = {'Pauwels','Debrunner','Iglic','Schimmelpfennig2020'};
 
 cadaver = 'TLEM2_0'; % Dostal1981
