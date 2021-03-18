@@ -5,7 +5,7 @@ addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 cadavers = {'Fick1850','Dostal1981','TLEM2_0'};
-models = {'Pauwels','Debrunner','Iglic','Schimmelpfennig2020'};
+models = {'Pauwels','Debrunner','Iglic','mediTEC2020'};
 
 %% Create results
 results = cell(length(cadavers), length(models));
@@ -24,7 +24,7 @@ for c = 1:length(cadavers)
         switch data.Model
             case {'Pauwels','Debrunner1975','Iglic'}
                 data.MuscleRecruitmentCriterion = 'None';
-            case {'Schimmelpfennig2020'}
+            case {'mediTEC2020'}
                 data.MuscleRecruitmentCriterion = 'Polynom2';
         end
         

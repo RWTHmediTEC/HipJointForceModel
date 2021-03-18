@@ -1,4 +1,4 @@
-function funcHandles = Schimmelpfennig2020
+function funcHandles = mediTEC2020
 % Based Iglic.m model but using all muscles which are connected to the pelvis.
 
 funcHandles.Posture     = @Posture;

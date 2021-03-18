@@ -5,7 +5,7 @@ addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 scalingLaws = {'None', 'NonUniformLinearA', 'NonUniformLinearB', 'LandmarkDeformableBones'};
-models = {'Pauwels','Debrunner','Iglic','Schimmelpfennig2020'};
+models = {'Pauwels','Debrunner','Iglic','mediTEC2020'};
 
 cadaver = 'TLEM2_0'; % Dostal1981
 musclePathModel = 'Wrapping'; % StraightLine
@@ -29,7 +29,7 @@ for s = 1:length(scalingLaws)
         switch data.Model
             case {'Pauwels','Debrunner1975','Iglic'}
                 data.MuscleRecruitmentCriterion = 'None';
-            case {'Schimmelpfennig2020'}
+            case {'mediTEC2020'}
                 data.MuscleRecruitmentCriterion = 'Polynom2';
         end
         

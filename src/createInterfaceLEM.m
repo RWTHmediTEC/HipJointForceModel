@@ -1088,7 +1088,7 @@ gui.Activation.Axes.Fascicles = axes(...
             data.Activation = [];
             updateActivationTab();
             data.Results = validateLEM(data, gui);
-            writetable(struct2table(data.Results), 'Results.xlsx')
+            % writetable(struct2table(data.Results), 'Results.xlsx')
             updateValidationTab();
         else
             data.Activation = [];

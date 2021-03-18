@@ -5,7 +5,7 @@ addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 cadavers = {'TLEM2_0'};
-model = 'Schimmelpfennig2020';
+model = 'mediTEC2020';
 MRC = {'Polynom1','Polynom2','Polynom3','Polynom5','MinMax'};
 
 %% Create results
