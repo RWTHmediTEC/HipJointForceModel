@@ -1,6 +1,5 @@
 
 % Cadaver
-% - TLEM2: Move origin of the femur mesh (from the EC midpoint) to the HJC
 % - Include additonal cadaver from https://github.com/anmuller/CusToM
 
 % Scaling laws
@@ -15,9 +14,6 @@
 % - Improve scaling of wrapping surfaces
 % - Improve inital wrapping parameters for better robustness of wrapping 
 %   for scaling and different postures
-
-% Muscle recruitment
-% - Create a simple test case for verification
 
 % HJF models
 % - Implement other one-leg stance models
