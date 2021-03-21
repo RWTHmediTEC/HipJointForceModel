@@ -21,7 +21,8 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
+postures = {...
+    'OneLeggedStance' 'OLS';
     'LevelWalking' 'LW'};
 
 end
@@ -107,7 +108,7 @@ for m = 1:NoAM
     A_Idx = strcmp(MusclePaths(m).Name(1:end-1), MuscleList(:,1));
     A(m) = MuscleList{A_Idx,5} / MuscleList{A_Idx,4};
 end
-A=A.*cell2mat(activeMuscles(:,3));
+A = A.*cell2mat(activeMuscles(:,3));
 
 % [Iglic 1990, S.37, Equ.2]
 f = cell2sym(activeMuscles(:,2));

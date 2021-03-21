@@ -6,7 +6,6 @@ addpath(genpath('..\data'))
 data = createData();
 gui = createInterface(data);
 
-
 function data = createData()
 %CREATEDATA creates initial data for wrapping
 data.Pos = [0 0 0];
