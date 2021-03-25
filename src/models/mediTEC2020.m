@@ -1,5 +1,5 @@
 function funcHandles = mediTEC2020
-% Based Iglic.m model but using all muscles which are connected to the pelvis.
+% Based on the Iglic.m model but using all muscles connected to the pelvis.
 
 % AUTHOR: Fabian Schimmelpfennig
 % COPYRIGHT (C) 2021

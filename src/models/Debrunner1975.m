@@ -1,8 +1,8 @@
 function funcHandles = Debrunner1975
 % The Debrunner model from 1975
-% 
+%
 % References:
-%   [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des 
+%   [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des
 %   Hüftgelenkes I
 
 funcHandles.Posture     = @Posture;
@@ -16,8 +16,10 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+postures = {...
+    'OneLeggedStance' 'OLS';
+    'LevelWalking' 'LW';
+    };
 
 end
 
@@ -36,7 +38,7 @@ function [activeMuscles, enable] = Muscles(~)
 % User is allowed to edit the default values
 enable = 'off';
 
-% Default muscles/fascicles of the model. 
+% Default muscles/fascicles of the model.
 % Debrunner did not specify the abductor muscles.
 activeMuscles = {};
 
@@ -73,11 +75,11 @@ G5 = g * 5/6 * KG; % Magnitude of the partial body weight [Debrunner 1975, Eq.3]
 Z = [0, HJC(2:3)]; % Hip joint center in the frontal plane
 % Width of the iliac bone along the Z-axis [Debrunner 1975, Abb.3]
 bD = MostLateral(3) - MostMedial(3);
- % Height of the iliac bone along the Y-axis [Debrunner 1975, Abb.3]
+% Height of the iliac bone along the Y-axis [Debrunner 1975, Abb.3]
 hD = MostCranial(2) - AcetabularRoof(2);
 % Origin point of the force of the abductor muscles [Debrunner 1975, Abb.3]
-A = [0, AcetabularRoof(2) + 2/3 * hD, MostLateral(3) - 2/5 * bD]; 
-% Use the greater trochanter in the frontal plane as insertion point of 
+A = [0, AcetabularRoof(2) + 2/3 * hD, MostLateral(3) - 2/5 * bD];
+% Use the greater trochanter in the frontal plane as insertion point of
 % the force of the abductor muscles [Debrunner 1975, Abb.2]
 T = [0, GreaterTrochanter(2:3)];
 

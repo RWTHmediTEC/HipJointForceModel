@@ -1,5 +1,5 @@
 function funcHandles = Iglic1990
-% The original model of Iglic with data from Johnston, Dostal, McLeish and 
+% The original model of Iglic with data from Johnston, Dostal, McLeish and
 % Clauser. Data was copied from the Iglic paper.
 
 % References:
@@ -20,8 +20,10 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+postures = {...
+    'OneLeggedStance' 'OLS';
+    'LevelWalking' 'LW';
+    };
 
 end
 
@@ -50,7 +52,7 @@ enable = 'off';
 % used for calculation as described in [Iglic 1990, S.37].
 
 % Data from [Johnston 1979] as presented in [Iglic 1990, S.37, Table 1]
-% The devision into the groups fa (anterior), ft (middle) and 
+% The devision into the groups fa (anterior), ft (middle) and
 % fp (posterior) is !QUESTIONABLE!
 activeMuscles = {...
     'GluteusMediusAnterior1',   'fa';...
@@ -58,7 +60,7 @@ activeMuscles = {...
     'TensorFasciaeLatae1',      'fa';...
     'RectusFemoris1',           'fa';...
     
-    'GluteusMediusMid1',        'ft';... 
+    'GluteusMediusMid1',        'ft';...
     'GluteusMinimusMid1',       'ft';...
     
     'GluteusMediusPosterior1',  'fp';...
@@ -87,7 +89,7 @@ W = [0, WB - WL, 0];               % 'WB - WL'
 b = 0.48 * l;                      % medio-lateral moment arm of the WL [Iglic 1990, S.37, Equ.7]
 c = 1.01 * l;                      % medio-lateral moment arm of the ground reaction force WB  [Iglic 1990, S.37, Equ.7]
 a = (WB * c - WL * b) / (WB - WL); % medio-lateral moment arm of 'WB - WL' [Iglic 1990, S.37, Equ.6]
-d = 0;                             % antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]             
+d = 0;                             % antero-posterior moment arm of 'WB - WL' [Iglic 1990, S.37]
 
 % Number of active muscles
 NoAM = length(MusclePaths);

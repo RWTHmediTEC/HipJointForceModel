@@ -65,7 +65,7 @@ activeMuscles = {...
     
     'GluteusMinimusMid1',       'ft';
     'GluteusMinimusMid2',       'ft';
-    %     'GluteusMediusMid1'         'ft';
+    % 'GluteusMediusMid1'         'ft';
     
     'GluteusMediusPosterior1',  'fp';
     'GluteusMediusPosterior2',  'ft';

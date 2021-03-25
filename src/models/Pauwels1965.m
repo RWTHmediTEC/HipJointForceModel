@@ -1,11 +1,11 @@
 function funcHandles = Pauwels1965
-% The original model of Pauwels without patient-specific adaption using  
+% The original model of Pauwels without patient-specific adaption using
 % the original data of Fick, Braune and Fischer
-% 
+%
 % References:
-%   [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur 
+%   [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur
 %   funktionellen Anatomie des Bewegungsapparates - Der Schenkelhalsbruch
-%   [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des 
+%   [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des
 %   Oberschenkels
 %   [Braune 1895] 1985 - Braune - Der Gang des Menschen - I. Theil
 %   [Fischer 1898] 1898 - Fischer - Der Gang des Menschen - II. Theil
@@ -23,8 +23,10 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+postures = {...
+    'OneLeggedStance' 'OLS';
+    'LevelWalking' 'LW';
+    };
 
 end
 
@@ -50,10 +52,10 @@ activeMuscles = {...
     'TensorFasciaeLatae';
     'RectusFemoris';
     'Sartorius'};
-    % 'Piriformis' % In [Pauwels 1965, S.109] it is claimed that the  
-    % Piriformis is considered as part of the P.T. group. However, 
-    % positional data for the origin and insertion of the Piriformis muscle 
-    % is missing in [Fick 1850, S.105-106] and is not present in 
+    % 'Piriformis' % In [Pauwels 1965, S.109] it is claimed that the
+    % Piriformis is considered as part of the P.T. group. However,
+    % positional data for the origin and insertion of the Piriformis muscle
+    % is missing in [Fick 1850, S.105-106] and is not present in
     % [Pauwels 1965, S.110, Fig. 169].
 end
 
@@ -63,11 +65,11 @@ function data = Calculation(data)
 % Define parameters
 G = -data.g; % Weight force
 
-[~, S5, abc] = derivationFromBrauneAndFischer189X; 
+[~, S5, abc] = derivationFromBrauneAndFischer189X;
 
 [BO, alphaM] = derivationFromFick1850();
 % BO = 40; % Moment arm of the muscle force M [Pauwels 1965, S.111]
-% alphaM = 21; % Angle between the muscle force M and the vertical [Pauwels 1965, S.111] 
+% alphaM = 21; % Angle between the muscle force M and the vertical [Pauwels 1965, S.111]
 
 syms M % Magnitude of the muscle force
 % Calculation of the muscle force
@@ -94,7 +96,7 @@ function [S, S5, s5_l] = derivationFromBrauneAndFischer189X()
 % Step 16, Experiment 1, Braune and Fischer
 [S, ~, G1, G2, g1_16, g2_L_16, hjc_R_16] = BrauneAndFischer189X();
 
-% Derivation 
+% Derivation
 S5 = S*(G1+G2);
 assert(isequal(round(S5,2), 47.76)); % [kg] Partial body weight weighing on the hip joint [Pauwels 1965, S.112]
 s5 = (g1_16*G1+g2_L_16*G2)/(G1+G2); % [Pauwels 1965, S.101]
@@ -125,7 +127,7 @@ visu = p.Results.visualization;
 
 HJC = HM(1).Joints.Hip.Pos;
 
-%% P.T. Group [Pauwels 1965, S.110] 
+%% P.T. Group [Pauwels 1965, S.110]
 % Positional data for the origin and insertion of the Piriformis muscle is
 % missing in [Fick 1850, S.105-106]
 GMe1 = createLine3d(HM(1).Muscle.GluteusMedius1.Pos, HM(2).Muscle.GluteusMedius1.Pos);
@@ -156,26 +158,26 @@ RF1 = createLine3d(HM(1).Muscle.RectusFemoris1.Pos, HM(2).Muscle.RectusFemoris1.
 RF2 = createLine3d(HM(1).Muscle.RectusFemoris2.Pos, HM(2).Muscle.RectusFemoris2.Pos);
 TF1 = createLine3d(HM(1).Muscle.TensorFasciaeLatae1.Pos, HM(2).Muscle.TensorFasciaeLatae1.Pos);
 TF2 = createLine3d(HM(1).Muscle.TensorFasciaeLatae2.Pos, HM(2).Muscle.TensorFasciaeLatae2.Pos);
- S1 = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
- S2 = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
+S1 = createLine3d(HM(1).Muscle.Sartorius1.Pos, HM(2).Muscle.Sartorius1.Pos);
+S2 = createLine3d(HM(1).Muscle.Sartorius2.Pos, HM(2).Muscle.Sartorius2.Pos);
 
 % Bisectrix
 RF_FP = bisector(RF1([2,3,5,6]),RF2([2,3,5,6]));
 if RF_FP(3)<0; RF_FP(3:4)=-RF_FP(3:4); end
 TF_FP = bisector(TF1([2,3,5,6]),TF2([2,3,5,6]));
 if TF_FP(3)<0; TF_FP(3:4)=-TF_FP(3:4); end
- S_FP = bisector(S1([2,3,5,6]),S2([2,3,5,6]));
+S_FP = bisector(S1([2,3,5,6]),S2([2,3,5,6]));
 if S_FP(3)<0; S_FP(3:4)=-S_FP(3:4); end
 
 % Moment arms of the muscles
 RF_FP_MA = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3), RF_FP));
 TF_FP_MA = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3), TF_FP));
- S_FP_MA = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3), S_FP));
+S_FP_MA = distancePoints(HJC(2:3), projPointOnLine(HJC(2:3), S_FP));
 
 % Relative force of the muscle based on its volume
 RF_rF = Moments.RectusFemoris(2)/RF_FP_MA;
 TF_rF = Moments.TensorFasciaeLatae(2)/TF_FP_MA;
- S_rF = Moments.Sartorius(2)/S_FP_MA;
+S_rF = Moments.Sartorius(2)/S_FP_MA;
 
 % Calculate the S.C. group's resulting force
 RF_TF_Its = intersectLines(RF_FP,TF_FP);
@@ -225,10 +227,11 @@ if visu
     
     ylim([-500 150]);zlim([-50 350])
     box = [get(axH, 'xlim') get(axH, 'ylim') get(axH, 'zlim')];
-    edge = clipLine3d([0 PT_group_FP(1:2), 0 PT_group_FP(3:4);...
-                       0 SC_group_FP(1:2), 0 SC_group_FP(3:4)], box);
+    edge = clipLine3d([...
+        0 PT_group_FP(1:2), 0 PT_group_FP(3:4);...
+        0 SC_group_FP(1:2), 0 SC_group_FP(3:4)], box);
     drawEdge3d(axH,edge,'Color','k','LineStyle','-.');
-        edge = clipLine3d([0 R_FP(1:2), 0 R_FP(3:4)], box);
+    edge = clipLine3d([0 R_FP(1:2), 0 R_FP(3:4)], box);
     drawEdge3d(axH,edge,'Color','k','LineStyle','-');
     
     axis(axH, 'equal');

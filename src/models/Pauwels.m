@@ -1,11 +1,11 @@
 function funcHandles = Pauwels
-% A Pauwels based model with subject-specific adaption using the the data 
+% A Pauwels based model with subject-specific adaption using the the data
 % of Braune and Fischer
-% 
+%
 % References:
-%   [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur 
+%   [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur
 %   funktionellen Anatomie des Bewegungsapparates - Der Schenkelhalsbruch
-% or 
+% or
 %   [Pauwels 1980] 1980 - Pauwels - Biomechanics of the Locomotor Apparatus
 %   - The Fracture of the Femoral Neck. A Mechanical Problem
 %
@@ -25,8 +25,10 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+postures = {...
+    'OneLeggedStance' 'OLS';
+    'LevelWalking' 'LW';
+    };
 
 end
 
@@ -127,7 +129,7 @@ end
 
 function M_FP = combineMuscleForces(MusclePaths, MusclePathModel, MuscleList)
 % Combination of muscle forces in the frontal plane (FP) into one resulting
-% muscle force as desribed by Pauwels [Pauwels 1965, p.111; Pauwels 1980, p.85] 
+% muscle force as desribed by Pauwels [Pauwels 1965, p.111; Pauwels 1980, p.85]
 
 % Number of active muscles
 NoAM = length(MusclePaths);

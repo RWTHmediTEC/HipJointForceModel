@@ -1,8 +1,8 @@
 function funcHandles = Debrunner
 % A Debrunner based model
-% 
+%
 % References:
-%   [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des 
+%   [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des
 %   Hüftgelenkes I
 
 funcHandles.Posture     = @Posture;
@@ -16,8 +16,10 @@ end
 function [postures, default] = Posture()
 
 default = 1;
-postures = {'OneLeggedStance' 'OLS';
-            'LevelWalking' 'LW'};
+postures = {...
+    'OneLeggedStance' 'OLS';
+    'LevelWalking' 'LW';
+    };
 
 end
 
@@ -83,7 +85,7 @@ for m = 1:length(activeMuscles)
     end
 end
 
-% In contrast to Debrunner, the mean of the origin points as well as the 
+% In contrast to Debrunner, the mean of the origin points as well as the
 % insertion points of the abductor muscles are taken as A and T.
 A = [0 mean(origin(:,2:3))];
 T = [0 mean(insertion(:,2:3))];
