@@ -2,13 +2,15 @@ function data = createLEM(data, Cadaver)
 %CREATELEM initializes the lower extremity template
 %
 % References:
+% [Destatis 2018] 2018 - Destatis - Mikrozensus 2017 - Fragen zur 
+% Gesundheit - Körpermaße der Bevölkerung
 % [Carbone 2015] 2015 - Carbone - TLEM 2.0 - A comprehensive  
 % musculoskeletal geometry dataset for subject-specific modeling of lower 
 % extremity
+% [Ward 2009] 2009 - Ward - Are current measurements of lower extremity 
+% muscle architecture accurate?
 % [Winter 2009] 2009 - Winter - Biomechanics and Motor Control of Human 
 % Movement - Fourth Edition
-% [Destatis 2018] 2018 - Destatis - Mikrozensus 2017 - Fragen zur 
-% Gesundheit - Körpermaße der Bevölkerung
 
 % Build structure which contains default data
 if nargin == 0 || isempty(data)
@@ -82,9 +84,7 @@ data.T.LE = LE;
 GluteusMaximusIdx = find(contains(muscleList(:,1),'GluteusMaximus'), 1);
 if ~isempty(GluteusMaximusIdx)
     if muscleList{GluteusMaximusIdx,5} <= 1
-        % Taken from Table 3: 2009 - Ward - Are current measurements of 
-        % lower extremity muscle architecture accurate?
-        GTM_MEAN_PCSA = 33.4*100; % [mm²]
+        GTM_MEAN_PCSA = 33.4*100; % [mm²] Table 3 in [Ward 2009]
         muscleList(:,5) = cellfun(@(x) x*GTM_MEAN_PCSA, muscleList(:,5), 'uni',0);
     end
 end
@@ -156,7 +156,7 @@ end
 % Transform the landmarks into the pelvic coordinate system [Wu 2002]
 pTFM = createPelvisCS_TFM_LEM(data.T.LE, 'verbose',data.Verbose, 'definition','Wu2002');
 
-% PelvicDepth = posteroanterior distance between ASIS and PSIS
+% PelvicDepth: posteroanterior distance between ASIS and PSIS
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         PSIS2ASIS = ...
@@ -167,7 +167,7 @@ switch Cadaver
         data.T.Scale(1).PelvicDepth = Scale(1).PelvicDepth;
 end
 
-% PelvicHeight = Inferosuperior distance between most inferior and superior pelvic landmarks 
+% PelvicHeight: inferosuperior distance between most inferior and superior pelvic landmarks 
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         IIT2SIP = ...
@@ -177,13 +177,13 @@ switch Cadaver
     case 'Dostal1981'
         data.T.Scale(1).PelvicHeight = Scale(1).PelvicHeight;
 end
-% HJCASISHeight = inferosuperior distance between the HJC and ASIS
+% HJCASISHeight: inferosuperior distance between the HJC and ASIS
 HJC2ASISDist = ...
     transformPoint3d(data.T.LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos, pTFM) - ...
     transformPoint3d(data.T.LE(1).Joints.Hip.Pos, pTFM);
 data.T.Scale(1).HJCASISHeight = abs(HJC2ASISDist(2));
 
-% HipJointWidth = mediolateral distance between the hip joint centers
+% HipJointWidth: mediolateral distance between the hip joint centers
 switch Cadaver
     case{'TLEM2_0','TLEM2_1'}
         % !!! Assuming symmetry of the pelvis !!!
