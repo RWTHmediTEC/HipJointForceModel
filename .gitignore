@@ -1,5 +1,2 @@
-/Results.xlsx
 /**/*.asv
-/studies/compareCadavers.xlsx
-/studies/compareScalingLaws.xlsx
-/data/Skinning/cache_*.mat
+/cache/cache_*.mat

@@ -33,9 +33,9 @@ if nargin == 0 || isempty(data)
     data.T.PelvicTilt = 0;
     % Pelvic bone coordinate system
     data.PelvicCS = 'Wu2002';
-    % Skinning cache
-    data.SkinningCache = Cache('CacheDirectory', ...
-        strrep(mfilename('fullpath'), ['src\' mfilename], 'data\Skinning'));
+    % Cache directory
+    data.CacheDir = Cache('CacheDirectory', ...
+        strrep(mfilename('fullpath'), ['src\' mfilename], 'cache'));
 end
 
 data.Cadaver = Cadaver;
