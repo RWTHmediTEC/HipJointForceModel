@@ -15,7 +15,7 @@ boneIdx = 1; % Pelvis
 if data.SurfaceData
     mesh = data.T.LE(boneIdx).Mesh;
     templateControls = data.T.Scale(boneIdx).Landmarks;
-    weights = calculateSkinningWeights(mesh, templateControls, data.CacheDir);
+    weights = calculateSkinningWeights(mesh, templateControls, data.Cache);
 else
     errMessage = ['No surface data available for cadaver ' data.Cadaver ...
         '! Skinning is not possible.'];

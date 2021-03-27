@@ -132,6 +132,7 @@ for m = 1:length(Fascicles)
 end
 
 %% Save data
-save('data\TLEM2_1.mat', 'LE', 'muscleList')
+cachePath = strrep(mfilename('fullpath'), ['data\' mfilename], 'cache');
+save(fullfile(cachePath, 'cache_TLEM2_1.mat'), 'LE', 'muscleList')
 
 end

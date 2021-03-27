@@ -1,15 +1,6 @@
 function [LE, muscleList] = importDataTLEM2_0()
-
-% Import TLEM 2.0 data and save as TLEM2_0.mat in data
-% including structure LE (Lower Extremity) and muscleList
-
-
-%% Look for old data
-if exist('data\TLEM2_0.mat','file')
-    load('data\TLEM2_0.mat','LE')
-    old_LE=LE;
-    clearvars LE;
-end
+% IMPORTDATATLEM2_0 Import TLEM 2.0 data and save as TLEM2_0.mat in data
+% including the LE (Lower Extremity) struct and muscleList
 
 
 %% Import .stl files
@@ -21,12 +12,13 @@ BoneSuffix = {' Right', ' Right', '-Fibula Right', ' Right', ' Right', ' straigh
 
 NoB = size(Bones,2);
 
+LE = repmat(struct('Name',[]),1,6);
 for b = 1:NoB
     % Lower Extremity (LE)
     LE(b).Name = Bones{b};
     % Load the bone surfaces described in the local (bone) coordinate system
     TR = stlread([tempFileName Bones{b} BoneSuffix{b} '.stl']);
-    LE(b).Mesh.vertices = TR.Points; 
+    LE(b).Mesh.vertices = TR.Points;
     LE(b).Mesh.faces = TR.ConnectivityList;
 end
 
@@ -62,7 +54,7 @@ for b = 1:NoB
         else
             LE(b).Joints.(joints{j}).Parent = 0;
         end
-    end 
+    end
 end
 
 % Store parent bone
@@ -107,7 +99,7 @@ muscleList(cellfun(@isempty, muscleList)) = [];
 cmap = round(rand(length(muscleList),3),4);
 muscleList(:,2) = num2cell(cmap,2);
 
-% Muscle bones 
+% Muscle bones
 for m = 1:length(muscleList)
     mBIdx = ismember(mRaw(:,1), muscleList{m,1});
     muscleData = mRaw(mBIdx,:);
@@ -174,8 +166,8 @@ sRaw(1:3,:) = [];
 % Erase spaces
 sRaw(:,1) = erase(sRaw(:,1),' ');
 
-% Add surface data (center, axis and radius of the cylinder) to data struct        
-for s = 1:size(sRaw,1)    
+% Add surface data (center, axis and radius of the cylinder) to data struct
+for s = 1:size(sRaw,1)
     for b = 1:size(LE,2)
         if isequal(sRaw{s,2},LE(b).Name)
             LE(b).Surface.(sRaw{s,1}).Center = cell2mat(sRaw(s,3:5))*1000;
@@ -185,25 +177,29 @@ for s = 1:size(sRaw,1)
     end
 end
 % Add muscles to surface they wrap over !!! Where does this info come from? !!!
-LE(1).Surface.GluteusMaximus.Muscles = 		{'GluteusMaximusInferior'; ...
-											'GluteusMaximusSuperior'};
-LE(2).Surface.Iliopsoas.Muscles = 			{'IliacusLateralis'; ...
-											'IliacusMedialis'; ...
-											'IliacusMid'; ...
-											'RectusFemoris'; ...
-											'PsoasMajor'};
-LE(2).Surface.QuadricepsFemoris.Muscles = 	{'VastusIntermedius'; ...
-											'VastusLateralisInferior'; ...
-											'VastusLateralisSuperior'; ...
-											'VastusMedialisInferior'; ...
-											'VastusMedialisMid'; ...
-											'VastusMedialisSuperior'; ...
-											'RectusFemoris'};
-LE(2).Surface.Gastrocnemius.Muscles = 		{'GastrocnemiusLateralis'; ...
-											'GastrocnemiusMedialis'; ...
-											'Plantaris'};
+LE(1).Surface.GluteusMaximus.Muscles = {...
+    'GluteusMaximusInferior'; ...
+    'GluteusMaximusSuperior'};
+LE(2).Surface.Iliopsoas.Muscles = {...
+    'IliacusLateralis'; ...
+    'IliacusMedialis'; ...
+    'IliacusMid'; ...
+    'RectusFemoris'; ...
+    'PsoasMajor'};
+LE(2).Surface.QuadricepsFemoris.Muscles = {...
+    'VastusIntermedius'; ...
+    'VastusLateralisInferior'; ...
+    'VastusLateralisSuperior'; ...
+    'VastusMedialisInferior'; ...
+    'VastusMedialisMid'; ...
+    'VastusMedialisSuperior'; ...
+    'RectusFemoris'};
+LE(2).Surface.Gastrocnemius.Muscles = {...
+    'GastrocnemiusLateralis'; ...
+    'GastrocnemiusMedialis'; ...
+    'Plantaris'};
 
-                                        
+
 %% Import bony landmarks
 lmRaw = readcell('TLEM 2.0 - Musculoskeletal Model Dataset - Table A2 - Bony landmarks.xlsx');
 
@@ -242,9 +238,9 @@ for b = 1:NoB
 end
 
 %% Add additional landmarks
+load('TLEM 2.0 - Additional bony landmarks.mat','TLEM2_0_Landmarks')
 % Pelvis
-% Manually detected landmarks
-manuLMpelvis = {...
+addLMpelvis = {...
     'AcetabularRoof_R';...
     'InferiorIschialTuberosity_R';...
     'PosteriorIschialTuberosity_R';...
@@ -259,20 +255,13 @@ manuLMpelvis = {...
     'MedialPubis_R';...
     'MedialIlium_R';...
     };
- for lm = 1:size(manuLMpelvis,1)
-     if exist('old_LE','var')
-         if isfield(old_LE(1).Landmarks, manuLMpelvis{lm,1})
-             manuLMpelvis{lm,2} = old_LE(1).Landmarks.(manuLMpelvis{lm,1}).Pos;
-         end
-     end
- end
-manuLMpelvis = selectLandmarks(LE(1).Mesh, manuLMpelvis);
-for lm = 1:size(manuLMpelvis,1)
-    LE(1).Landmarks.(manuLMpelvis{lm,1}).Pos  = manuLMpelvis{lm,2};
-    LE(1).Landmarks.(manuLMpelvis{lm,1}).Node = manuLMpelvis{lm,3};
+for lm = 1:size(addLMpelvis,1)
+    LE(1).Landmarks.(addLMpelvis{lm,1}).Pos  = TLEM2_0_Landmarks(1).Landmarks.(addLMpelvis{lm,1}).Pos;
+    if isfield(TLEM2_0_Landmarks(1).Landmarks.(addLMpelvis{lm,1}), 'Node')
+        LE(1).Landmarks.(addLMpelvis{lm,1}).Node = TLEM2_0_Landmarks(1).Landmarks.(addLMpelvis{lm,1}).Node;
+    end
 end
-
-% Construction of Pubic Symphysis
+% Construction of the Pubic Symphysis
 LE(1).Landmarks.PubicSymphysis.Pos = [...
     LE(1).Landmarks.RightPubicTubercle.Pos(1:2), ...
     LE(1).Landmarks.RightAnteriorSuperiorIliacSpine.Pos(3) - ...
@@ -280,41 +269,23 @@ LE(1).Landmarks.PubicSymphysis.Pos = [...
     LE(1).Landmarks.LeftAnteriorSuperiorIliacSpine.Pos(3))];
 
 % Femur
-% Manually detected landmarks
-manuLMfemur = {...
+addLMfemur = {...
     'SuperiorGreaterTrochanter';...
+    'P1';...
     'P2';...
-    }; 
- for lm = 1:length(manuLMfemur)
-     if exist('old_LE','var')
-         if isfield(old_LE(2).Landmarks, manuLMfemur{lm,1})
-             manuLMfemur{lm,2} = old_LE(2).Landmarks.(manuLMfemur{lm,1}).Pos;
-         end
-     end
- end
-manuLMfemur = selectLandmarks(LE(2).Mesh, manuLMfemur);
-for lm = 1:size(manuLMfemur,1)
-    LE(2).Landmarks.(manuLMfemur{lm,1}).Pos  = manuLMfemur{lm,2};
-    LE(2).Landmarks.(manuLMfemur{lm,1}).Node = manuLMfemur{lm,3};
+    'MedialPosteriorCondyle';...
+    'LateralPosteriorCondyle';...
+    };
+for lm = 1:size(addLMfemur,1)
+    LE(2).Landmarks.(addLMfemur{lm,1}).Pos  = TLEM2_0_Landmarks(2).Landmarks.(addLMfemur{lm,1}).Pos;
+    if isfield(TLEM2_0_Landmarks(2).Landmarks.(addLMfemur{lm,1}), 'Node')
+        LE(2).Landmarks.(addLMfemur{lm,1}).Node = TLEM2_0_Landmarks(2).Landmarks.(addLMfemur{lm,1}).Node;
+    end
 end
-
-% Automatically detected landmarks
-addpath('D:\Biomechanics\Knee\Code\FemoralCoordinateSystem')
-[~, ~, autoLMIdx] = automaticFemoralCS(LE(2).Mesh, 'R', ...
-    'definition','Bergmann2016', 'visu',1, 'verbose',1, 'subject', 'TLEM2_0');
-autoLMfemur={'MedialPosteriorCondyle';'LateralPosteriorCondyle'};
-for lm = 1:size(autoLMfemur,1)
-    LE(2).Landmarks.(autoLMfemur{lm}).Pos  = LE(2).Mesh.vertices(autoLMIdx.(autoLMfemur{lm})',:);
-    LE(2).Landmarks.(autoLMfemur{lm}).Node = autoLMIdx.(autoLMfemur{lm})';
-end
-
-% Construction of P1 [Bergmann 2016]
-NeckAxis = createLine3d(LE(2).Mesh.vertices(autoLMIdx.NeckAxis(1),:),LE(2).Mesh.vertices(autoLMIdx.NeckAxis(2),:));
-ShaftAxis = createLine3d(LE(2).Mesh.vertices(autoLMIdx.ShaftAxis(1),:),LE(2).Mesh.vertices(autoLMIdx.ShaftAxis(2),:));
-[~, LE(2).Landmarks.P1.Pos] = distanceLines3d(NeckAxis, ShaftAxis);
 
 
 %% Save data
-save('data\TLEM2_0.mat', 'LE', 'muscleList')
+cachePath = strrep(mfilename('fullpath'), ['data\' mfilename], 'cache');
+save(fullfile(cachePath, 'cache_TLEM2_0.mat'), 'LE', 'muscleList')
 
 end

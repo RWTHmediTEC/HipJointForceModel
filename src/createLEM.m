@@ -1,5 +1,5 @@
 function data = createLEM(data, Cadaver)
-%CREATELEM initializes the lower extremity template
+%CREATELEM initializes the lower extremity (LE) template
 %
 % References:
 % [Destatis 2018] 2018 - Destatis - Mikrozensus 2017 - Fragen zur 
@@ -11,6 +11,8 @@ function data = createLEM(data, Cadaver)
 % muscle architecture accurate?
 % [Winter 2009] 2009 - Winter - Biomechanics and Motor Control of Human 
 % Movement - Fourth Edition
+
+cachePath = strrep(mfilename('fullpath'), ['src\' mfilename], 'cache');
 
 % Build structure which contains default data
 if nargin == 0 || isempty(data)
@@ -34,31 +36,30 @@ if nargin == 0 || isempty(data)
     % Pelvic bone coordinate system
     data.PelvicCS = 'Wu2002';
     % Cache directory
-    data.CacheDir = Cache('CacheDirectory', ...
-        strrep(mfilename('fullpath'), ['src\' mfilename], 'cache'));
+    data.Cache = Cache('CacheDirectory', cachePath);
 end
 
 data.Cadaver = Cadaver;
 
 switch Cadaver
     case 'TLEM2_0'
-        if ~exist('data\TLEM2_0.mat', 'file')
+        if ~exist(fullfile(cachePath, 'cache_TLEM2_0.mat'), 'file')
             importDataTLEM2_0;
         end
-        load('TLEM2_0', 'LE', 'muscleList')
+        load(fullfile(cachePath, 'cache_TLEM2_0'), 'LE', 'muscleList')
         data.T.BodyWeight = 45; % Cadavers's body weight [kg] [Carbone 2015]
         % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
         data.T.BodyHeight = 813/10/0.53;
         data.SurfaceData=true;
     case 'TLEM2_1'
-        if ~exist('data\TLEM2_1.mat', 'file')
-            if ~exist('data\TLEM2_0.mat', 'file')
+        if ~exist(fullfile(cachePath, 'cache_TLEM2_1.mat'), 'file')
+            if ~exist(fullfile(cachePath, 'cache_TLEM2_0.mat'), 'file')
                 importDataTLEM2_0;
             end
-            load('TLEM2_0', 'LE', 'muscleList')
+            load(fullfile(cachePath, 'cache_TLEM2_0'), 'LE', 'muscleList')
             importDataTLEM2_1(LE, muscleList);
         end
-        load('TLEM2_1', 'LE', 'muscleList')
+        load(fullfile(cachePath, 'cache_TLEM2_1'), 'LE', 'muscleList')
         data.T.BodyWeight = 45; % Cadavers's body weight [kg] [Carbone 2015]
         % Approximated from leg length of 813 mm [Carbone 2015] and [Winter 2009, S.83, Fig.4.1]
         data.T.BodyHeight = 813/10/0.53; % [cm]
