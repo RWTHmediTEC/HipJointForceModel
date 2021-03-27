@@ -4,10 +4,12 @@ addpath(genpath('..\src'))
 addpath(genpath('..\data'))
 addpath(genpath('src'))
 
+% Cadaver templates
 cadavers = {'Fick1850','Dostal1981','TLEM2_0'};
+% Static models
 models = {'Pauwels','Debrunner','Iglic','mediTEC2020'};
 
-%% Create results
+%% Validate the static models using the various cadaver templates
 results = cell(length(cadavers), length(models));
 for c = 1:length(cadavers)
     for m=1:length(models)
@@ -15,28 +17,28 @@ for c = 1:length(cadavers)
         data = createLEM();
         data.Verbose = 0;
         data = createLEM(data, cadavers{c});
-        
+        % Scaling Law
         data.ScalingLaw = 'None';
+        % Muscle path model
         data.MusclePathModel = 'StraightLine';
-        
+        % Static model
         data.Model = models{m};
-        
+        % Muscle recruitment
         switch data.Model
             case {'Pauwels','Debrunner1975','Iglic'}
                 data.MuscleRecruitmentCriterion = 'None';
             case {'mediTEC2020'}
                 data.MuscleRecruitmentCriterion = 'Polynom2';
         end
-        
+        % Get the model specifications
         modelHandle = str2func(data.Model);
         gui.Home.Model.modelHandle = modelHandle();
-        [postures, defaultPosture] = gui.Home.Model.modelHandle.Posture();
-        for p = 1:length(postures)
+        postures = gui.Home.Model.modelHandle.Posture();
+        for p = 1:size(postures,1)
             data.Posture = postures{p,2};
-            
             data.activeMuscles = gui.Home.Model.modelHandle.Muscles();
             data.activeMuscles = parseActiveMusclesLEM(data.activeMuscles, data.MuscleList);
-            
+            % Validate model
             results{c,m,p} = validateLEM(data, gui);
         end
     end
@@ -64,8 +66,10 @@ for p = 1:length(postures)
                 AE_Dir{c,m,p} = rad2deg(vectorAngle3d(pHJF, iHJF));
                 
                 % Table
-                compTab(2+c,2+(m-1)*NoE,p) = medianStats(AE_Mag{c,m,p},'format','short','test','none','alpha',alpha);
-                compTab(2+c,1+m*NoE,p)     = medianStats(AE_Dir{c,m,p},'format','short','test','none','alpha',alpha);
+                compTab(2+c,2+(m-1)*NoE,p) = ...
+                    medianStats(AE_Mag{c,m,p},'format','short','test','none','alpha',alpha);
+                compTab(2+c,1+m*NoE,p)     = ...
+                    medianStats(AE_Dir{c,m,p},'format','short','test','none','alpha',alpha);
             end
         end
     end
