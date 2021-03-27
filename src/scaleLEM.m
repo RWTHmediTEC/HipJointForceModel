@@ -67,7 +67,7 @@ switch data.ScalingLaw
 end
 
 %% Correct bone coordinate systems
-% Bone CSs may have changed due to scaling and have to be corrected
+% Bone CS may have changed due to scaling and have to be corrected
 boneCS_TFM = repmat(eye(4), 1, 1, 6);
 % Pelvis
 boneCS_TFM(:,:,1) = createPelvisCS_TFM_LEM(data.S.LE, ...

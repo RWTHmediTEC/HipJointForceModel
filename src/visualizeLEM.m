@@ -1,4 +1,5 @@
 function visualizeLEM(axH, LE, side, varargin)
+%VISUALIZELEM Visualize the lower extrimity model
 
 %% Input parsing
 p = inputParser;

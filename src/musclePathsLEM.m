@@ -4,14 +4,14 @@ function data = musclePathsLEM(data)
 if data.Verbose
     tStart = tic;
 end
-%% create the muscle paths
+%% Create the muscle paths
 LE = data.S.LE;
 MuscleList = data.MuscleList;
 MusclePathModel = data.MusclePathModel;
 ActiveMuscles = parseActiveMusclesLEM(data.activeMuscles, MuscleList);
 % Create the muscle paths variable
 MusclePaths = cell2struct(ActiveMuscles(:,1)',{'Name'});
-% Find the Index of the active muscle in Muscle List
+% Find the index of the active muscle in Muscle List
 MuscleListIdx = nan(size(MusclePaths));
 MuscleBones = cell(size(MusclePaths));
 MusclePathModels = cell(size(MusclePaths));
