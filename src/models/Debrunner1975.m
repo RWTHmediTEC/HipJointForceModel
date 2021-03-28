@@ -56,12 +56,13 @@ HJC = data.S.LE(1).Joints.Hip.Pos;
 
 try
     GreaterTrochanter = LE(2).Mesh.vertices(LE(2).Landmarks.GreaterTrochanter.Node,:);
-    AcetabularRoof    = LE(1).Mesh.vertices(LE(1).Landmarks.AcetabularRoof_R.Node,:);
-    MostCranial       = LE(1).Mesh.vertices(LE(1).Landmarks.SuperiorIliacCrest_R.Node,:);
-    MostMedial        = LE(1).Mesh.vertices(LE(1).Landmarks.MedialIlium_R.Node,:);
-    MostLateral       = LE(1).Mesh.vertices(LE(1).Landmarks.IliacTubercle_R.Node,:);
+    AcetabularRoof    = LE(1).Mesh.vertices(LE(1).Landmarks.RightAcetabularRoof.Node,:);
+    MostCranial       = LE(1).Mesh.vertices(LE(1).Landmarks.RightSuperiorIliacCrest.Node,:);
+    MostMedial        = LE(1).Mesh.vertices(LE(1).Landmarks.RightMedialIlium.Node,:);
+    MostLateral       = LE(1).Mesh.vertices(LE(1).Landmarks.RightIliacTubercle.Node,:);
 catch
-    errMessage = ['At least one landmark for this model is missing. '...
+    errMessage = [...
+        'At least one landmark for this model is missing. '...
         'Choose a different cadaver to use this model!'];
     msgbox(errMessage,mfilename,'error')
     error(errMessage)
