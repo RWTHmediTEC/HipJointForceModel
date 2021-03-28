@@ -1,7 +1,11 @@
 function [HM, Scale] = Dostal1981()
+%DOSTAL1981 contains the cadaver data from [Dostal 1981]
+%
 % Reference:
 % [Dostal 1981] 1981 - Dostal A three-dimensional biomechanical model of 
 %   hip musculature
+% https://doi.org/10.1016/0021-9290(81)90036-1
+
 % All values in [cm]!
 
 % Segment names

@@ -1,6 +1,9 @@
 function TFM = createPelvisCS_TFM_APP(ASIS_R, ASIS_L, PS, varargin)
-% Construct the anterior pelvic plane (APP) bone coordinate system 
-% recommended by orthopedic surgeons around the world. ASR orientation.
+%CREATEPELVISCS_TFM_APP creates the transformation to the anterior pelvic 
+% plane (APP) bone coordinate established in orthopedic surgery.
+%
+% Orientation: 'ASR'
+% Origin: Midpoint between left and right ASIS [default]
 
 p = inputParser;
 isPoint3d = @(x) validateattributes(x,{'numeric'},...
@@ -13,7 +16,7 @@ appPatch.vertices = [ASIS_R; PS; ASIS_L];
 appPatch.faces = [1 2 3];
 appTrans = [[eye(3), -origin']; [0 0 0 1]];
 appRot = eye(4);
-% x axis is the normal of the SISP plane
+% x axis is the normal of the APP
 appRot(1,1:3) = normalizeVector3d(meshFaceNormals(appPatch));
 % z axis is the connection of right and left ASIS
 appRot(3,1:3) = normalizeVector3d(ASIS_R - ASIS_L);

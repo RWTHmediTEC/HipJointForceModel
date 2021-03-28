@@ -1,6 +1,6 @@
 function [LE, muscleList] = importDataTLEM2_0()
-% IMPORTDATATLEM2_0 Import TLEM 2.0 data and save as TLEM2_0.mat in data
-% including the LE (Lower Extremity) struct and muscleList
+%IMPORTDATATLEM2_0 Import TLEM 2.0 cadaver data and save in cache including
+% the Lower Extremity (LE) struct and muscleList
 
 
 %% Import .stl files

@@ -1,7 +1,10 @@
 function ML = Johnston1979()
-
+%JOHNSTON1979 contains the muscle data from [Johnston 1979]
+%
 % Reference:
 % [Johnston 1979] 1979 - Johnston - Reconstruction of the Hip
+% https://pubmed.ncbi.nlm.nih.gov/457709
+%
 % Table I. Relative physiological cross-sectional areas of the muscles 
 % studied computed by normalizing the area of each muscle with relation to 
 % the area of the gluteus maximus.

@@ -1,6 +1,10 @@
 function [HM, muscleList, Moments] = Fick1850(varargin)
+%FICK1850 contains the cadaver data from [Fick 1850]
+%
 % Reference:
-% [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des Oberschenkels
+% [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des 
+%   Oberschenkels
+% https://babel.hathitrust.org/cgi/pt?id=mdp.39015053249606&view=1up&seq=117
 
 % Parsing
 p = inputParser;

@@ -1,17 +1,23 @@
 function importDataTLEM2_1(LE, muscleList)
-% !!! Update of muscleList needed? !!!
-
-% Update TLEM 2.0 to TLEM 2.1
-% Hardcoding of changes made in the AnyBody model due to the reviewed TLEM
-
-%% Update joint centers
+% IMPORTDATATLEM2_1 Updates TLEM 2.0 to TLEM 2.1
+%
+% Reference:
+% Changes made in the AnyBody model due to the reviewed TLEM based on: 
+% [DePieri 2018] - Refining muscle geometry and wrapping in the TLEM 2
+%   model for improved hip contact force prediction
+% https://doi.org/10.1371/journal.pone.0204109
+%
+% TODO:
+%   Update of wrapping surfaces is missing
+%   Update of muscleList needed?
 
 scaleFactor = 1000; % [m] in [mm]
 
+%% Update of joints
 % Joint centers
 AnyBodyHipJointTLEM2_0 = [-0.0338      -0.0807      0.0843    ] .* scaleFactor;
 AnyBodyHipJointTLEM2_1 = [-0.03697295  -0.07767031  0.08159202] .* scaleFactor;
-% In AnyBody instead of the HJC a different origin is used: 
+% In AnyBody instead of the HJC a different origin is used:
 %   0.5*(ASIS_R + ASIS_L)
 % The difference is used to reconstruct the translation of the joint center
 LE(1).Joints.Hip.       Pos = AnyBodyHipJointTLEM2_1 - AnyBodyHipJointTLEM2_0;
@@ -35,8 +41,8 @@ LE(5).Joints.Talocrural.Axis = normalizeVector3d([0.362799     0.1304906    -0.9
 LE(5).Joints.Subtalar.  Axis = normalizeVector3d([0.8784254    0.4637787     0.1152306]);
 LE(6).Joints.Subtalar.  Axis = normalizeVector3d([0.8784254    0.4637787     0.1152306]);
 
-%% Update muscle elements
-% Pelvic muscle elements
+%% Update of muscles
+% Pelvis
 LE(1).Muscle.GluteusMaximusInferior1.Pos = [-0.08467, 0.04858, -0.04897] * scaleFactor;
 LE(1).Muscle.GluteusMaximusInferior2.Pos = [-0.08405, 0.03945, -0.05900] * scaleFactor;
 LE(1).Muscle.GluteusMaximusInferior3.Pos = [-0.08492, 0.01396, -0.05762] * scaleFactor;
@@ -74,7 +80,7 @@ LE(1).Muscle.Sartorius1.Pos = [0.03195,0.07861,0.03261] * scaleFactor;
 LE(1).Muscle.TensorFasciaeLatae1.Pos = [0.02942,0.08614,0.04266] * scaleFactor;
 LE(1).Muscle.TensorFasciaeLatae2.Pos = [0.02249,0.09155,0.04677] * scaleFactor;
 
-% Femoral muscle elements
+% Femur
 LE(2).Muscle.GluteusMaximusInferior1.Pos = [-0.0117,  0.28838,  0.045480] * scaleFactor;
 LE(2).Muscle.GluteusMaximusInferior2.Pos = [-0.00933, 0.27438,  0.043026] * scaleFactor;
 LE(2).Muscle.GluteusMaximusInferior3.Pos = [-0.00696, 0.26038,  0.040572] * scaleFactor;
@@ -114,17 +120,16 @@ LE(2).Muscle.GluteusMinimusPosterior1.Pos(2,1:3) = [0.01656,0.32615,0.05660] * s
 LE(2).Muscle.Piriformis1.Pos = [0.00153,0.36326,0.05249] * scaleFactor;
 % LE(2).Muscle.Sartorius1.Pos = [] * ScaleFactor; % Review needed
 
-% Tibial muscle elements
+% Tibia
 LE(3).Muscle.TensorFasciaeLatae1.Pos = [0.01568,0.32738,0.03194] * scaleFactor;
 % LE(3).Muscle.TensorFasciaeLatae2.Pos = [] * ScaleFactor; % Same as node 1
 % LE(3).Muscle.Sartorius1.Pos = [0.01796,0.29020,-0.01085] * ScaleFactor; % Review needed
 
-% Patellar muscle elements
+% Patella
 LE(4).Muscle.RectusFemoris1.Pos = [0.00290,0.01391,- 0.00732] * scaleFactor;
 LE(4).Muscle.RectusFemoris2.Pos = [0.00397,0.01249, 0.00462] * scaleFactor;
 
 %% Update nearest node to femoral muscle origins, insertions and via points
-
 femurNS = createns(LE(2).Mesh.vertices);
 Fascicles = fieldnames(LE(2).Muscle);
 for m = 1:length(Fascicles)

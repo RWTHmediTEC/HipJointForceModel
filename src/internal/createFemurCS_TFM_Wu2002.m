@@ -1,8 +1,17 @@
 function TFM = createFemurCS_TFM_Wu2002(MEC, LEC, HJC, side, varargin)
-
-% 2002 - Wu et al. - ISB recommendation on definitions of joint coordinate 
-% systems of various joints for the reporting of human joint motion Part 1
-% Femoral coordinate system—xyz:
+%CREATEFEMURCS_TFM_WU2002 calculates the transformation to the femoral bone
+% coordinate system defined by [Wu 2002]
+%
+% Orientation: 'ASR'
+% Origin: Hip joint center (HJC) [default]
+%
+% Reference:
+% [Wu 2002] 2002 - Wu et al. - ISB recommendation on definitions of joint 
+%   coordinate systems of various joints for the reporting of human joint 
+%   motion - part 1: ankle, hip, and spine
+% https://doi.org/10.1016/s0021-9290(01)00222-6
+%
+% Femoral coordinate system - xyz [Wu 2002]:
 % o: The origin coincident with the right (or left) hip center of rotation, 
 %    coincident with that of the pelvic coordinate system (o) in the 
 %    neutral configuration.
@@ -10,8 +19,7 @@ function TFM = createFemurCS_TFM_Wu2002(MEC, LEC, HJC, side, varargin)
 %    epicondyles (FEs) and the origin, and pointing cranially.
 % z: The line perpendicular to the y-axis, lying in the plane defined by 
 %    the origin and the two FEs, pointing to the right.
-% x: The line perpendicular to both y- and z-axis, pointing anteriorly 
-% (Cappozzo et al., 1995)
+% x: The line perpendicular to both y- and z-axis, pointing anteriorly
 
 %% Parsing
 p = inputParser;

@@ -1,28 +1,30 @@
 function OL = importDataOrthoLoad(varargin)
-
-%% Input parsing
-p = inputParser;
-logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
-addParameter(p, 'WriteExcel', false, logParValidFunc);
-parse(p, varargin{:});
-writeExcel = p.Results.WriteExcel;
-
-% Import OrthoLoad data as OL (OrthoLoad) struct and save as OrthoLoad.mat 
+%IMPORTDATAORTHOLOAD Import OrthoLoad (OL) HipIII data as struct
+%
+% References:
+% [Bergmann 2016] 2016 - Bergmann - Standardized Loads Acting in Hip 
+%   Implants
+% https://doi.org/10.1371/journal.pone.0155612
+% [Wu 2002] 2002 - Wu et al. - ISB recommendation on definitions of joint 
+%   coordinate systems of various joints for the reporting of human joint 
+%   motion - part 1: ankle, hip, and spine
+% https://doi.org/10.1016/s0021-9290(01)00222-6
 
 sides={'R','L'};
 
-%% Create structure OL
+%% Create OrthoLoad (OL) struct
+% Biometric parameters [Bergmann 2016]
 Subject = {'H1L' 'H2R' 'H3L' 'H4L' 'H5L' 'H6R' 'H7R' 'H8L' 'H9L' 'H10R'};
 Sex     = {'m'   'm'   'm'   'm'   'f'   'm'   'm'   'm'   'm'   'f'};
 Height  = [178   172   168   178   168   176   179   178   181   162];
 OL = repmat(struct('Subject', [], 'Sex', []), length(Subject),1);
 
-%% Hardcoding of implant parameters from '2016 - Bergmann - Standardized Loads Acting in Hip Implants'
-NeckLength = [ 55.6  59.3  56.6  63.3  55.6 55.6  63.3 59.3  59.3 59.6];
-% alphaX =     [ 2.3   4.1   4.0   7.5   4.0  5.8   6.3  4.6   4.6  1.7];
-% alphaY =     [-2.3   0.6  -3.0  -1.7  -2.3 -1.7  -1.7 -1.7   0.6 -1.2];
-alphaZ =     [-15.0 -13.8 -13.8 -18.9 -2.3 -31.0 -2.4 -15.5 -2.3 -9.7];  % Femoral version
-CCD =         135;                                                       % CCD angle is always 135°
+% Implant and implantation parameters [Bergmann 2016]
+NeckLength = [55.6  59.3  56.6  63.3  55.6 55.6  63.3 59.3  59.3 59.6]; % [mm]
+% alphaX = [ 2.3   4.1   4.0   7.5   4.0  5.8   6.3  4.6   4.6  1.7]; % [°]
+% alphaY = [-2.3   0.6  -3.0  -1.7  -2.3 -1.7  -1.7 -1.7   0.6 -1.2]; % [°]
+alphaZ = [-15.0 -13.8 -13.8 -18.9 -2.3 -31.0 -2.4 -15.5 -2.3 -9.7]; % Femoral version [°]
+CCD = 135; % CCD angle is always 135°
 
 for s = 1:length(Subject)
     
@@ -51,36 +53,9 @@ for t = 1:size(tempContent,1)
     OL(s).Landmarks.Femur.(tempContent{t,12}) = tempPos(t,:);
 end
 
-%% Write selected landmarks of the femur as excel file:
-if writeExcel
-    excelLM = repmat(struct('Subject',[]), length(Subject),1);
-    femurLM = {'PSA','DSA','MNA','LNA','MEC','LEC','MPC','LPC','HJC','P1','P2','GT','LT'};
-    excelLM(s).Subject=OL(s).Subject;
-    for lm=1:length(femurLM)
-        if isfield(OL(s).Landmarks.Femur, [femurLM{lm} '_' Side_IL])
-            excelLM(s).([femurLM{lm}]) = OL(s).Landmarks.Femur.([femurLM{lm} '_' Side_IL]) .* [-1 -1 1];
-        else
-            excelLM(s).([femurLM{lm}]) = [nan nan nan];
-        end
-    end
-    % Reconstruct P1
-    NeckAxis = createLine3d(...
-        OL(s).Landmarks.Femur.(['MNA_' Side_IL]),...
-        OL(s).Landmarks.Femur.(['LNA_' Side_IL]));
-    ShaftAxis = createLine3d(...
-        OL(s).Landmarks.Femur.(['PSA_' Side_IL]),...
-        OL(s).Landmarks.Femur.(['DSA_' Side_IL]));
-    [~, P1_NA, P1_SA] = distanceLines3d(NeckAxis, ShaftAxis);
-    excelLM(s).P1_Fischer = midPoint3d(P1_NA,P1_SA) .* [-1 -1 1];
-    excelLM(s).Distance_P1_Damm_Fischer = ...
-        distancePoints3d(OL(s).Landmarks.Femur.(['P1_' Side_IL]), midPoint3d(P1_NA,P1_SA));
-    
-    writetable(struct2table(excelLM),'data\OrthoLoad\Landmarks\OrthoLoadFemurLandmarks.xlsx',...
-        'WriteVariableNames',false,'Range','B4')
-end
-
 %% Convert left to right sides
-% For scaling landmarks have to be mirrored to the right side as the cadavers are right sided.
+% For scaling, landmarks have to be mirrored to the right side as the 
+% cadavers are always right sided.
 switch Side_IL
     case 'R'
         mirrorZTFM = eye(4);
