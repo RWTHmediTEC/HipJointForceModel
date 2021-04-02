@@ -1,4 +1,9 @@
 function gui = updateParameters(data, gui)
+%UPDATEPARAMETERS updates the patient-specific parameters in the GUI
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 set(gui.Home.Parameters.EditText.BodyWeight,     'String', data.S.BodyWeight);
 set(gui.Home.Parameters.EditText.BodyHeight,     'String', data.S.BodyHeight);

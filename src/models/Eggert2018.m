@@ -1,7 +1,14 @@
 function funcHandles = Eggert2018
-% Based on the model of [Iglic 1990] but using the TLEM2 cadaver data
-% instead of Dostal's cadaver data. Grouping of the muscles was removed to
-% avoid unphysiological / negative muscle forces.
+%EGGERT2018 Iglic based model. However, the grouping of the muscles was 
+% removed to avoid unphysiological / negative muscle forces.
+%
+% Reference:
+% [Iglic 1990] 1990 - Iglic - Mathematical Analysis of Chiari Osteotomy
+% http://physics.fe.uni-lj.si/publications/pdf/acta1990.PDF
+%
+% AUTHOR: B. Eggert
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

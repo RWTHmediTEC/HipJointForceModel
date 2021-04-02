@@ -5,6 +5,10 @@ function [HM, muscleList, Moments] = Fick1850(varargin)
 % [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des 
 %   Oberschenkels
 % https://babel.hathitrust.org/cgi/pt?id=mdp.39015053249606&view=1up&seq=117
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Parsing
 p = inputParser;

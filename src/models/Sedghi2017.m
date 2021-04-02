@@ -1,14 +1,13 @@
 function funcHandles = Sedghi2017
-% Based on the model of [Iglic 1990] using the cadaver data of
-% [Dostal 1981].  A patient-specific femoral and pelvic scaling was
-% included. PCSAs were changed without further explanation.
-
-% References:
-% [Iglic 1990] 1990 - Iglic - Mathematical analysis of Chiari Osteotomy
-% [Johnston 1979] 1979 - Johnston - Reconstruction of the Hip
-% [McLeish 1970] 1970 - McLeish - Abduction forces in the one-legged stance
-% [Dostal 1981] 1981 - Dostal A three-dimensional biomechanical model of hip musculature
-% [Winter 2009] 2009 - Winter - Biomechanics and Motor Control of Human Movement - Fourth Edition
+%SEDGHI2017 Iglic based model.
+%
+% Reference:
+% [Iglic 1990] 1990 - Iglic - Mathematical Analysis of Chiari Osteotomy
+% http://physics.fe.uni-lj.si/publications/pdf/acta1990.PDF
+%
+% AUTHOR: A. Sedghi
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;
@@ -48,8 +47,7 @@ function [activeMuscles, enable] = Muscles(~)
 % User is not allowed to edit the default values
 enable = 'off';
 
-% Without further explanation, [Sedghi 2017] changed the PCSAs compared to
-% [Iglic 1990, S.37, Tab.1] and excluded the Piriformis muscle.
+% PCSAs were changed and Piriformis muscle excluded compared to [Iglic 1990, Tab.1].
 activeMuscles = {...
     'GluteusMediusAnterior1',   'fa', 3*0.2;...
     'GluteusMinimusAnterior1',  'fa', 3*0.2;...

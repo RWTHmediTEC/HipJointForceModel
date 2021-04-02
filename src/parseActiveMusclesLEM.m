@@ -1,4 +1,9 @@
 function activeFascicles = parseActiveMusclesLEM(activeMuscles, muscleList)
+%PARSEACTIVEMUSCLESLEM converts the selected muscles into the fascicles of the LE model
+%
+% AUTHOR: L. Schartz
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Workaround for some older models with additonal info (columns) in the active muscle variable
 if size(activeMuscles,2) > 1

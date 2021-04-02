@@ -1,6 +1,10 @@
 function visualizeMuscleActivation(MSC, activation, varargin)
 %VISUALIZEMUSCLEACTIVATION visualizes the activation of the muscles for the
 % optimization based muscle recruitment.
+%
+% AUTHOR: F. Schimmelpfennig
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 hAx = gca;
 if isAxisHandle(MSC)

@@ -1,6 +1,6 @@
 
 % Cadaver
-% - Include additonal cadaver from https://github.com/anmuller/CusToM
+% - Include additonal cadavers from https://github.com/anmuller/CusToM
 
 % Scaling laws
 % - Revision of PCSAs
@@ -18,7 +18,7 @@
 % HJF models
 % - Implement other one-leg stance models
 % - Implement models for other ADLs
-% - Schartz2020 move upper body weight W anterior
+% - Schartz2020 move upper body weight W anterior?
 
 % GUI
 % - Move postures selection to validation tab

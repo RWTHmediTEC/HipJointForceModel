@@ -10,6 +10,10 @@ function importDataTLEM2_1(LE, muscleList)
 % TODO:
 %   Update of wrapping surfaces is missing
 %   Update of muscleList needed?
+%
+% AUTHOR: B. Eggert
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 scaleFactor = 1000; % [m] in [mm]
 

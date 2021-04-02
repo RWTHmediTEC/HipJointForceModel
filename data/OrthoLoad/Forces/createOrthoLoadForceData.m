@@ -18,6 +18,10 @@ function createOrthoLoadForceData(dbPath, varargin)
 % 'C:\StandardLoads-Hip_CompleteData\Data\';
 % or
 % 'D:\StandardLoads-Hip_CompleteData\Data\';
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Parsing
 p = inputParser;

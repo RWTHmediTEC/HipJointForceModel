@@ -1,6 +1,10 @@
 function muscleListDostal = Johnston1979toDostal1981(muscleListJohnston, LE)
 %JOHNSTON1979TODOSTAL1981 converts the muscle data of [Johnston 1979] to 
 % the muscleList for the [Dostal 1981] cadaver template
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 muscleListDostal = fieldnames(LE(1).Muscle);
 

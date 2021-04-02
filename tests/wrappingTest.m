@@ -1,3 +1,9 @@
+%WRAPPINGTEST GUI to test the wrapping with a test case
+%
+% AUTHOR: L. Schartz
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
+
 clearvars; close all;
 
 addpath(genpath('..\src'))

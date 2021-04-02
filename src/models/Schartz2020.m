@@ -1,4 +1,9 @@
 function funcHandles = Schartz2020
+%SCHARTZ2020 Model for Standing Up.
+%
+% AUTHOR: L. Schartz
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

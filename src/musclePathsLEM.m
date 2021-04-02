@@ -1,5 +1,5 @@
 function data = musclePathsLEM(data)
-%MUSCLEPATHSLEM constructs the paths of the active muscles
+%MUSCLEPATHSLEM constructs the paths of the active muscles.
 %
 % AUTHOR: L. Schartz
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University

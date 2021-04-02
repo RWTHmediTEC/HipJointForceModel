@@ -6,7 +6,10 @@ function [LE, muscleList] = importDataTLEM2_0()
 % [Carbone 2015] TLEM 2.0 – A comprehensive musculoskeletal geometry 
 %   dataset for subject-specific modeling of lower extremity
 %   https://doi.org/10.1016/j.jbiomech.2014.12.034
-
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 %% Import .stl files
 tempFileName = 'TLEM 2.0 - Bones - Local Reference Frame - ';

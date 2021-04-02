@@ -9,6 +9,10 @@ function OL = importDataOrthoLoad(varargin)
 %   coordinate systems of various joints for the reporting of human joint 
 %   motion - part 1: ankle, hip, and spine
 % https://doi.org/10.1016/s0021-9290(01)00222-6
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 sides={'R','L'};
 

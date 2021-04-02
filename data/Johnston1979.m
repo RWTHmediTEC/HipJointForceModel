@@ -8,6 +8,10 @@ function ML = Johnston1979()
 % Table I. Relative physiological cross-sectional areas of the muscles 
 % studied computed by normalizing the area of each muscle with relation to 
 % the area of the gluteus maximus.
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 ML( 1,:) = {'GluteusMaximus' 1.00}; ML(13,:) = {'TensorFasciaeLatae' 0.12}; 
 ML( 2,:) = {'Sartorius'      0.07}; ML(14,:) = {'Piriformis'         0.10};

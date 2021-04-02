@@ -1,4 +1,10 @@
 function gui = updateResults(data, gui)
+%UPDATERESULTS updates the results after HJF calculation in the GUI
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
+
 delete([...
     gui.Home.Results.Axis_FrontalView   .Children,...
     gui.Home.Results.Axis_SagittalView  .Children,...
