@@ -1,4 +1,14 @@
 function weights = calculateSkinningWeights(mesh, controls, cache, varargin)
+%CALCULATESKINNINGWEIGHTS calcultes vertex weights for linear blend 
+% skinning of a mesh based on control points.
+%
+% Reference: [Jacobson 2014] 2014 - Jacobson - Bounded biharmonic weights 
+%   for real-time deformation
+%   https://doi.org/10.1145/2578850
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Parsing
 p = inputParser;

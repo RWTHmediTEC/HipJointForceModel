@@ -1,5 +1,9 @@
 function data = skinPelvisLEM(data, method, varargin)
-% Linear blend skinning (LBS) of the pelvis
+%SKINPELVISLEM deforms the pelvis using linear blend skinning
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Parsing
 p = inputParser;

@@ -1,5 +1,13 @@
 function skinnedMesh = skinningWrapper(mesh, tControls, weights, sControls)
-% Wrapper for linear blend skinning (LBS)
+%SKINNINGWRAPPER Wrapper for linear blend skinning to deform meshes using control points.
+%
+% Reference: [Jacobson 2014] 2014 - Jacobson - Bounded biharmonic weights 
+%   for real-time deformation
+%   https://doi.org/10.1145/2578850
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Number of controls
 NoC = length(fieldnames(tControls));

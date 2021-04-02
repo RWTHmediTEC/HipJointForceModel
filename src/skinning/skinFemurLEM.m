@@ -1,5 +1,9 @@
 function data = skinFemurLEM(data, method)
-% Linear blend skinning (LBS) of the femur
+%SKINFEMURLEM deforms the femur using linear blend skinning
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 boneIdx = 2; % femur
 
