@@ -1,11 +1,34 @@
-clearvars; close all;
-
-% Path of the data collection of the publication:
-% 2016 - Bergmann - Standardized Loads Acting in Hip Implants
+function createOrthoLoadForceData(dbPath, varargin)
+%CREATEORTHOLOADFORCEDATA extracts the in vivo hip joint force (HJF) of the 
+% OrthoLoad subjects during the peak force phase of activities of daily
+% living.
+%
+% The in vivo HJF is derived from the extensive Hip Joint III Data 
+% Collection that contains the individual average HJF for several ADL 
+% calculated from multiple trials of each patient.
+% 
+% Reference:
+% [Bergmann 2016] 2016 - Bergmann - Standardized Loads Acting in Hip Implants
+% Hip Joint III Data Collection:
 % https://orthoload.com/test-loads/standardized-loads-acting-at-hip-implants/
 % https://orthoload.com/wp-content/uploads/StandardLoads-Hip_CompleteData.zip
-dbPath = 'D:\Biomechanics\Hip\Databases\StandardLoads-Hip_CompleteData\Data\';
+% 
+% Input:
+% The path of the Hip Joint III Data Collection of the publication, e.g.:
+% 'C:\StandardLoads-Hip_CompleteData\Data\';
+% or
+% 'D:\StandardLoads-Hip_CompleteData\Data\';
 
+% Parsing
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p,'visualization',0, logParValidFunc);
+parse(p,varargin{:});
+visu = p.Results.visualization;
+
+dbPath = fullfile(dbPath, '\');
+
+% Name of the activities in OrthoLoad and this framework + abbreviation
 activities = {...
     'Walking', 'Level Walking', 'LW';...
     'Stance' , 'One-Legged Stance', 'OLS';...
@@ -14,8 +37,7 @@ activities = {...
 % Implant side of the the OrthoLoad subjects
 sides = {'L','R','L','L','L','R','R','L','L','R'};
 
-visu = 1;
-
+% Visualization settings
 pointProps.Marker='o';
 pointProps.MarkerSize=5;
 pointProps.MarkerEdgeColor='k';
@@ -73,11 +95,12 @@ for a=1:length(activities)
                     error([activities{a,1} ' not implemented yet!'])
             end
             avPFP.HJF_pBW = mean(avHJF(pfpIdx,2:4));
-            meanPFP = struct2table(avPFP);
-            save(['H' num2str(s) sides{s} '_' activities{a,3}],'meanPFP')
+            % Save in vivo HJF
+            meanPFP = avPFP;
+            writestruct(meanPFP,['H' num2str(s) sides{s} '_' activities{a,3} '.xml'])
             clearvars avPFP meanPFP
             if visu
-                figH = figure('Name', sFile.name, 'NumberTitle', 'off',...
+                figure('Name', sFile.name, 'NumberTitle', 'off',...
                     'Color', 'w','Position', [100,400,1600,400]);
                 saxH(1) = subplot(1,4,1);
                 plot(avHJF(:,1),avHJF(:,2),'g'); grid on;
@@ -100,7 +123,9 @@ for a=1:length(activities)
                 end
             end
         elseif isempty(sFile) || length(sFile) > 1
-            warning(['Check: '  activities{a,1} '_H' num2str(s) '.xlsx'])
+            warning([activities{a,1} '_H' num2str(s) '.xlsx' ' is missing!'])
         end
     end
+end
+
 end

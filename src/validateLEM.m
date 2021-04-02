@@ -11,7 +11,7 @@ for s = 1:length(OL)
     Results(s).Sex     = OL(s).Sex;
     try
         % Load body weight and HJF of OrthoLoad subjects
-        load([OL(s).Subject '_' data.Posture '.mat'],'meanPFP')
+        meanPFP = readstruct([OL(s).Subject '_' data.Posture '.xml']);
         OL(s).BodyWeight = meanPFP.Weight_N / data.g; % [N] to [kg]
         
         % The HJF of the OrthoLoad subjects is given in the OrthLoad CS 
