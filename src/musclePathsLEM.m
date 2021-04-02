@@ -1,6 +1,11 @@
 function data = musclePathsLEM(data)
 %MUSCLEPATHSLEM constructs the paths of the active muscles.
 %
+% Reference:
+% [Scholz 2015] 2015 - Scholz et al. - A fast multi-obstacle muscle 
+%   wrapping method using natural geodesic variations
+%   https://doi.org/10.1007/s11044-015-9451-1
+%
 % AUTHOR: L. Schartz
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
