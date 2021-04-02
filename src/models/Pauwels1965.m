@@ -1,16 +1,23 @@
 function funcHandles = Pauwels1965
-% The original model of Pauwels without patient-specific adaption using
-% the original data of Fick, Braune and Fischer
+%PAUWELS1965 The original model of Pauwels without patient-specific 
+% adaption using the original data of Fick, Braune and Fischer
 %
 % References:
-%   [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur
-%   funktionellen Anatomie des Bewegungsapparates - Der Schenkelhalsbruch
-%   [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des
-%   Oberschenkels
-%   [Braune 1895] 1985 - Braune - Der Gang des Menschen - I. Theil
-%   [Fischer 1898] 1898 - Fischer - Der Gang des Menschen - II. Theil
+% [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur funktionellen
+%   Anatomie des Bewegungsapparates - Der Schenkelhalsbruch
+%   https://doi.org/10.1007/978-3-642-86841-2_1
 % or
-%   [Braune 1987] 1987 - Braune - The Human Gait
+% [Pauwels 1980] 1980 - Pauwels - Biomechanics of the Locomotor Apparatus -
+%   The Fracture of the Femoral Neck. A Mechanical Problem
+%   https://doi.org/10.1007/978-3-642-67138-8_1
+% [Fick 1850] 1850 - Fick - Statische Betrachtung der Muskulatur des
+%   Oberschenkels
+%   https://babel.hathitrust.org/cgi/pt?id=mdp.39015053249606&view=1up&seq=117
+% [Braune 1895] 1985 - Braune - Der Gang des Menschen - I. Theil
+% [Fischer 1898] 1898 - Fischer - Der Gang des Menschen - II. Theil
+% or
+% [Braune 1987] 1987 - Braune - The Human Gait
+%   https://doi.org/10.1007/978-3-642-70326-3
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;
@@ -32,8 +39,6 @@ end
 
 %% Calculate the joint angles for positioning of the TLEM2
 function jointAngles = Position(~)
-
-% Inputs
 
 % Calculate the joint angles
 jointAngles = {[0 0 0], [0 0 0], 0, 0, 0, 0};

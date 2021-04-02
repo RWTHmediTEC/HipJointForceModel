@@ -2,8 +2,9 @@ function funcHandles = Iglic
 % A Iglic based model with adapted muscle grouping to be compatible with
 % other cadaver templates. See below for further information.
 %
-% References:
-%   [Iglic 1990] 1990 - Iglic - Mathematical Analysis of Chiari Osteotomy
+% Reference:
+% [Iglic 1990] 1990 - Iglic - Mathematical Analysis of Chiari Osteotomy
+% http://physics.fe.uni-lj.si/publications/pdf/acta1990.PDF
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

@@ -2,7 +2,7 @@ function importDataTLEM2_1(LE, muscleList)
 % IMPORTDATATLEM2_1 Updates TLEM 2.0 to TLEM 2.1
 %
 % Reference:
-% Changes made in the AnyBody model due to the reviewed TLEM based on: 
+% Changes made in the AnyBody model due to the reviewed TLEM 2.0 based on: 
 % [DePieri 2018] - Refining muscle geometry and wrapping in the TLEM 2
 %   model for improved hip contact force prediction
 % https://doi.org/10.1371/journal.pone.0204109

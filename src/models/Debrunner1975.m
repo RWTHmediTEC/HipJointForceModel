@@ -1,9 +1,10 @@
 function funcHandles = Debrunner1975
-% The Debrunner model from 1975
+%DEBRUNNER1975 The Debrunner model from 1975
 %
-% References:
-%   [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des
+% Reference:
+% [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des
 %   Hüftgelenkes I
+% https://www.docdroid.net/nSjKceC
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

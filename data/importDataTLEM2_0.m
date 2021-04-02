@@ -1,6 +1,11 @@
 function [LE, muscleList] = importDataTLEM2_0()
 %IMPORTDATATLEM2_0 Import TLEM 2.0 cadaver data and save in cache including
 % the Lower Extremity (LE) struct and muscleList
+%
+% Reference:
+% [Carbone 2015] TLEM 2.0 – A comprehensive musculoskeletal geometry 
+%   dataset for subject-specific modeling of lower extremity
+%   https://doi.org/10.1016/j.jbiomech.2014.12.034
 
 
 %% Import .stl files

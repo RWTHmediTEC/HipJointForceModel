@@ -4,10 +4,15 @@ function funcHandles = Iglic1990
 
 % References:
 % [Iglic 1990] 1990 - Iglic - Mathematical analysis of Chiari Osteotomy
+%   http://physics.fe.uni-lj.si/publications/pdf/acta1990.PDF
 % [Johnston 1979] 1979 - Johnston - Reconstruction of the Hip
+%   https://pubmed.ncbi.nlm.nih.gov/457709
 % [McLeish 1970] 1970 - McLeish - Abduction forces in the one-legged stance
+%   https://doi.org/10.1016/0021-9290(70)90006-0
 % [Clauser 1969] 1969 - Clauser - Weight, volume and centre of mass of segments of the human body
+%   https://apps.dtic.mil/dtic/tr/fulltext/u2/710622.pdf
 % [Dostal 1981] 1981 - Dostal A three-dimensional biomechanical model of hip musculature
+%   https://doi.org/10.1016/0021-9290(81)90036-1
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

@@ -4,8 +4,9 @@ function [S, HJW, G1, G2, g1_16, g2_L_16, hjc_R_16] = BrauneAndFischer189X()
 % References:
 % [Braune 1895] 1985 - Der Gang des Menschen - I. Theil
 % [Fischer 1898] 1898 - Der Gang des Menschen - II. Theil
+% or
 % [Braune 1987] 1987 - Braune - The Human Gait
-% https://doi.org/10.1007/978-3-642-70326-3
+%   https://doi.org/10.1007/978-3-642-70326-3
 
 S = 58.7; % Body weight [Fischer 1898, S.60; Braune 1987, S.152]
 HJW = 17; % Hip joint Width. Distance between the hip joint centers [Braune 1895 , S.96; Braune 1987, S.66]
