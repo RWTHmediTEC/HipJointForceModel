@@ -1,4 +1,6 @@
-function plotActivation(MSC, activation, varargin)
+function visualizeMuscleActivation(MSC, activation, varargin)
+%VISUALIZEMUSCLEACTIVATION visualizes the activation of the muscles for the
+% optimization based muscle recruitment.
 
 hAx = gca;
 if isAxisHandle(MSC)

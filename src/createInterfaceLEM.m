@@ -1348,8 +1348,8 @@ gui.Activation.Axes.Fascicles = axes(...
         else
             structfun(@(x) set(x, 'Visible','on'), gui.Activation.Axes)
             MSC = data.MuscleRecruitmentCriterion;
-            plotActivation(gui.Activation.Axes.Muscles, MSC, data.Activation.Muscles)
-            plotActivation(gui.Activation.Axes.Fascicles, MSC, data.Activation.Fascicles)
+            visualizeMuscleActivation(gui.Activation.Axes.Muscles, MSC, data.Activation.Muscles)
+            visualizeMuscleActivation(gui.Activation.Axes.Fascicles, MSC, data.Activation.Fascicles)
         end
     end
 
