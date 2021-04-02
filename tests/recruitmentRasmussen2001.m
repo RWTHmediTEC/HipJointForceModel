@@ -66,7 +66,7 @@ for i = 1:nMoments
             F_pol.(['Power' num2str(dP(j))])(:,i) = run(GlobalSearch,problem_pol_max);
         else
             F_pol.(['Power' num2str(dP(j))])(:,i) = ...
-                muscleRecruitmentPoly(dP(j),F0,Fmin,Fmax,aeq,beq(:,i),Fmax,opts);
+                muscleRecruitmentPoly(F0,Fmin,Fmax,aeq,beq(:,i),Fmax,dP(j),opts);
         end
         A_pol.(['Power' num2str(dP(j))])(:,i) = F_pol.(['Power' num2str(dP(j))])(:,i)./Fmax;
     end

@@ -1,9 +1,19 @@
 function [force, data] = muscleRecruitment(lBW, BW, LoA_PoA, LoA_Dir, PCSA, data)
-% lBW = lever arm of the bodyweight force;
-% BW = bodyweight force;
-% LoA_PoA = point of application (origin) of the fascicle's line of action;
-% LoA_Dir = unit vector in the direction of the fascicle's line of action;
-% PCSA = physiological cross sectional area of fascicles [mm²]
+%MUSCLERECRUITMENT calculates muscle forces and activations using optimization
+%
+% Inputs:
+% lBW: lever arm of the bodyweight force
+% BW: body weight force
+% LoA_PoA: point of application (origin) of the fascicle's line of action
+% LoA_Dir: unit vector in the direction of the fascicle's line of action
+% PCSA: physiological cross sectional area of fascicles [mm²]
+%
+% TODO:
+% - SIGMA & C1 parameter should not be hardcoded here.
+%
+% AUTHOR: Fabian Schimmelpfennig
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 if data.Verbose
     tStart = tic;
@@ -15,15 +25,15 @@ MRC           = data.MuscleRecruitmentCriterion;
 HJC           = data.S.LE(1).Joints.Hip.Pos;
 
 %% Parameters
-% Muscle Tension [N/mm²] 0.9 in Anybody, 0.5 in CusToM
+% Muscle Tension [N/mm²] 0.9 in AnyBody, 0.5 in CusToM
 SIGMA = 0.9;
 % Maximal fascicle strength [N]
-fMax = SIGMA*PCSA;
-% Weighting factor in Minmax and Polynomial criteria (fMax or PCSA)
-n = 'Fmax';
-switch n
+Fmax = SIGMA*PCSA;
+% Weighting factor in the Polynomial and MinMax criteria (fMax or PCSA)
+WeightingFactor = 'Fmax';
+switch WeightingFactor
     case 'Fmax'
-        N = fMax;
+        N = Fmax;
     case 'PCSA'
         N = PCSA;
 end
@@ -33,9 +43,9 @@ end
 NoAF = length(musclePaths);
 
 % Initial value of optimization
-F_0 = zeros(NoAF,1);
+F0 = zeros(NoAF,1);
 % Minimum fasicle strength [N]
-F_MIN = zeros(size(F_0));
+Fmin = zeros(size(F0));
 % Project the HJC onto the line of action
 HJConLineOfAction = projPointOnLine3d(HJC,[LoA_PoA LoA_Dir]);
 % Get lever arms of the fascicles around HJC
@@ -62,14 +72,14 @@ opts = optimoptions(@fmincon,...
     'MaxIterations',5000);
 switch MRC
     case {'Polynom1', 'Polynom2', 'Polynom3', 'Polynom5'}
-        % Polynomial muscle recruitment criteria with power = 2, 3 or 5
+        % Polynomial muscle recruitment criterion with power = 1, 2, 3 or 5
         DP = str2double(MRC(end));
-        fascicleForce = muscleRecruitmentPoly(DP,F_0,F_MIN,fMax,aeq,beq,N,opts);
+        fascicleForce = muscleRecruitmentPoly(F0,Fmin,Fmax,aeq,beq,N,DP,opts);
     case 'MinMax'
-        % MinMax muscle recruitment criteria
-        fascicleForce = muscleRecruitmentMinMax(F_0,F_MIN,fMax,aeq,beq,N,opts);
+        % MinMax muscle recruitment criterion
+        fascicleForce = muscleRecruitmentMinMax(F0,Fmin,Fmax,aeq,beq,N,opts);
     case 'Energy'
-        % Energy muscle recruitment criteria
+        % Energy muscle recruitment criterion
         if size(muscleList,2) >= 7
             % Get mass of each fascicle
             fascicleMass = zeros(NoAF,1);
@@ -83,9 +93,9 @@ switch MRC
             msgbox(errMessage,mfilename,'error')
             error(errMessage)
         end
-        % Weighting factor in Energy criteria [~]
+        % Weighting factor in the Energy criterion
         C1 = .5;
-        fascicleForce = muscleRecruitmentEnergy(C1,F_0,F_MIN,fMax,aeq,beq,PCSA,opts,fascicleMass);
+        fascicleForce = muscleRecruitmentEnergy(F0,Fmin,Fmax,aeq,beq,PCSA,C1,fascicleMass,opts);
 end
 
 % Get the fascicle forces by multiplying the unit force direction vector
@@ -136,7 +146,7 @@ for i = 1:length(fMaxM)
     end
 end
 % Activation of each fascicle
-fascicleActivation = table(fascicleForce./fMax,'VariableNames',{'Activation'},'RowNames',{musclePaths.Name});
+fascicleActivation = table(fascicleForce./Fmax,'VariableNames',{'Activation'},'RowNames',{musclePaths.Name});
 data.Activation.Fascicles = fascicleActivation;
 % Activation of each muscle
 muscleActivation = table(muscleForce./fMaxM,'VariableNames',{'Activation'},'RowNames',activeMuscles);
