@@ -11,7 +11,7 @@ function fasForce = muscleRecruitmentEnergy(F0,Fmin,Fmax,aeq,beq,PCSA,C1,fasMass
 % C1: Contribution from the linear term
 % fasMass: fascicle mass
 %
-% AUTHOR: Fabian Schimmelpfennig
+% AUTHOR: F. Schimmelpfennig
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
 

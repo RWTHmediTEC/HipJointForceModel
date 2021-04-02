@@ -1,5 +1,9 @@
 function MusclePaths = linesOfActionLEM(LE, MusclePaths)
 %LINESOFACTIONLEM Create the lines of action for the muscle path models
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Contains origin and a normalized direction vector for each model
 for i = 1:length(MusclePaths)
@@ -9,15 +13,15 @@ for i = 1:length(MusclePaths)
     % Create line of action for StraightLine
     MusclePaths(i).StraightLine = shortestDistanceJoint2MusclePath(...
         LE(1).Joints.Hip.Pos, MusclePaths(i).Points([1 end],:));
-    % Creates line of action for ViaPoint without Wrapping
     if size(MusclePaths(i).Points,1) > 2 && isempty(MusclePaths(i).Surface)
+        % Creates line of action for ViaPoint without Wrapping
         MusclePaths(i).ViaPoint = shortestDistanceJoint2MusclePath(...
             LE(1).Joints.Hip.Pos, MusclePaths(i).Points);
     elseif ~isempty(MusclePaths(i).Surface)
+        % Creates line of action for Wrapping
         MusclePaths(i).Wrapping = shortestDistanceJoint2MusclePath(...
             LE(1).Joints.Hip.Pos, MusclePaths(i).Points);
     end
-    % Creates line of action for Wrapping
     if isempty(MusclePaths(i).ViaPoint)
         MusclePaths(i).ViaPoint = MusclePaths(i).StraightLine;
     end

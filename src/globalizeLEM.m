@@ -1,5 +1,10 @@
 function data = globalizeLEM(data)
 %GLOBALIZELEM tranforms the bones from the local to the global coordinate system
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
+
 LE = data.S.LE;
 
 %% Transformations from local to global coordinate system

@@ -1,5 +1,9 @@
 function LE = transformLEM(LE, TFM)
-%TRANSFORMLEM Transformation of the model by matrix TFM
+%TRANSFORMLEM Transformation of the LE model by the matrices in TFM
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 for b = 1:length(LE)
     if ~isequal(TFM(:,:,b), eye(4))

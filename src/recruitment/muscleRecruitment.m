@@ -11,7 +11,7 @@ function [force, data] = muscleRecruitment(lBW, BW, LoA_PoA, LoA_Dir, PCSA, data
 % TODO:
 % - SIGMA & C1 parameter should not be hardcoded here.
 %
-% AUTHOR: Fabian Schimmelpfennig
+% AUTHOR: F. Schimmelpfennig
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
 

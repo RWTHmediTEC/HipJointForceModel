@@ -1,5 +1,9 @@
 function LE = positionLEM(LE, jointAngles)
 %POSITIONLEM rotates the the bones by jointAngles
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 NoB = length(LE);
 

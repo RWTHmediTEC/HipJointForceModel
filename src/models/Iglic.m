@@ -5,6 +5,10 @@ function funcHandles = Iglic
 % Reference:
 % [Iglic 1990] 1990 - Iglic - Mathematical Analysis of Chiari Osteotomy
 % http://physics.fe.uni-lj.si/publications/pdf/acta1990.PDF
+%
+% AUTHOR: B. Eggert
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

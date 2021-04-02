@@ -10,7 +10,7 @@ function fasForce = muscleRecruitmentPoly(F0,Fmin,Fmax,aeq,beq,N,DP,opts)
 % p: Power
 % N: Normalization factor (maximum muscle strength, PCSA or others)
 %
-% AUTHOR: Fabian Schimmelpfennig
+% AUTHOR: F. Schimmelpfennig
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
 

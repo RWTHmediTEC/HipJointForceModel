@@ -5,6 +5,10 @@ function funcHandles = Debrunner1975
 % [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des
 %   Hüftgelenkes I
 % https://www.docdroid.net/nSjKceC
+%
+% AUTHOR: B. Eggert
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

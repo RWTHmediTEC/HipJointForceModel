@@ -1,4 +1,9 @@
 function gui = createInterfaceLEM(data)
+%CREATEINTERFACELEM GUI for the HJF prediction framework
+%
+% AUTHORS: B. Eggert, M.C.M. Fischer, L. Schartz, F. Schimmelpfennig, ...
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Create GUI
 gui.Window = figure(...

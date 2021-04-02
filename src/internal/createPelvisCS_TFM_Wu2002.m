@@ -21,6 +21,10 @@ function TFM = createPelvisCS_TFM_Wu2002(ASIS_R, ASIS_L, PSIS_R, PSIS_L,varargin
 %    ASISs and the midpoint of the two PSISs, orthogonal to the Z-axis, and
 %    pointing anteriorly.
 % Y: The line perpendicular to both X and Z, pointing cranially.
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 p = inputParser;
 isPoint3d = @(x) validateattributes(x,{'numeric'},...

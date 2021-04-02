@@ -1,5 +1,9 @@
 function TFM = createFemurCS_TFM_LEM(LE, side, varargin)
-% Wrapper function for createFemurCS_TFM_*.m and the LE struct
+%CREATEFEMURCS_TFM_LEM Wrapper function for createFemurCS_TFM_*.m and the LE struct
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 p = inputParser;
 logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));

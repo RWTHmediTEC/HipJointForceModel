@@ -1,5 +1,9 @@
 function Results = validateLEM(data, gui)
 %VALIDATELEM validates the simulated HJF with the OrthoLoad subjects
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 OL = importDataOrthoLoad;
 

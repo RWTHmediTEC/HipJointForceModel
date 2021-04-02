@@ -1,5 +1,9 @@
 function data = scaleLEM(data)
-%SCALELEM scales the lower extremity template
+%SCALELEM scales the lower extremity model
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Create scaling matrices
 scaleTFM = repmat(eye(4), 1, 1, length(data.T.LE));

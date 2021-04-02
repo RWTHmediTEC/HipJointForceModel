@@ -1,16 +1,24 @@
 function data = createLEM(data, Cadaver)
-%CREATELEM initializes the lower extremity (LE) template
+%CREATELEM initializes the lower extremity (LE) model
 %
 % References:
 % [Destatis 2018] 2018 - Destatis - Mikrozensus 2017 - Fragen zur 
-% Gesundheit - Körpermaße der Bevölkerung
+%   Gesundheit - Körpermaße der Bevölkerung
+%   https://bit.ly/3mf5dDP
 % [Carbone 2015] 2015 - Carbone - TLEM 2.0 - A comprehensive  
-% musculoskeletal geometry dataset for subject-specific modeling of lower 
-% extremity
+%   musculoskeletal geometry dataset for subject-specific modeling of lower 
+%   extremity
+%   https://doi.org/10.1016/j.jbiomech.2014.12.034
 % [Ward 2009] 2009 - Ward - Are current measurements of lower extremity 
-% muscle architecture accurate?
+%   muscle architecture accurate?
+%   https://doi.org/10.1007/s11999-008-0594-8
 % [Winter 2009] 2009 - Winter - Biomechanics and Motor Control of Human 
-% Movement - Fourth Edition
+%   Movement - Fourth Edition - Chapter 4: Anthropometry
+%   https://doi.org/10.1002/9780470549148.ch4
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 cachePath = strrep(mfilename('fullpath'), ['src\' mfilename], 'cache');
 

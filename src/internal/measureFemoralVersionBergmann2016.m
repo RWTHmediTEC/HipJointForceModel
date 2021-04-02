@@ -9,6 +9,10 @@ function femoralVersion = measureFemoralVersionBergmann2016(HJC, P1, P2, MPC, LP
 % [Bergmann 2016] 2016 - Bergmann - Standardized Loads Acting in Hip 
 %   Implants
 % https://doi.org/10.1371/journal.pone.0155612
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % The normal of the transverse plan is the straight femur axis defined by 
 % the points P1 and P2 [Bergmann2016].

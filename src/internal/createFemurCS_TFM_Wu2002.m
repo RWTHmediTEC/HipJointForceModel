@@ -20,6 +20,10 @@ function TFM = createFemurCS_TFM_Wu2002(MEC, LEC, HJC, side, varargin)
 % z: The line perpendicular to the y-axis, lying in the plane defined by 
 %    the origin and the two FEs, pointing to the right.
 % x: The line perpendicular to both y- and z-axis, pointing anteriorly
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 %% Parsing
 p = inputParser;

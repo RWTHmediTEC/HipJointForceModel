@@ -15,6 +15,10 @@ function funcHandles = Pauwels
 % or
 % [Braune 1987] 1987 - Braune - The Human Gait
 %   https://doi.org/10.1007/978-3-642-70326-3
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

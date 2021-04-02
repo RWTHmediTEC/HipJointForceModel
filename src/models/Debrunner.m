@@ -1,9 +1,13 @@
 function funcHandles = Debrunner
-% A Debrunner based model
+%DEBRUNNER A Debrunner based model
 %
 % References:
 %   [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des
 %   Hüftgelenkes I
+%
+% AUTHOR: B. Eggert
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

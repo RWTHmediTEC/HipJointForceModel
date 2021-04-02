@@ -1,6 +1,10 @@
 function data = convertGlobalHJF2LocalHJF(R, data)
 %CONVERTGLOBALHJF2LOCALHJF converts the HJF calculated in the global
 % (world) coordinate system to the local bone coordinate systems.
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % Convert R from [N] to [%BW]
 R = R / abs(data.S.BodyWeight * data.g) * 100;

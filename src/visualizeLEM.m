@@ -1,5 +1,9 @@
 function visualizeLEM(axH, LE, side, varargin)
 %VISUALIZELEM Visualize the lower extrimity model
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 %% Input parsing
 p = inputParser;

@@ -1,5 +1,9 @@
 function data = musclePathsLEM(data)
 %MUSCLEPATHSLEM constructs the paths of the active muscles
+%
+% AUTHOR: L. Schartz
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 if data.Verbose
     tStart = tic;

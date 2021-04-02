@@ -1,8 +1,8 @@
 function funcHandles = mediTEC2020
 % Based on the Iglic.m model but using all muscles connected to the pelvis.
 
-% AUTHOR: Fabian Schimmelpfennig
-% COPYRIGHT (C) 2021
+% AUTHOR: F. Schimmelpfennig
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;

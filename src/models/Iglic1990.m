@@ -13,6 +13,10 @@ function funcHandles = Iglic1990
 %   https://apps.dtic.mil/dtic/tr/fulltext/u2/710622.pdf
 % [Dostal 1981] 1981 - Dostal A three-dimensional biomechanical model of hip musculature
 %   https://doi.org/10.1016/0021-9290(81)90036-1
+%
+% AUTHOR: B. Eggert
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 funcHandles.Posture     = @Posture;
 funcHandles.Position    = @Position;

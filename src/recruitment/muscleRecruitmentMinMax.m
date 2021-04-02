@@ -9,7 +9,7 @@ function fasForce = muscleRecruitmentMinMax(F0,Fmin,Fmax,aeq,beq,N,OPTIONS)
 % Inputs
 % N: Normalization factor (maximum muscle strength, PCSA or others)
 %
-% AUTHOR: Fabian Schimmelpfennig
+% AUTHOR: F. Schimmelpfennig
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
 

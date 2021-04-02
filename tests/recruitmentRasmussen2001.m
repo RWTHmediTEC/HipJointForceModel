@@ -7,8 +7,8 @@ clearvars; close all;
 % polynomial criterion [Rasmussen 2001]. Global optimization can be used to
 % reduce the differences.
 
-% AUTHOR: Fabian Schimmelpfennig
-% COPYRIGHT (C) 2021
+% AUTHOR: F. Schimmelpfennig
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
 
 addpath(genpath('..\src'))

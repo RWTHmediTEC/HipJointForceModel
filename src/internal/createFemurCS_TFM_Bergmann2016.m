@@ -17,6 +17,10 @@ function TFM = createFemurCS_TFM_Bergmann2016(MPC, LPC, P1, P2, HJC, side)
 % The +x axis points laterally and is oriented parallel to the proximal 
 % contour of the condyles. The +y axis points in the anterior direction
 % [Bergmann 2016]."
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 % The straight femur axis is defined by the points P1 and P2 [Bergmann2016]
 % P1 is the point on the neck axis closest to the shaft axis

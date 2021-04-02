@@ -4,6 +4,10 @@ function TFM = createPelvisCS_TFM_APP(ASIS_R, ASIS_L, PS, varargin)
 %
 % Orientation: 'ASR'
 % Origin: Midpoint between left and right ASIS [default]
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 p = inputParser;
 isPoint3d = @(x) validateattributes(x,{'numeric'},...
