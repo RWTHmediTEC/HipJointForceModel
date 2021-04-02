@@ -1,6 +1,9 @@
 clearvars; close all; opengl hardware
 warning off backtrace; warning off verbose
 
+% Requires the toolbox, add-on or app:
+%   GUI Layout Toolbox by David Sampson
+
 addpath(genpath('src'))
 addpath(genpath('data'))
 
