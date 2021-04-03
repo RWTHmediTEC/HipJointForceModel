@@ -18,7 +18,6 @@
 % HJF models
 % - Implement other one-leg stance models
 % - Implement models for other ADLs
-% - Schartz2020 move upper body weight W anterior?
 
 % GUI
 % - Move postures selection to validation tab

@@ -1,6 +1,8 @@
 clearvars; close all; opengl hardware
 warning off backtrace; warning off verbose
 
+% Requires at least:
+% - MATLAB 2020b
 % Requires the toolbox, add-on or app:
 % - GUI Layout Toolbox by David Sampson
 

@@ -41,7 +41,7 @@ if cache.isCached(key)
     weights = cache.get(key);
 else
     % Create weights
-    disp('Skinning weights are calculated. This may take about 5 to 10 minutes ...')
+    disp('Skinning weights are calculated. This may take about 5 to 20 minutes ...')
     % Compute boundary conditions
     [bVertices, bConditions] = boundary_conditions(mesh.vertices, mesh.faces, ...
         cell2mat(struct2cell(controls)), 1:length(fieldnames(controls)));
