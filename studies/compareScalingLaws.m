@@ -27,7 +27,7 @@ for s = 1:length(scalingLaws)
         data.Model = models{m};
         
         switch data.Model
-            case {'Pauwels','Debrunner1975','Iglic'}
+            case {'Pauwels','Debrunner','Iglic'}
                 data.MuscleRecruitmentCriterion = 'None';
             case {'mediTEC2020'}
                 data.MuscleRecruitmentCriterion = 'Polynom2';
@@ -60,13 +60,8 @@ for p = 1:length(postures)
             compTab(2,2+(m-1)*NoE:1+m*NoE,p) = errorNames;
             if ~isempty(results{s,m})
                 % Predicted and in vivo HJF
-                if all(all(isnan(reshape([results{s,m,p}.HJF_Bergmann2016],[3,10])')))
-                    pHJF = reshape([results{s,m,p}.HJF_Wu2002],[3,10])';
-                    iHJF = reshape([results{s,m,p}.OL_HJF_Wu2002],[3,10])';
-                else
-                    pHJF = reshape([results{s,m,p}.HJF_Bergmann2016],[3,10])';
-                    iHJF = reshape([results{s,m,p}.OL_HJF_Bergmann2016],[3,10])';
-                end
+                pHJF = reshape([results{s,m,p}.HJF_Wu2002],[3,10])';
+                iHJF = reshape([results{s,m,p}.OL_HJF_Wu2002],[3,10])';
                 % Absolute Error in magnitude
                 AE_Mag{s,m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction
@@ -84,10 +79,10 @@ for p = 1:length(postures)
         for m=1:length(models)
             if ~isempty(results{s,m})
                 if signrank(AE_Mag{1,m,p}, AE_Mag{s,m,p}) <= alpha
-                    compTab{2+s,2+(m-1)*NoE,p} = [compTab{2+s,2+(m-1)*NoE,p} '✝'];
+                    compTab{2+s,2+(m-1)*NoE,p} = [compTab{2+s,2+(m-1)*NoE,p} '†'];
                 end
                 if signrank(AE_Dir{1,m,p}, AE_Dir{s,m,p}) <= alpha
-                    compTab{2+s,1+m*NoE,p} = [compTab{2+s,1+m*NoE,p} '✝'];
+                    compTab{2+s,1+m*NoE,p} = [compTab{2+s,1+m*NoE,p} '†'];
                 end
             end
         end

@@ -19,10 +19,15 @@ for c = 1:length(cadavers)
         data = createLEM(data, cadavers{c});
         % Scaling Law
         data.ScalingLaw = 'None';
-        % Muscle path model
-        data.MusclePathModel = 'StraightLine';
         % Static model
         data.Model = models{m};
+        % Muscle path model
+        switch cadavers{c}
+            case {'Fick1850','Dostal1981'}
+                 data.MusclePathModel = 'StraightLine';
+            case {'TLEM2_0'}
+                 data.MusclePathModel = 'Wrapping';
+        end
         % Muscle recruitment
         switch data.Model
             case {'Pauwels','Debrunner1975','Iglic'}

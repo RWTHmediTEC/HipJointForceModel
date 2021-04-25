@@ -94,19 +94,19 @@ if strcmp(MusclePathModel,'Wrapping')
                                 % Cylinder inputs: center, rotation matrix, linear velocity, angular velocity, radius, heigth
                                 cyl = Cylinder(cCenter', cRot(1:3,1:3), [0 0 0]', [0 0 0]', cRadius, 20*cRadius); % Cylinder initialization
                                 wrappingCyl = WrappingObstacle(cyl); % Initialization for wrapping Cylinder
-                                if ~isempty(MWS)
-                                    % If there is more than one wrapping surface, the start point on the cylinder has to be adjusted
-                                    geoLen = length(MWS.wrappingObstacles); % Numbers of geodesic elements
-                                    lineOrigin = MWS.straightLineSegments{1, geoLen+1}.startPoint'; % creating new start Point
-                                    % initialize starting conditions for wrapping
-                                    [~, theta, height, arcLength, vector] = startingPoint3d(testCylinder, lineOrigin, lineInsertion, cCenter, cAxis);
-                                elseif isempty(MWS)
+                                if isempty(MWS)
                                     lineOrigin = MusclePaths(i).Points(1,:); % creating new start Point
                                     lineInsertion = MusclePaths(i).Points(end,:);
                                     % initialize starting conditions for wrapping
                                     [~, theta, height, arcLength, vector] = startingPoint3d(testCylinder, lineOrigin, lineInsertion, cCenter, cAxis);
                                     % initialize wrapping system with Origin and Insertion
                                     MWS = MuscleWrappingSystem(lineOrigin', lineInsertion');
+                                elseif ~isempty(MWS)
+                                    % If there is more than one wrapping surface, the start point on the cylinder has to be adjusted
+                                    geoLen = length(MWS.wrappingObstacles); % Numbers of geodesic elements
+                                    lineOrigin = MWS.straightLineSegments{1, geoLen+1}.startPoint'; % creating new start Point
+                                    % initialize starting conditions for wrapping
+                                    [~, theta, height, arcLength, vector] = startingPoint3d(testCylinder, lineOrigin, lineInsertion, cCenter, cAxis);
                                 end
                                 % define initial conditions for wrapping, depending on muscles
                                 % inputs for initial conditions
@@ -159,17 +159,18 @@ if strcmp(MusclePathModel,'Wrapping')
                                     cRadius = distancePointLine3d(MusclePaths(i).Points(1,:), axisLine) - 0.00001;
                                 end
                                 testCylinder = [cStart, cEnd, cRadius]; % Cylinder definition for MatGeom
-                                testIntersection = intersectLineCylinder(testLine, testCylinder, 'checkBounds', false); % Intersection Points of Line and Cylinder
-                                % initalize 2 vectors with diffrent directions
-                                v1 = [1 0 0];
-                                v2 = [0 1 0];
-                                % vectors from first muscle point to cylinder intersection and from second muscle point to cylinder intersection
-                                if ~isempty(testIntersection) % checks if muscle passes through cylinder
+                                % Check if the line of the muscle path segment intersects the cylinder
+                                testIntersection = intersectLineCylinder(testLine, testCylinder, 'checkBounds', false);
+                                % Check if cylinder lies between the muscle points of the muscle path segment
+                                [v1, v2] = deal(nan);
+                                if ~isempty(testIntersection) 
+                                    % Vector from the 1st muscle point to the 1st cylinder intersection
                                     v1 = round(normalizeVector3d(testIntersection(1,:) - MusclePaths(i).Points(p,:)),6);
+                                    % Vector from the 2nd muscle point to the 2nd cylinder intersection
                                     v2 = round(normalizeVector3d(testIntersection(2,:) - MusclePaths(i).Points(p+1,:)),6);
                                 end
-                                % checks if muscle passes through cylinder and if vectors have opposing directions
-                                % if vectors have opposing directions the cylinder lies between the two sucessive points
+                                % The muscle path segment intersects the cylinder if the line of the muscle 
+                                % path segment intersects the cylinder and vectors v1 & v2 are antiparallel.
                                 if ~isempty(testIntersection) && isequal(v1, -v2)
                                     % Initialize values for wrapping
                                     cRot = createRotationVector3d([0 0 1], cAxis); % Rotaion matrix of the cylinder

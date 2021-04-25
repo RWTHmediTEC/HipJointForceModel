@@ -58,8 +58,8 @@ for p = 1:length(postures)
             compTab(2,2+(m-1)*NoE:1+m*NoE,p) = errorNames;
             if ~isempty(results{c,m})
                 % Predicted and in vivo HJF
-                pHJF = reshape([results{c,m,p}.HJF_Bergmann2016],[3,10])';
-                iHJF = reshape([results{c,m,p}.OL_HJF_Bergmann2016],[3,10])';
+                pHJF = reshape([results{c,m,p}.HJF_Wu2002],[3,10])';
+                iHJF = reshape([results{c,m,p}.OL_HJF_Wu2002],[3,10])';
                 % Absolute Error in magnitude
                 AE_Mag{c,m,p} = abs(vectorNorm3d(pHJF)-vectorNorm3d(iHJF));
                 % Angular Error in direction
@@ -74,5 +74,5 @@ for p = 1:length(postures)
     writecell(compTab(:,:,p),'compareRecruitment.xlsx','Sheet',postures{p,2},'Range','B2')
 end
 
-% [p,tbl,stats] = friedman(cell2mat(AE_Mag(1,:,1)));
-% multcompare(stats,'alpha',0.01)
+[p,tbl,stats] = friedman(cell2mat(AE_Mag(1,:,1)));
+multcompare(stats,'alpha',0.01)
