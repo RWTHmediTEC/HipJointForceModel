@@ -14,6 +14,13 @@ function OL = importDataOrthoLoad(varargin)
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
 
+%% Input parsing
+p = inputParser;
+logParValidFunc=@(x) (islogical(x) || isequal(x,1) || isequal(x,0));
+addParameter(p, 'WriteExcel', false, logParValidFunc);
+parse(p, varargin{:});
+writeExcel = p.Results.WriteExcel;
+
 sides={'R','L'};
 
 %% Create OrthoLoad (OL) struct
@@ -29,6 +36,10 @@ NeckLength = [55.6  59.3  56.6  63.3  55.6 55.6  63.3 59.3  59.3 59.6]; % [mm]
 % alphaY = [-2.3   0.6  -3.0  -1.7  -2.3 -1.7  -1.7 -1.7   0.6 -1.2]; % [°]
 alphaZ = [-15.0 -13.8 -13.8 -18.9 -2.3 -31.0 -2.4 -15.5 -2.3 -9.7]; % Femoral version [°]
 CCD = 135; % CCD angle is always 135°
+
+if writeExcel
+    excelLM = repmat(struct('Subject',[]), length(Subject),1);
+end
 
 for s = 1:length(Subject)
     
@@ -55,6 +66,35 @@ tempPos = cellfun(@str2double, tempContent(:,2:4));
 % Write landmarks
 for t = 1:size(tempContent,1)
     OL(s).Landmarks.Femur.(tempContent{t,12}) = tempPos(t,:);
+end
+
+%% Write selected landmarks of the pelvis and femur as excel file:
+if writeExcel
+    excelLM(s).Subject = OL(s).Subject;
+    pelvisLM_BL = {'ASIS_R','ASIS_L','HJC_R','HJC_L','PSIS_R','PSIS_L'};
+    for lm = 1:length(pelvisLM_BL)
+        if isfield(OL(s).Landmarks.Pelvis, pelvisLM_BL{lm})
+            excelLM(s).([pelvisLM_BL{lm}]) = OL(s).Landmarks.Pelvis.(pelvisLM_BL{lm}) .* [-1 -1 1];
+        else
+            excelLM(s).([pelvisLM_BL{lm}]) = nan(1,3);
+        end
+    end
+    pelvisLM_IL = {'AIIS','MP','PT','IIT', 'PIT','IS','PIIS','SIC','IT'};
+    for lm = 1:length(pelvisLM_IL)
+        if isfield(OL(s).Landmarks.Pelvis, [pelvisLM_IL{lm} '_' Side_IL])
+            excelLM(s).([pelvisLM_IL{lm}]) = OL(s).Landmarks.Pelvis.([pelvisLM_IL{lm} '_' Side_IL]) .* [-1 -1 1];
+        else
+            excelLM(s).([pelvisLM_IL{lm}]) = nan(1,3);
+        end
+    end
+    femurLM_IL = {'HJC','GT','P1','LT','MEC','LEC','MPC','LPC','P2'};
+    for lm = 1:length(femurLM_IL)
+        if isfield(OL(s).Landmarks.Femur, [femurLM_IL{lm} '_' Side_IL])
+            excelLM(s).([femurLM_IL{lm}]) = OL(s).Landmarks.Femur.([femurLM_IL{lm} '_' Side_IL]) .* [-1 -1 1];
+        else
+            excelLM(s).([femurLM_IL{lm}]) = nan(1,3);
+        end
+    end
 end
 
 %% Convert left to right sides
@@ -128,6 +168,11 @@ Bergman2016TFM = createFemurCS_TFM_Bergmann2016(...
 % Create transformation for the hip joint force from [Bergmann 2016] to [Wu 2002].
 OL(s).Wu2002TFM = [Bergman2016TFM(1:4,1:3)'; 0 0 0 1];
 
+end
+
+if writeExcel
+    writetable(struct2table(excelLM),'OrthoLoadLandmarks.xlsx',...
+        'WriteVariableNames',0,'Range','B5')
 end
 
 end
