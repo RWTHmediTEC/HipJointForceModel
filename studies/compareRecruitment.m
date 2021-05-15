@@ -1,11 +1,15 @@
 clearvars; warning off backtrace; warning off verbose
 
+% Script to create Table 4 in 2021 - Fischer - Effect of the underlying 
+% cadaver data and patient-specific adaptation of the femur and pelvis on 
+% the prediction of the hip joint force estimated using static models
+
 addpath(genpath('..\src'))
 addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 cadavers = {'TLEM2_0'};
-model = 'mediTEC2020';
+model = 'mediTEC2021';
 MRC = {'Polynom1','Polynom2','Polynom3','Polynom5','MinMax'};
 
 %% Create results
@@ -74,5 +78,5 @@ for p = 1:length(postures)
     writecell(compTab(:,:,p),'compareRecruitment.xlsx','Sheet',postures{p,2},'Range','B2')
 end
 
-[p,tbl,stats] = friedman(cell2mat(AE_Mag(1,:,1)));
-multcompare(stats,'alpha',0.01)
+% [p,tbl,stats] = friedman(cell2mat(AE_Mag(1,:,1)));
+% multcompare(stats,'alpha',0.01);

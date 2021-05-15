@@ -1,4 +1,4 @@
-function funcHandles = Pauwels
+function funcHandles = Pauwels2021
 % A Pauwels based model with subject-specific adaption using the the data
 % of Braune and Fischer
 %

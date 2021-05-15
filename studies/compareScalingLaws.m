@@ -1,11 +1,15 @@
 clearvars; warning off backtrace; warning off verbose
 
+% Script to create Table 2 & 3 in 2021 - Fischer - Effect of the underlying 
+% cadaver data and patient-specific adaptation of the femur and pelvis on 
+% the prediction of the hip joint force estimated using static models
+
 addpath(genpath('..\src'))
 addpath(genpath('..\data'))
 addpath(genpath('src'))
 
 scalingLaws = {'None', 'NonUniformLinearA', 'NonUniformLinearB', 'LandmarkDeformableBones'};
-models = {'Pauwels','Debrunner','Iglic','mediTEC2020'};
+models = {'Pauwels2021','Debrunner2021','Iglic2021','mediTEC2021'};
 
 cadaver = 'TLEM2_0'; % Dostal1981
 musclePathModel = 'Wrapping'; % StraightLine
@@ -27,9 +31,9 @@ for s = 1:length(scalingLaws)
         data.Model = models{m};
         
         switch data.Model
-            case {'Pauwels','Debrunner','Iglic'}
+            case {'Pauwels2021','Debrunner2021','Iglic2021'}
                 data.MuscleRecruitmentCriterion = 'None';
-            case {'mediTEC2020'}
+            case {'mediTEC2021'}
                 data.MuscleRecruitmentCriterion = 'Polynom2';
         end
         

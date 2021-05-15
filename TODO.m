@@ -1,6 +1,6 @@
 
 % Cadaver
-% - Include additonal cadavers from https://github.com/anmuller/CusToM
+% - Include additonal cadaver templates
 
 % Scaling laws
 % - Revision of PCSAs

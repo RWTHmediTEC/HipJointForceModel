@@ -1,4 +1,4 @@
-function funcHandles = Debrunner
+function funcHandles = Debrunner2021
 %DEBRUNNER A Debrunner based model
 %
 % References:

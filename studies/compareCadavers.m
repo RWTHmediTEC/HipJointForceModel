@@ -1,4 +1,8 @@
-clearvars
+clearvars; warning off backtrace; warning off verbose
+
+% Script to create Table 1 in 2021 - Fischer - Effect of the underlying 
+% cadaver data and patient-specific adaptation of the femur and pelvis on 
+% the prediction of the hip joint force estimated using static models
 
 addpath(genpath('..\src'))
 addpath(genpath('..\data'))
@@ -7,7 +11,7 @@ addpath(genpath('src'))
 % Cadaver templates
 cadavers = {'Fick1850','Dostal1981','TLEM2_0'};
 % Static models
-models = {'Pauwels','Debrunner','Iglic','mediTEC2020'};
+models = {'Pauwels2021','Debrunner2021','Iglic2021','mediTEC2021'};
 
 %% Validate the static models using the various cadaver templates
 results = cell(length(cadavers), length(models));
@@ -30,9 +34,9 @@ for c = 1:length(cadavers)
         end
         % Muscle recruitment
         switch data.Model
-            case {'Pauwels','Debrunner1975','Iglic'}
+            case {'Pauwels2021','Debrunner2021','Iglic2021'}
                 data.MuscleRecruitmentCriterion = 'None';
-            case {'mediTEC2020'}
+            case {'mediTEC2021'}
                 data.MuscleRecruitmentCriterion = 'Polynom2';
         end
         % Get the model specifications
