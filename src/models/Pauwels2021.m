@@ -1,6 +1,6 @@
 function funcHandles = Pauwels2021
-% A Pauwels based model with subject-specific adaption using the the data
-% of Braune and Fischer
+%PAUWELS2021 A Pauwels based model with subject-specific adaption using the 
+% data of Braune and Fischer
 %
 % References:
 % [Pauwels 1965] 1965 - Pauwels - Gesammelte Abhandlungen zur funktionellen 

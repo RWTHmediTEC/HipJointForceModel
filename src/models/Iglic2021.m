@@ -1,6 +1,6 @@
 function funcHandles = Iglic2021
-% A Iglic based model with adapted muscle grouping to be compatible with
-% other cadaver templates. See below for further information.
+%IGLIC2021 A Iglic based model with adapted muscle grouping to be 
+% compatible with other cadaver templates. See below for further information.
 %
 % Reference:
 % [Iglic 1990] 1990 - Iglic - Mathematical Analysis of Chiari Osteotomy

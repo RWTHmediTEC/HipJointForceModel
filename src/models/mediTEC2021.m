@@ -1,6 +1,7 @@
 function funcHandles = mediTEC2021
-% Based on the Iglic.m model but using all muscles connected to the pelvis.
-
+%MEDITEC2021 A Iglic based model but using all muscles connected to the 
+% pelvis and optimization to solve the load sharing problem.
+% 
 % AUTHOR: F. Schimmelpfennig
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2

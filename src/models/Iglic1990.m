@@ -1,6 +1,6 @@
 function funcHandles = Iglic1990
-% The original model of Iglic with data from Johnston, Dostal, McLeish and
-% Clauser. Data was copied from the Iglic paper.
+%IGLIC1990 The original model of Iglic with data from Johnston, Dostal, 
+% McLeish and Clauser. Data was copied from the Iglic paper.
 
 % References:
 % [Iglic 1990] 1990 - Iglic - Mathematical analysis of Chiari Osteotomy

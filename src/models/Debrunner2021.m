@@ -1,5 +1,5 @@
 function funcHandles = Debrunner2021
-%DEBRUNNER A Debrunner based model
+%DEBRUNNER2021 A Debrunner based model
 %
 % References:
 %   [Debrunner 1975] 1975 - Debrunner - Studien zur Biomechanik des
