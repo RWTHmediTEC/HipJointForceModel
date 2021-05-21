@@ -1,4 +1,9 @@
 function statsCell = meanStats(data, varargin)
+%MEANSTATS calculates mean statistics
+%
+% AUTHOR: M.C.M. Fischer
+% COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
+% LICENSE: EUPL v1.2
 
 p = inputParser;
 addRequired(p,'data',@(x) validateattributes(x,{'numeric'},{'ncols', 1}))

@@ -6,7 +6,7 @@ clearvars; close all;
 % polynomial degrees (>3) might be caused by numerical difficulties of the
 % polynomial criterion [Rasmussen 2001]. Global optimization can be used to
 % reduce the differences.
-
+%
 % AUTHOR: F. Schimmelpfennig
 % COPYRIGHT (C) 2021 mediTEC, RWTH Aachen University
 % LICENSE: EUPL v1.2
