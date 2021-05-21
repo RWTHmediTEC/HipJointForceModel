@@ -10,7 +10,3 @@ vtkMRMLMarkupsFiducialNode_9,-143.667,-21.078,1480.451,0,0,0,1,1,0,1,P1_L,,vtkMR
 vtkMRMLMarkupsFiducialNode_9,-102.302,-22.61105346679688,1058.048,0,0,0,1,1,0,1,P2_L,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_9,-72.819,-71.099,1076.631591796875,0,0,0,1,1,0,1,MPC_L,,vtkMRMLScalarVolumeNode1
 vtkMRMLMarkupsFiducialNode_9,-132.178,-65.935,1075.3017578125,0,0,0,1,1,0,1,LPC_L,,vtkMRMLScalarVolumeNode1
-vtkMRMLMarkupsFiducialNode_9,-131.102,-10.965,1343.96936035156,0,0,0,1,1,0,1,DSA_L,,vtkMRMLScalarVolumeNode1
-vtkMRMLMarkupsFiducialNode_9,-144.551,-21.789,1490.046020507813,0,0,0,1,1,0,1,PSA_L,,vtkMRMLScalarVolumeNode1
-vtkMRMLMarkupsFiducialNode_9,-133.608,-21.603,1493.326049804688,0,0,0,1,1,0,1,LNA_L,,vtkMRMLScalarVolumeNode1
-vtkMRMLMarkupsFiducialNode_9,-114.253,-22.439,1518.105590820313,0,0,0,1,1,0,1,MNA_L,,vtkMRMLScalarVolumeNode1

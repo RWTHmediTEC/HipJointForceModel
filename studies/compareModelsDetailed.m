@@ -3,6 +3,7 @@ clearvars; warning off backtrace; warning off verbose
 % Script to create Table 5 in 2021 - Fischer - Effect of the underlying 
 % cadaver data and patient-specific adaptation of the femur and pelvis on 
 % the prediction of the hip joint force estimated using static models
+% https://doi.org/10.1016/j.jbiomech.2021.110526
 
 addpath(genpath('..\src'))
 addpath(genpath('..\data'))
