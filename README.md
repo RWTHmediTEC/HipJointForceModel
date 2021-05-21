@@ -1,0 +1,17 @@
+# HipJointForceModel 
+MATLAB framework for the prediction of the hip joint force using static models.
+
+## Reference
+Please cite the following paper:<br/>
+- [Fischer 2021] Fischer et al. - Effect of the underlying cadaver data and patient-specific adaptation of the femur and pelvis on the prediction of the hip joint force estimated using static models. Journal of Biomechanics, https://doi.org/10.1016/j.jbiomech.2021.110526 (2021)
+
+## Releases
+
+
+## Usage 
+Clone with the recursive option to get the submodules and run *startLEM.m* in MATLAB.<br/>
+![startLEM](https://user-images.githubusercontent.com/43516130/119170209-3a71d780-ba63-11eb-8e67-cea0c7f5f56d.png)
+
+## License
+EUPL v1.2
+
