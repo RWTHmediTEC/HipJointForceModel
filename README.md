@@ -6,7 +6,7 @@ Please cite the following paper:<br/>
 - [Fischer 2021] Fischer et al. - Effect of the underlying cadaver data and patient-specific adaptation of the femur and pelvis on the prediction of the hip joint force estimated using static models. Journal of Biomechanics, https://doi.org/10.1016/j.jbiomech.2021.110526 (2021)
 
 ## Releases
-
+- v1.0.0 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4793184.svg)](https://doi.org/10.5281/zenodo.4793184) was used in [Fischer 2021]. 
 
 ## Usage 
 - Requires at least MATLAB 2020b and the [GUI Layout Toolbox](https://mathworks.com/matlabcentral/fileexchange/47982) by David Sampson.
